@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">303COM_LauKuanSin</string>
+    <string name="app_name">Care 4 You</string>
     <string name="alert_title_error">Error!</string>
     <string name="alert_title_warning">Warning!</string>
     <string name="alert_title_success">Success!</string>

@@ -3,8 +3,8 @@
 <color name="coupon_fail">#ED0100</color>
 <color name="delete">#FA315B</color>
 <!-- DEFAULT colors -->
-<color name="colorPrimary">#008577</color>
-<color name="colorPrimaryDark">#00574B</color>
+<color name="colorPrimary">#AE4648</color>
+<color name="colorPrimaryDark">#7C3234</color>
 <color name="colorAccent">#D81B60</color>
 
 <!-- Material DEFAULT colors -->
