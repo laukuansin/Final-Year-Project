@@ -27,14 +27,12 @@ public class SplashScreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //hide the action bar
-        this.getSupportActionBar().hide();
+        //this.getSupportActionBar().hide();
         setContentView(R.layout.activity_splash_screen);
 
         //Initialize
         initialization();
 
-        //set animation
-        setAnimation();
 
         //when click login button action
         _loginButton.setOnClickListener(new OnSingleClickListener() {
@@ -86,6 +84,10 @@ public class SplashScreenActivity extends AppCompatActivity {
         _titleView = findViewById(R.id.title);
         _signUpButton = findViewById(R.id.signUpButton);
         _loginButton = findViewById(R.id.loginButton);
+
+        //set animation
+        setAnimation();
+
     }
 
     private void setAnimation()

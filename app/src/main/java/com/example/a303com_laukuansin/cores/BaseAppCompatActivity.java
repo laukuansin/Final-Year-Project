@@ -47,8 +47,10 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         _instance = this;
         _sessionHandler = AppController.getInstance().getSessionHandler();
         _appController = (AppController)getApplicationContext();
-       // _appController.getSessionHandler().checkAuthorization();
         setContentView(ContentView());
+
+        //check login or not
+        _appController.getSessionHandler().checkAuthorization();
         /*if (_appController.getSessionHandler().isLoginWithFacebook()){
             FacebookSdk.sdkInitialize(getApplicationContext());
             _accessTokenTracker = new AccessTokenTracker() {

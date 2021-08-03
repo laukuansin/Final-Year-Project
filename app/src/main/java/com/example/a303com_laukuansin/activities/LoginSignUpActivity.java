@@ -8,6 +8,9 @@ import android.widget.Toast;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.fragments.ForgotPasswordFragment;
 import com.example.a303com_laukuansin.fragments.LoginFragment;
+import com.example.a303com_laukuansin.fragments.SignUpFragment;
+import com.example.a303com_laukuansin.fragments.SuccessEmailFragment;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -15,43 +18,42 @@ import androidx.fragment.app.FragmentTransaction;
 public class LoginSignUpActivity extends AppCompatActivity{
     private FrameLayout _frameLayout;
     private int type;
-    private FragmentTransaction fragmentTransaction;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //hide the action bar
-        this.getSupportActionBar().hide();
         setContentView(R.layout.activity_login_signup);
 
         //initialize
         initialization();
+    }
+
+    private void initialization()
+    {
+        _frameLayout = findViewById(R.id.frameLayout);
+
         //received data from splash screen activity
         receivedData();
         //set the Fragment
         setFragment();
         //set animation
         setAnimation();
-
-
     }
 
-    private void initialization()
-    {
-        _frameLayout = findViewById(R.id.frameLayout);
-    }
     private void setFragment()
     {
-        fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        //set fragment when type is 0, Go to login page
         if(type==0)
         {
-            fragmentTransaction.add(R.id.frameLayout,new LoginFragment());
+            fragmentTransaction.add(_frameLayout.getId(),new LoginFragment());
             fragmentTransaction.commit();
         }
-        else if(type==1)
+        else if(type==1)//set fragment when type is 1, Go to Sign Up Fragment
         {
-
+            fragmentTransaction.add(_frameLayout.getId(),new SignUpFragment());
+            fragmentTransaction.commit();
         }
-        else
+        else//When did not received the data
         {
             Toast.makeText(this, "Error occurs: Cannot received previous activity data", Toast.LENGTH_SHORT).show();
         }
@@ -59,10 +61,10 @@ public class LoginSignUpActivity extends AppCompatActivity{
     private void receivedData()
     {
         Intent intent = getIntent();
-        type = intent.getIntExtra(SplashScreenActivity.KEY,-1);
+        type = intent.getIntExtra(SplashScreenActivity.KEY,-1);//set to -1 if did not received data
     }
 
-    private void setAnimation()
+    private void setAnimation()//set animation
     {
         Animation _bottomAnim = AnimationUtils.loadAnimation(this,R.anim.bottom_animation_faster);
         _frameLayout.setAnimation(_bottomAnim);
@@ -73,7 +75,7 @@ public class LoginSignUpActivity extends AppCompatActivity{
 
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         //check the fragment is ForgotPasswordFragment
-        if(fragment instanceof ForgotPasswordFragment)
+        if(fragment instanceof ForgotPasswordFragment||fragment instanceof SuccessEmailFragment)
         {
             getSupportFragmentManager().popBackStack();
         }

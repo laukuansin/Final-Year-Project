@@ -4,5 +4,5 @@
     <string name="alert_title_warning">Warning!</string>
     <string name="alert_title_success">Success!</string>
     <string name="alert_close">Close</string>
-    <string name="alert_ok">Ok</string>
+    <string name="alert_ok">OK</string>
 </resources>

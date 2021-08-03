@@ -1,20 +1,22 @@
 package com.example.a303com_laukuansin.fragments;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
-
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentTransaction;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ForgotPasswordFragment extends BaseFragment {
     private TextInputLayout _inputEmail;
@@ -72,10 +74,31 @@ public class ForgotPasswordFragment extends BaseFragment {
         else{
             _inputEmail.setError(null);
         }
-
         if(check)
         {
-            Toast.makeText(getContext(), "Success", Toast.LENGTH_SHORT).show();
+            //progress dialog
+            SweetAlertDialog _progressDialog= new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
+            _progressDialog.setContentText("Sending reset password email.");
+            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimary));
+            _progressDialog.setCancelable(false);
+            _progressDialog.show();
+            //firebase instance
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            auth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
+                if (_progressDialog.isShowing())
+                    _progressDialog.dismiss();
+                //if success
+                if(task.isSuccessful()){
+                    getActivity().getSupportFragmentManager().popBackStack();
+                    FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.frameLayout,new SuccessEmailFragment());
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
+                else{
+                    ErrorAlert(task.getException().getMessage(), (sweetAlertDialog) -> sweetAlertDialog.cancel()).show();
+                }
+            });
         }
     }
 }
