@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "728255485856",
+    "project_id": "care-4-you",
+    "storage_bucket": "care-4-you.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:728255485856:android:42868e693a627ce0db76c5",
+        "android_client_info": {
+          "package_name": "com.example.a303com_laukuansin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "728255485856-vv04elp773ac69sf9lve5apehei1rnhj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.a303com_laukuansin",
+            "certificate_hash": "725754ed6d193581b269669fa0d5a6f971b96d18"
+          }
+        },
+        {
+          "client_id": "728255485856-muj5eilhuqu6ds0hkcs2p5iu1b4m37fu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDG0j3RX8UHkcOkisORsOSr0FLXIcTJMP0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "728255485856-muj5eilhuqu6ds0hkcs2p5iu1b4m37fu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

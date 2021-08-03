@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/frameLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="0.1"
+    android:background="@drawable/layout_corner"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:gravity="center"
+    android:layout_marginTop="10dp"
+    android:theme="@style/MaterialTheme">
+    <ImageView
+        android:layout_width="150dp"
+        android:src="@drawable/ic_email_sent"
+        android:layout_gravity="center"
+        android:layout_height="150dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:textAlignment="center"
+        android:text="Password reset successfully. Check you email to proceed"
+        />
+
+
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/border_white_color_button"
+        android:text="login"
+        android:textAllCaps="true"
+        android:textColor="@color/colorPrimary" />
+
+</LinearLayout>

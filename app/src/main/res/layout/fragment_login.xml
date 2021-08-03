@@ -10,7 +10,8 @@
         android:layout_width="match_parent"
         android:id="@+id/frameLayout"
         android:orientation="vertical"
-        android:padding="20dp"
+        android:padding="10dp"
+        android:layout_marginTop="10dp"
         android:layout_height="wrap_content">
         <TextView
             android:text="Login To Your Account"
@@ -23,7 +24,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="25dp"
             android:hint="Email"
             app:errorEnabled="true"
             android:id="@+id/emailLayout"
