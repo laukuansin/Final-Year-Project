@@ -14,16 +14,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".activities.MainActivity"
+        <activity
+            android:name=".activities.SplashScreenActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name=".activities.MainActivity"
+            android:screenOrientation="portrait">
+        </activity>
         <activity
-            android:name=".activities.SplashScreenActivity"
+            android:name=".activities.HomeActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
@@ -34,7 +37,7 @@
             android:name=".activities.PersonalInformationActivity"
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait">
-        </activity>
+        </activity><!-- windowSoftInputMode is for even keyboard pop out, the below layout still can show-->
     </application>
 
 </manifest>

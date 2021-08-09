@@ -1,103 +1,18 @@
 package com.example.a303com_laukuansin.activities;
-import android.app.ActivityOptions;
-import android.content.Intent;
-import android.os.Build;
+
 import android.os.Bundle;
-import android.util.Pair;
-import android.view.View;
-import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
-import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
+import com.example.a303com_laukuansin.cores.AppController;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashScreenActivity extends AppCompatActivity {
-    public static final String KEY="key";
-    private ImageView _imageView;
-    private TextView _titleView;
-    private Button _signUpButton,_loginButton;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //hide the action bar
-        //this.getSupportActionBar().hide();
         setContentView(R.layout.activity_splash_screen);
 
-        //Initialize
-        initialization();
-
-
-        //when click login button action
-        _loginButton.setOnClickListener(new OnSingleClickListener() {
-            @Override
-            public void onSingleClick(View v) {
-                Intent intent = new Intent(SplashScreenActivity.this, LoginSignUpActivity.class);
-                //create pair to store the view for animation
-                Pair[] pairs = new Pair[2];
-                pairs[0] = new Pair<View,String>(_imageView,"logoImage");
-                pairs[1] = new Pair<View,String>(_titleView,"title");
-
-                //animate and transition to login page
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(SplashScreenActivity.this,pairs);
-                    intent.putExtra(KEY,0);
-                    startActivity(intent,options.toBundle());
-                }
-                else{
-                    startActivity(intent);
-                }
-            }
-        });
-
-        //when click sign up button action
-        _signUpButton.setOnClickListener(new OnSingleClickListener() {
-            @Override
-            public void onSingleClick(View v) {
-                Intent intent = new Intent(SplashScreenActivity.this, LoginSignUpActivity.class);
-                //create pair to store the view for animation
-                Pair[] pairs = new Pair[2];
-                pairs[0] = new Pair<View,String>(_imageView,"logoImage");
-                pairs[1] = new Pair<View,String>(_titleView,"title");
-
-                //animate and transition to login page
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(SplashScreenActivity.this,pairs);
-                    intent.putExtra(KEY,1);
-                    startActivity(intent,options.toBundle());
-                }
-                else{
-                    startActivity(intent);
-                }
-            }
-        });
+        AppController.getInstance().getSessionHandler().checkAuthorization();//check authorization, determine which activity to go
     }
-    private void initialization()
-    {
-        _imageView = findViewById(R.id.logoImage);
-        _titleView = findViewById(R.id.title);
-        _signUpButton = findViewById(R.id.signUpButton);
-        _loginButton = findViewById(R.id.loginButton);
-
-        //set animation
-        setAnimation();
-
-    }
-
-    private void setAnimation()
-    {
-        Animation _topAnim = AnimationUtils.loadAnimation(this,R.anim.top_animation);
-        Animation _bottomAnim = AnimationUtils.loadAnimation(this,R.anim.bottom_animation);
-        _imageView.setAnimation(_topAnim);
-        _titleView.setAnimation(_topAnim);
-        _signUpButton.setAnimation(_bottomAnim);
-        _loginButton.setAnimation(_bottomAnim);
-    }
-
 }

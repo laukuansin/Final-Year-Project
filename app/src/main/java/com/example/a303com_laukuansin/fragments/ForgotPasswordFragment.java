@@ -1,6 +1,5 @@
 package com.example.a303com_laukuansin.fragments;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ForgotPasswordFragment extends BaseFragment {
     private TextInputLayout _inputEmail;
-    private Button _submitButton;
     public ForgotPasswordFragment()
     {
 
@@ -40,6 +38,14 @@ public class ForgotPasswordFragment extends BaseFragment {
         //initialize
         initialization(view);
 
+        return view;
+    }
+
+    private void initialization(View view)
+    {
+        _inputEmail = view.findViewById(R.id.emailLayout);
+        Button _submitButton = view.findViewById(R.id.submitButton);
+
         //when click submit button action
         _submitButton.setOnClickListener(new OnSingleClickListener() {
             @Override
@@ -47,34 +53,26 @@ public class ForgotPasswordFragment extends BaseFragment {
                 checkInput();
             }
         });
-
-        return view;
-    }
-
-    private void initialization(View view)
-    {
-        _inputEmail = view.findViewById(R.id.emailLayout);
-        _submitButton = view.findViewById(R.id.submitButton);
     }
 
     private void checkInput()
     {
-        String email = _inputEmail.getEditText().getText().toString().trim();
+        String email = _inputEmail.getEditText().getText().toString().trim();//get email
         boolean check = true;
-        if(email.isEmpty())
+        if(email.isEmpty())//if email is empty
         {
             _inputEmail.setError("Email address cannot be empty!");
             check = false;
         }
-        else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())
+        else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())//email did not match format
         {
             _inputEmail.setError("Invalid Email address format!");
             check = false;
         }
-        else{
+        else{//else no error occur
             _inputEmail.setError(null);
         }
-        if(check)
+        if(check)//no error occurs
         {
             //progress dialog
             SweetAlertDialog _progressDialog= new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);

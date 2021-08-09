@@ -1,6 +1,5 @@
 package com.example.a303com_laukuansin.fragments;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -16,8 +15,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
-import com.example.a303com_laukuansin.activities.PersonalInformationActivity;
-import com.example.a303com_laukuansin.cores.AppController;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
@@ -33,8 +30,9 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class LoginFragment extends BaseFragment {
     private TextInputLayout _inputEmail,_inputPassword;
-    private Button _loginButton;
-    private TextView _forgotPasswordView, _signUpView;
+    private TextView _signUpView;
+    private FirebaseAuth auth;
+    private SweetAlertDialog _progressDialog;
 
     public LoginFragment()
     {
@@ -54,10 +52,42 @@ public class LoginFragment extends BaseFragment {
         //initialize
         initialization(view);
 
+
+        return view;
+    }
+    private void loadFragment(Fragment fragment)
+    {
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.frameLayout,fragment);
+        if(fragment instanceof ForgotPasswordFragment)
+            fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    private void initialization(View view)
+    {
+        _inputEmail = view.findViewById(R.id.emailLayout);
+        _inputPassword = view.findViewById(R.id.passwordLayout);
+        Button _loginButton = view.findViewById(R.id.loginButton);
+        TextView _forgotPasswordView = view.findViewById(R.id.forgotPassword);
+        _signUpView = view.findViewById(R.id.signUpButton);
+
+        //get auth instance
+        auth = FirebaseAuth.getInstance();
+
+
+        //create progress dialog
+        _progressDialog = new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
+        _progressDialog.setContentText("Logging in...");
+        _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimary));
+        _progressDialog.setCancelable(false);
+
+
         //when click login button action
         _loginButton.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
+                //check input
                 checkInput();
             }
         });
@@ -70,24 +100,8 @@ public class LoginFragment extends BaseFragment {
                 loadFragment(new ForgotPasswordFragment());
             }
         });
-        return view;
-    }
-    private void loadFragment(Fragment fragment)
-    {
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout,fragment);
-        if(fragment instanceof ForgotPasswordFragment)
-            fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }
-    private void initialization(View view)
-    {
-        _inputEmail = view.findViewById(R.id.emailLayout);
-        _inputPassword = view.findViewById(R.id.passwordLayout);
-        _loginButton = view.findViewById(R.id.loginButton);
-        _forgotPasswordView = view.findViewById(R.id.forgotPassword);
-        _signUpView = view.findViewById(R.id.signUpButton);
 
+        //change the few text color in textview
         setTextViewClickAndStyle();
 
     }
@@ -115,66 +129,62 @@ public class LoginFragment extends BaseFragment {
 
     private void checkInput()
     {
-        String email = _inputEmail.getEditText().getText().toString().trim();
+        String email = _inputEmail.getEditText().getText().toString().trim();//get email
         boolean check = true;
-        if(email.isEmpty())
+        if(email.isEmpty())// if email is empty
         {
             _inputEmail.setError("Email address cannot be empty!");
             check = false;
         }
-        else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())
+        else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())//if email does not meet the format
         {
             _inputEmail.setError("Invalid Email address format!");
             check = false;
         }
-        else{
+        else{//else email did not have any error
             _inputEmail.setError(null);
         }
-        String password = _inputPassword.getEditText().getText().toString().trim();
-        if(password.isEmpty())
+        String password = _inputPassword.getEditText().getText().toString().trim();//get password
+        if(password.isEmpty())//if password is empty
         {
             _inputPassword.setError("Password cannot be empty!");
             check = false;
         }
-        else{
+        else{//else password is correct
             _inputPassword.setError(null);
         }
         if(check)
         {
-            //progress dialog
-            SweetAlertDialog _progressDialog= new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
-            _progressDialog.setContentText("Logging in...");
-            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimary));
-            _progressDialog.setCancelable(false);
             _progressDialog.show();
-            //firebase instance
-            FirebaseAuth auth = FirebaseAuth.getInstance();
 
-            auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(task -> {
-                if (_progressDialog.isShowing())
-                    _progressDialog.dismiss();
+            auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(task -> {//checked by authentication firebase
                 //if register success
                 if(task.isSuccessful())
                 {
-                    FirebaseUser firebaseUser = auth.getCurrentUser();
+                    FirebaseUser firebaseUser = auth.getCurrentUser();//get current user
                     User user = new User();
                     user.setEmailAddress(firebaseUser.getEmail());
                     user.setUID(firebaseUser.getUid());
+
                     //save user detail in preferences
-                    AppController.getInstance().getSessionHandler().setUser(user);
-                    Intent intent = new Intent(getContext(), PersonalInformationActivity.class);
-                    // Closing all the Activities
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    // Add new Flag to start new Activity
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
+                    getSessionHandler().setUser(user);
+                    getSessionHandler().checkAuthorization();//check authorization, to determine which activity to go
                 }
                 else{//if register fail
                     //appear alert dialog
+                    if(_progressDialog.isShowing())
+                        _progressDialog.dismiss();
                     ErrorAlert(task.getException().getMessage(), sweetAlertDialog -> sweetAlertDialog.cancel()).show();
                 }
-
             });
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_progressDialog.isShowing())
+            _progressDialog.dismiss();
+    }
+
 }

@@ -1,11 +1,7 @@
 package com.example.a303com_laukuansin.fragments;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableString;
@@ -13,8 +9,6 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.text.style.StyleSpan;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +16,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
-import com.example.a303com_laukuansin.activities.MainActivity;
-import com.example.a303com_laukuansin.cores.AppController;
+import com.example.a303com_laukuansin.activities.PersonalInformationActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
@@ -39,7 +31,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-import static androidx.constraintlayout.motion.widget.MotionScene.TAG;
 
 public class SignUpFragment extends BaseFragment {
     private CheckBox _checkBox;
@@ -62,31 +53,6 @@ public class SignUpFragment extends BaseFragment {
         //initialize
         initialization(view);
 
-        //when click the check box action
-        _checkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(_checkBox.isChecked())
-                {
-                    _signUpButton.setAlpha(1f);
-                    _signUpButton.setEnabled(true);
-                }
-                else{
-                    _signUpButton.setAlpha(0.5f);
-                    _signUpButton.setEnabled(false);
-                }
-            }
-        });
-
-        //when click sign up button action
-        _signUpButton.setOnClickListener(new OnSingleClickListener() {
-            @Override
-            public void onSingleClick(View v) {
-                checkInput();
-            }
-        });
-
-
         return view;
     }
 
@@ -103,8 +69,8 @@ public class SignUpFragment extends BaseFragment {
         {
             _inputEmail.setError("Invalid Email address format!");
             check = false;
-        }//check exist
-        else{
+        }
+        else{//else no error
             _inputEmail.setError(null);
         }
         String password = _inputPassword.getEditText().getText().toString().trim();
@@ -118,7 +84,7 @@ public class SignUpFragment extends BaseFragment {
             _inputPassword.setError("Password should be more than 8 characters long.");
             check = false;
         }
-        else{
+        else{//else no error
             _inputPassword.setError(null);
         }
         if(check)//all input is correct
@@ -132,26 +98,33 @@ public class SignUpFragment extends BaseFragment {
             //firebase instance
             FirebaseAuth auth = FirebaseAuth.getInstance();
             auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(getActivity(), task -> {
-                if (_progressDialog.isShowing())
-                    _progressDialog.dismiss();
-
                 //if register success
                 if(task.isSuccessful())
                 {
-                    FirebaseUser firebaseUser = auth.getCurrentUser();
+                    FirebaseUser firebaseUser = auth.getCurrentUser();//get user
                     User user = new User();
                     user.setEmailAddress(firebaseUser.getEmail());
                     user.setUID(firebaseUser.getUid());
                     //save user detail in preferences
                     getSessionHandler().setUser(user);
-                    Intent intent = new Intent(getContext(), MainActivity.class);
+                    Intent intent = new Intent(getContext(), PersonalInformationActivity.class);
                     // Closing all the Activities
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     // Add new Flag to start new Activity
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+
+                    //close progress dialog
+                    if (_progressDialog.isShowing())
+                        _progressDialog.dismiss();
+
                 }
                 else{//if register fail
+
+                    //close progress dialog
+                    if (_progressDialog.isShowing())
+                        _progressDialog.dismiss();
+
                     //appear alert dialog
                     ErrorAlert(task.getException().getMessage(), (sweetAlertDialog) -> sweetAlertDialog.cancel()).show();
                 }
@@ -167,6 +140,27 @@ public class SignUpFragment extends BaseFragment {
         _loginView = view.findViewById(R.id.loginButton);
         _inputEmail = view.findViewById(R.id.emailLayout);
         _inputPassword = view.findViewById(R.id.passwordLayout);
+
+        //when click the check box action
+        _checkBox.setOnClickListener(v -> {
+            if(_checkBox.isChecked())
+            {
+                _signUpButton.setAlpha(1f);
+                _signUpButton.setEnabled(true);
+            }
+            else{
+                _signUpButton.setAlpha(0.3f);
+                _signUpButton.setEnabled(false);
+            }
+        });
+
+        //when click sign up button action
+        _signUpButton.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                checkInput();
+            }
+        });
 
         setTextViewClickAndStyle();
     }
@@ -225,9 +219,11 @@ public class SignUpFragment extends BaseFragment {
                 ds.setUnderlineText(false);
             }
         };
+
         spanString.setSpan(clickableTerms,30,48, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanString.setSpan(clickablePolicy,52,67, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanStringLogin.setSpan(clickableLogin,24,30,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
         _termPolicy.setText(spanString);
         _termPolicy.setMovementMethod(LinkMovementMethod.getInstance());
         _termPolicy.setHighlightColor(Color.TRANSPARENT);

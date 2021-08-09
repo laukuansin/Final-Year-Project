@@ -58,21 +58,20 @@ public class LoginSignUpActivity extends AppCompatActivity{
             Toast.makeText(this, "Error occurs: Cannot received previous activity data", Toast.LENGTH_SHORT).show();
         }
     }
-    private void receivedData()
+    private void receivedData()//received data
     {
         Intent intent = getIntent();
-        type = intent.getIntExtra(SplashScreenActivity.KEY,-1);//set to -1 if did not received data
+        type = intent.getIntExtra(HomeActivity.KEY,-1);//set to -1 if did not received data
     }
 
     private void setAnimation()//set animation
     {
         Animation _bottomAnim = AnimationUtils.loadAnimation(this,R.anim.bottom_animation_faster);
-        _frameLayout.setAnimation(_bottomAnim);
+        _frameLayout.setAnimation(_bottomAnim);//set animation
     }
 
     @Override
     public void onBackPressed() {
-
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
         //check the fragment is ForgotPasswordFragment
         if(fragment instanceof ForgotPasswordFragment||fragment instanceof SuccessEmailFragment)
