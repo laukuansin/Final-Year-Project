@@ -1,4 +1,4 @@
-package com.example.a303com_laukuansin.fragments;
+package com.example.a303com_laukuansin.fragments.PersonalInformation;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -7,10 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
-import com.example.a303com_laukuansin.activities.PersonalInformationActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
@@ -19,25 +17,19 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentTransaction;
 
 public class FillNameFragment extends BaseFragment {
     private User user;
     private TextInputLayout _inputName;
-    private TextInputEditText _inputEditName;
-    private TextView _nextButton;
     private OnReturnNameListener _listener;
 
-    public FillNameFragment(User user) {
-        Bundle args = new Bundle();
-        args.putSerializable(PersonalInformationActivity.KEY_USER,user);
-        setArguments(args);
+    public FillNameFragment() {
+        user = getSessionHandler().getUser();//get the user from preferences
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            user = (User) getArguments().getSerializable(PersonalInformationActivity.KEY_USER);
-        }
         setHasOptionsMenu(false);
     }
     @Nullable
@@ -48,27 +40,38 @@ public class FillNameFragment extends BaseFragment {
         //initialize
         initialization(view);
 
-        _nextButton.setOnClickListener(new OnSingleClickListener() {
-            @Override
-            public void onSingleClick(View v) {
-                user.setName(_inputName.getEditText().toString().trim());
-                _listener.returnUserWithName(user);
-            }
-        });
+
         return view;
 
+    }
+
+    private void loadGenderFragment()//load gender fragment
+    {
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.frameLayout,new FillGenderFragment());
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
     private void initialization(View view)
     {
         _inputName = view.findViewById(R.id.nameLayout);
-        _inputEditName = view.findViewById(R.id.editTextName);
-        _nextButton = view.findViewById(R.id.nextButton);
+        TextInputEditText _inputEditName = view.findViewById(R.id.editTextName);
+        TextView _nextButton = view.findViewById(R.id.nextButton);
 
-        //assign listener
+        //initial listener
         _listener = (OnReturnNameListener)getContext();
 
-        _inputEditName.addTextChangedListener(new TextWatcher() {
+        if(user.getName()!=null)//if the user name is no empty
+        {
+            _inputEditName.setText(getSessionHandler().getUser().getName());//display the user name
+
+            //enable the button
+            _nextButton.setAlpha(1f);
+            _nextButton.setEnabled(true);
+        }
+
+        _inputEditName.addTextChangedListener(new TextWatcher() {//when user is typing the name
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -76,12 +79,12 @@ public class FillNameFragment extends BaseFragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.toString().trim().isEmpty())
+                if(charSequence.toString().trim().isEmpty())//if the name is empty
                 {
                     _nextButton.setEnabled(false);
-                    _nextButton.setAlpha(0.5f);
+                    _nextButton.setAlpha(0.3f);
                 }
-                else{
+                else{//else not empty
                     _nextButton.setAlpha(1f);
                     _nextButton.setEnabled(true);
                 }
@@ -92,12 +95,24 @@ public class FillNameFragment extends BaseFragment {
 
             }
         });
+
+        //when click next button action
+        _nextButton.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                user = getSessionHandler().getUser();//get the latest user
+                user.setName(_inputName.getEditText().getText().toString().trim());//set the name
+                getSessionHandler().setUser(user);//update user
+                loadGenderFragment();//load next fragment which is gender fragment
+                _listener.nextStep();//call listener
+
+            }
+        });
     }
 
     public interface OnReturnNameListener
     {
-        void returnUserWithName(User user);
-
+        void nextStep();
     }
 
 

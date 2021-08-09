@@ -24,7 +24,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     private SessionHandler _sessionHandler;
     private static BaseAppCompatActivity _instance;
     private AppController _appController;
-    //private AccessTokenTracker _accessTokenTracker;
     public static BaseAppCompatActivity getInstance()
     {
         return _instance;
@@ -47,31 +46,9 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         _instance = this;
         _sessionHandler = AppController.getInstance().getSessionHandler();
         _appController = (AppController)getApplicationContext();
+
         setContentView(ContentView());
 
-        //check login or not
-        _appController.getSessionHandler().checkAuthorization();
-        /*if (_appController.getSessionHandler().isLoginWithFacebook()){
-            FacebookSdk.sdkInitialize(getApplicationContext());
-            _accessTokenTracker = new AccessTokenTracker() {
-                @Override
-                protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-                    if (currentAccessToken == null){
-                        if (_appController.getSessionHandler().isLoginWithFacebook())
-                            LoginManager.getInstance().logOut();
-
-                        _appController.getSessionHandler().clearLoginSession();
-                        //  _appController.getSessionHandler().checkAuthorization();
-                    }else{
-                        if (oldAccessToken != currentAccessToken){
-                            _appController.getSessionHandler().setFacebookSession(currentAccessToken.getUserId(),
-                                    currentAccessToken.getToken());
-                        }
-
-                    }
-                }
-            };
-        }*/
 
     }
 

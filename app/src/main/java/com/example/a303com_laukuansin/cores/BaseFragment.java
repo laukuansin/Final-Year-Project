@@ -1,7 +1,5 @@
 package com.example.a303com_laukuansin.cores;
 
-import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import com.example.a303com_laukuansin.R;
@@ -10,7 +8,6 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 

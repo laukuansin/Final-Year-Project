@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 
 public class SuccessEmailFragment extends BaseFragment {
-    private Button _loginButton;
     public SuccessEmailFragment() {
     }
     @Override
@@ -32,6 +31,14 @@ public class SuccessEmailFragment extends BaseFragment {
         //initialize
         initialization(view);
 
+
+        return view;
+    }
+
+    private void initialization(View view)
+    {
+        Button _loginButton = view.findViewById(R.id.loginButton);
+
         //when click login button action
         _loginButton.setOnClickListener(new OnSingleClickListener() {
             @Override
@@ -44,11 +51,5 @@ public class SuccessEmailFragment extends BaseFragment {
             }
         });
 
-        return view;
-    }
-
-    private void initialization(View view)
-    {
-        _loginButton = view.findViewById(R.id.loginButton);
     }
 }

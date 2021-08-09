@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/upperLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/upperView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="What is your target weight?"
+                android:textAlignment="center"
+                android:textColor="@color/black_1000"
+                android:textSize="25dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="15dp">
+
+                <TextView
+                    android:id="@+id/BMIView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Based on your current weight and height, you BMI is "
+                    android:textAlignment="center" />
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Your Ideal Body Weight range is "
+                        android:textAlignment="center" />
+
+                    <TextView
+                        android:id="@+id/idealWeightRangeView"
+                        android:layout_width="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/green_A700"
+                        android:textStyle="bold|italic"
+                        android:drawablePadding="5dp"
+                        android:drawableEnd="@drawable/ic_question"
+                        />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bottomLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="40dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_arrow_right" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <cn.carbswang.android.numberpickerview.library.NumberPickerView
+                    android:id="@+id/weightPicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:npv_ItemPaddingHorizontal="5dp"
+                    app:npv_ItemPaddingVertical="5dp"
+                    app:npv_MarginStartOfHint="10dp"
+                    app:npv_RespondChangeOnDetached="false"
+                    app:npv_ShowDivider="false"
+                    app:npv_ShownCount="5"
+                    app:npv_TextColorNormal="@color/grey_300"
+                    app:npv_TextColorSelected="@color/colorPrimary"
+                    app:npv_TextSizeNormal="25dp"
+                    app:npv_TextSizeSelected="40dp"
+                    app:npv_WrapSelectorWheel="false" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="."
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="40dp" />
+
+                <cn.carbswang.android.numberpickerview.library.NumberPickerView
+                    android:id="@+id/weightDecimalPicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:npv_ItemPaddingHorizontal="5dp"
+                    app:npv_ItemPaddingVertical="5dp"
+                    app:npv_MarginStartOfHint="10dp"
+                    app:npv_RespondChangeOnDetached="false"
+                    app:npv_ShowDivider="false"
+                    app:npv_ShownCount="5"
+                    app:npv_TextColorNormal="@color/grey_300"
+                    app:npv_TextColorSelected="@color/colorPrimary"
+                    app:npv_TextSizeNormal="25dp"
+                    app:npv_TextSizeSelected="40dp"
+                    app:npv_WrapSelectorWheel="false" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KG"
+                    android:id="@+id/units"
+                    android:textColor="@color/orange_700" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_arrow_left" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border_top_shadow_layout"
+        android:baselineAligned="false"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5">
+
+            <TextView
+                android:id="@+id/backButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_click"
+                android:drawableLeft="@drawable/ic_chevron_left_black"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="back"
+                android:textAllCaps="true"
+                android:textColor="@color/black_1000" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:gravity="end">
+
+            <TextView
+                android:id="@+id/nextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_click"
+                android:drawableRight="@drawable/ic_chevron_right_primarycolor"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="next"
+                android:textAllCaps="true"
+                android:textColor="@color/colorPrimary" />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

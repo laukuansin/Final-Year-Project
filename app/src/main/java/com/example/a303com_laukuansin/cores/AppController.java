@@ -25,7 +25,6 @@ public class AppController extends MultiDexApplication {
         _instance = this;
 
         _sessionHandler = new SessionHandler(this);
-        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         try {
             ViewConfiguration config = ViewConfiguration.get(this);
@@ -37,8 +36,5 @@ public class AppController extends MultiDexApplication {
         } catch (Exception ex) {
             // Ignore
         }
-        // Initialize the SDK before executing any other operations,
-        //FacebookSdk.sdkInitialize(getApplicationContext());
-        //AppEventsLogger.activateApp(this);
     }
 }

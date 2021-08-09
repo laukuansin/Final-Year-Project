@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.a303com_laukuansin.R;
-import com.example.a303com_laukuansin.activities.SplashScreenActivity;
+import com.example.a303com_laukuansin.activities.HomeActivity;
 import com.example.a303com_laukuansin.cores.AppController;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
@@ -48,7 +48,7 @@ public class MainFragment extends BaseFragment {
                 AppController.getInstance().getSessionHandler().clearLoginSession();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
                 auth.signOut();
-                Intent intent = new Intent(getContext(), SplashScreenActivity.class);
+                Intent intent = new Intent(getContext(), HomeActivity.class);
                // Closing all the Activities
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 // Add new Flag to start new Activity
