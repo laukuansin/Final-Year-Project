@@ -18,6 +18,7 @@ import com.example.a303com_laukuansin.fragments.PersonalInformation.FillHeightFr
 import com.example.a303com_laukuansin.fragments.PersonalInformation.FillNameFragment;
 import com.example.a303com_laukuansin.fragments.PersonalInformation.FillTargetWeightFragment;
 import com.example.a303com_laukuansin.fragments.PersonalInformation.FillWeightFragment;
+import com.example.a303com_laukuansin.receivers.ConnectivityReceiver;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -61,7 +62,7 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
 
         //load fill name fragment on the default
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(_frameLayout.getId(),new FillNameFragment());
+        fragmentTransaction.add(_frameLayout.getId(),FillNameFragment.newInstance());
         fragmentTransaction.commit();
     }
 
@@ -117,36 +118,43 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
         &&user.getWeight()!=0 && user.getTargetWeight()!=0 && user.getActivityLevel()!=0)//if all the user personal information is filled
         {
             FirebaseFirestore database = FirebaseFirestore.getInstance();//create database
+            if(ConnectivityReceiver.isConnected())//if have wifi connection
+            {
+                Map<String, Object> userMap = new HashMap<>();//create hash map to store the user's data
+                userMap.put("email",user.getEmailAddress());
+                userMap.put("name",user.getName());
+                userMap.put("gender",user.getGender());
+                userMap.put("yearOfBirth",user.getYearOfBirth());
+                userMap.put("height",user.getHeight());
+                userMap.put("weight",user.getWeight());
+                userMap.put("startWeight",user.getWeight());
+                userMap.put("targetWeight",user.getTargetWeight());
+                userMap.put("activityLevel",user.getActivityLevel());
 
-            Map<String, Object> userMap = new HashMap<>();//create hash map to store the user's data
-            userMap.put("UID",user.getUID());
-            userMap.put("email",user.getEmailAddress());
-            userMap.put("name",user.getName());
-            userMap.put("gender",user.getGender());
-            userMap.put("yearOfBirth",user.getYearOfBirth());
-            userMap.put("height",user.getHeight());
-            userMap.put("weight",user.getWeight());
-            userMap.put("startWeight",user.getWeight());
-            userMap.put("targetWeight",user.getTargetWeight());
-            userMap.put("activityLevel",user.getActivityLevel());
+                database.collection("Users").document(user.getUID()).set(userMap)//add user to database
+                        .addOnSuccessListener(documentReference -> {//if success
+                            if (_progressDialog.isShowing())//cancel dialog
+                                _progressDialog.dismiss();
 
-            database.collection("Users").add(userMap)//add user to database
-                .addOnSuccessListener(documentReference -> {//if success
-                    if (_progressDialog.isShowing())//cancel dialog
-                        _progressDialog.dismiss();
+                            Intent intent = new Intent(this, HomeActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
 
-                    Intent intent = new Intent(this,MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
+                        })
+                        .addOnFailureListener(e -> {//if failure
+                            if (_progressDialog.isShowing())//cancel dialog
+                                _progressDialog.dismiss();
 
-            })
-                .addOnFailureListener(e -> {//if failure
-                    if (_progressDialog.isShowing())//cancel dialog
-                        _progressDialog.dismiss();
+                            createErrorDialog(e.getMessage());
+                        });
+            }
+            else{//have wifi connection
+                if (_progressDialog.isShowing())//cancel dialog
+                    _progressDialog.dismiss();
 
-                    createErrorDialog(e.getMessage());
-            });
+                createErrorDialog("No internet connection! Please check your connection and try again.");
+            }
         }
         else{//if one of the user personal information is missing
             //cancel dialog

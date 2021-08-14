@@ -7,10 +7,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.handlers.SessionHandler;
+import com.example.a303com_laukuansin.receivers.ConnectivityReceiver;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.IdRes;
@@ -20,7 +23,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-public abstract class BaseAppCompatActivity extends AppCompatActivity {
+public abstract class BaseAppCompatActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener{
     private SessionHandler _sessionHandler;
     private static BaseAppCompatActivity _instance;
     private AppController _appController;
@@ -28,8 +31,10 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     {
         return _instance;
     }
+    private Snackbar _connectionSnackbar = null;
     protected abstract @LayoutRes
     int ContentView();
+    protected abstract boolean RequiredInternetConnection();
     protected abstract void AttemptSave();
     protected abstract void AttemptDelete();
     protected abstract void AttemptSearch();
@@ -40,6 +45,15 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
     int MenuResource();
     protected abstract boolean DisableActionMenu();
 
+    // Method to manually check connection status
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        showSnack(isConnected);
+    }
+    protected boolean isConnected(){//return got wifi connection or not
+        return ConnectivityReceiver.isConnected();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,13 +62,48 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity {
         _appController = (AppController)getApplicationContext();
 
         setContentView(ContentView());
-
-
     }
+    // Showing the status in Snackbar
+    private void showSnack(boolean isConnected) {
+        FrameLayout contentContainer = (FrameLayout) findViewById(R.id.frame_container);
+        FrameLayout noConnectionContainer = (FrameLayout) findViewById(R.id.no_connection_container);
 
+        //when no internet connection
+        if (!isConnected) {
+            if (RequiredInternetConnection()){//and the activity page is required internet connection
+                hideSoftKeyboard();//hide the keyboard
+
+                contentContainer.setVisibility(View.GONE);//set visibility to gone for the content container
+                noConnectionContainer.setVisibility(View.VISIBLE);//set visibility to visible for no connection container
+            }
+            _connectionSnackbar = initSnackbar(android.R.id.content,"Unable to connect to the internet", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Retry", view -> checkConnection());//set up snackbar
+            _connectionSnackbar.show();//show snackbar
+        }else{//when got internet connection
+            if (_connectionSnackbar != null && _connectionSnackbar.isShown())//when snackbar is showing
+            {
+                _connectionSnackbar.dismiss();//cancel snackbar
+            }
+            if (RequiredInternetConnection()){//if this activity required wifi
+                contentContainer.setVisibility(View.VISIBLE);//then show content
+                noConnectionContainer.setVisibility(View.GONE);//hide no connection snackbar
+            }
+        }
+    }
+    /**
+     * Callback will be triggered when there is change in
+     * network connection
+     */
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        showSnack(isConnected);
+    }
     @Override
     protected void onResume() {
         super.onResume();
+        // register connection status listener
+        AppController.getInstance().setConnectivityListener(this);
+        checkConnection();//check got wifi or not
     }
 
     @Override

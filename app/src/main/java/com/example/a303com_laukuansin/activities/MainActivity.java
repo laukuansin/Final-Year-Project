@@ -1,94 +1,89 @@
 package com.example.a303com_laukuansin.activities;
-
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
+import android.app.ActivityOptions;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
-import com.example.a303com_laukuansin.cores.BaseActivity;
-import com.example.a303com_laukuansin.fragments.MainFragment;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 
-public class MainActivity extends BaseActivity {
-    public Fragment _fragment;
-    private ActionBar actionBar;
-    @Override
-    protected int ContentView() {
-        return R.layout.activity_logged_template;
-    }
+import androidx.appcompat.app.AppCompatActivity;
 
-    @Override
-    protected void AttemptSave() {
-
-    }
-
-    @Override
-    protected void AttemptDelete() {
-
-    }
-
-    @Override
-    protected void AttemptSearch() {
-
-    }
-
-    @Override
-    protected void AttemptAdd() {
-
-    }
-
-    @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
-
-    }
-
-    @Override
-    protected int MenuResource() {
-        return 0;
-    }
-
-    @Override
-    protected boolean DisableActionMenu() {
-        return true;
-    }
+public class MainActivity extends AppCompatActivity {
+    public static final String KEY="key";
+    private ImageView _imageView;
+    private TextView _titleView;
+    private Button _signUpButton,_loginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        actionBar=getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setHomeButtonEnabled(true);
-        if (savedInstanceState == null ) {
-            _fragment = MainFragment.newInstance();
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.add(R.id.frame_container, _fragment).commit();
+        setContentView(R.layout.activity_main);
 
-        }
-        //initialize
-       // initialization();
+        //Initialize
+        initialization();
+    }
+    private void initialization()
+    {
+        _imageView = findViewById(R.id.logoImage);
+        _titleView = findViewById(R.id.title);
+        _signUpButton = findViewById(R.id.signUpButton);
+        _loginButton = findViewById(R.id.loginButton);
 
-//        _logout.setOnClickListener(new OnSingleClickListener() {
-//            @Override
-//            public void onSingleClick(View v) {
-//
-//            }
-//        });
+        //when click login button action
+        _loginButton.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+               intentToLoginSignUpActivity(0);//pass 0
+            }
+        });
+
+        //when click sign up button action
+        _signUpButton.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+               intentToLoginSignUpActivity(1);//pass 1
+            }
+        });
+
+        //set animation
+        setAnimation();
     }
 
+    private void intentToLoginSignUpActivity(int key)
+    {
+        Intent intent = new Intent(MainActivity.this, LoginSignUpActivity.class);
+        //create pair to store the view for animation
+        Pair[] pairs = new Pair[2];
+        pairs[0] = new Pair<View,String>(_imageView,"logoImage");
+        pairs[1] = new Pair<View,String>(_titleView,"title");
 
-//    private void initialization()
-//    {
-//        _logout = findViewById(R.id.logout);
-//    }
+        intent.putExtra(KEY,key);
+        //animate and transition to login page
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this,pairs);
+            startActivity(intent,options.toBundle());
+        }
+        else{
+            startActivity(intent);
+        }
+    }
+
+    private void setAnimation()
+    {
+        Animation _topAnim = AnimationUtils.loadAnimation(this,R.anim.top_animation);//move from top to bottom
+        Animation _bottomAnim = AnimationUtils.loadAnimation(this,R.anim.bottom_animation);//move from bottom to top
+        _imageView.setAnimation(_topAnim);
+        _titleView.setAnimation(_topAnim);
+        _signUpButton.setAnimation(_bottomAnim);
+        _loginButton.setAnimation(_bottomAnim);
+    }
 
 }

@@ -1,89 +1,164 @@
 package com.example.a303com_laukuansin.activities;
-import android.app.ActivityOptions;
-import android.content.Intent;
+
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Pair;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
-import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
+import com.example.a303com_laukuansin.cores.BaseActivity;
+import com.example.a303com_laukuansin.fragments.AccountFragment;
+import com.example.a303com_laukuansin.fragments.AnalyticFragment;
+import com.example.a303com_laukuansin.fragments.HomeFragment;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import androidx.appcompat.app.AppCompatActivity;
+public class HomeActivity extends BaseActivity {
+    public Fragment _fragment;
+    private static final int PERMISSION_CODE = 100;
 
-public class HomeActivity extends AppCompatActivity {
-    public static final String KEY="key";
-    private ImageView _imageView;
-    private TextView _titleView;
-    private Button _signUpButton,_loginButton;
+    @Override
+    protected int ContentView() {
+        return R.layout.activity_bottom_navigation;
+    }
+
+    @Override
+    protected boolean RequiredInternetConnection() {
+        return true;
+    }
+
+    @Override
+    protected void AttemptSave() {
+
+    }
+
+    @Override
+    protected void AttemptDelete() {
+
+    }
+
+    @Override
+    protected void AttemptSearch() {
+
+    }
+
+    @Override
+    protected void AttemptAdd() {
+
+    }
+
+    @Override
+    protected void AttemptFilter() {
+
+    }
+
+    @Override
+    protected void AttemptRefresh() {
+
+    }
+
+    @Override
+    protected int MenuResource() {
+        return 0;
+    }
+
+    @Override
+    protected boolean DisableActionMenu() {
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        isPermissionGranted();//check permission
 
-        //Initialize
         initialization();
+
+        if (savedInstanceState == null) {
+            _fragment = HomeFragment.newInstance();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(R.id.frame_container, _fragment).commit();
+        }
     }
+
     private void initialization()
     {
-        _imageView = findViewById(R.id.logoImage);
-        _titleView = findViewById(R.id.title);
-        _signUpButton = findViewById(R.id.signUpButton);
-        _loginButton = findViewById(R.id.loginButton);
+        //setup bottom navigation bar
+        BottomNavigationView btmNavBar = (BottomNavigationView)findViewById(R.id.bottomNavigationBar);
+        btmNavBar.getMenu().getItem(0).setEnabled(false);//because on default first item at bottom navigation did not disable
 
-        //when click login button action
-        _loginButton.setOnClickListener(new OnSingleClickListener() {
-            @Override
-            public void onSingleClick(View v) {
-               intentToLoginSignUpActivity(0);//pass 0
+        btmNavBar.setOnNavigationItemSelectedListener(item -> {
+
+            for (int i = 0; i < 3; i++) {
+                btmNavBar.getMenu().getItem(i).setEnabled(true);
             }
-        });
-
-        //when click sign up button action
-        _signUpButton.setOnClickListener(new OnSingleClickListener() {
-            @Override
-            public void onSingleClick(View v) {
-               intentToLoginSignUpActivity(1);//pass 1
+            switch (item.getItemId()) {
+                case R.id.home://when click home page
+                    _fragment = HomeFragment.newInstance();
+                    btmNavBar.getMenu().getItem(0).setEnabled(false);
+                    break;
+                case R.id.analytic://when click analytic page
+                    _fragment = AnalyticFragment.newInstance();
+                    btmNavBar.getMenu().getItem(1).setEnabled(false);
+                    break;
+                case R.id.account://when click account page
+                    _fragment = AccountFragment.newInstance();
+                    btmNavBar.getMenu().getItem(2).setEnabled(false);
+                    break;
+                default:
+                    Toast.makeText(HomeActivity.this, "Default frag", Toast.LENGTH_SHORT).show();
+                    break;
             }
+            btmNavBar.setSelectedItemId(item.getItemId());//set selected item
+            return loadFragment(_fragment);
         });
-
-        //set animation
-        setAnimation();
     }
 
-    private void intentToLoginSignUpActivity(int key)
-    {
-        Intent intent = new Intent(HomeActivity.this, LoginSignUpActivity.class);
-        //create pair to store the view for animation
-        Pair[] pairs = new Pair[2];
-        pairs[0] = new Pair<View,String>(_imageView,"logoImage");
-        pairs[1] = new Pair<View,String>(_titleView,"title");
-
-        intent.putExtra(KEY,key);
-        //animate and transition to login page
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(HomeActivity.this,pairs);
-            startActivity(intent,options.toBundle());
+    private boolean loadFragment(Fragment fragment) {
+        if (fragment != null) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.setCustomAnimations(R.anim.fade_in,R.anim.fade_out,R.anim.fade_in,R.anim.fade_out);//set animation
+            fragmentTransaction.replace(R.id.frame_container, fragment);
+            fragmentTransaction.commit();
+            return true;
         }
-        else{
-            startActivity(intent);
+        return false;
+    }
+
+    private void isPermissionGranted() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(Manifest.permission.CAMERA)!=PackageManager.PERMISSION_GRANTED)//if storage or camera did not get permission
+            {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA},PERMISSION_CODE);//ask permission for storage and camera
+            }
         }
     }
 
-    private void setAnimation()
-    {
-        Animation _topAnim = AnimationUtils.loadAnimation(this,R.anim.top_animation);//move from top to bottom
-        Animation _bottomAnim = AnimationUtils.loadAnimation(this,R.anim.bottom_animation);//move from bottom to top
-        _imageView.setAnimation(_topAnim);
-        _titleView.setAnimation(_topAnim);
-        _signUpButton.setAnimation(_bottomAnim);
-        _loginButton.setAnimation(_bottomAnim);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_CODE) {//if same permission code
+            if (grantResults.length > 0)
+            {
+                if(grantResults[0] != PackageManager.PERMISSION_GRANTED && grantResults[1]!=PackageManager.PERMISSION_GRANTED)//if denied camera and storage permission
+                {
+                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+                }
+                else if(grantResults[0] != PackageManager.PERMISSION_GRANTED)//if denied storage permission only
+                {
+                    Toast.makeText(this, "Storage Permission Denied", Toast.LENGTH_SHORT).show();
+                }
+                else if(grantResults[1]!=PackageManager.PERMISSION_GRANTED)//if denied camera permission only
+                {
+                    Toast.makeText(this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
-
 }

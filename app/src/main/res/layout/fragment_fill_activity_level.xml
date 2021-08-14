@@ -57,6 +57,7 @@
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
+                        android:contentDescription="sedentary"
                         android:layout_gravity="center"
                         android:layout_margin="10dp"
                         android:src="@drawable/sedentary" />
@@ -96,6 +97,7 @@
                     <ImageView
                         android:layout_width="30dp"
                         android:layout_height="30dp"
+                        android:contentDescription="lightly_active"
                         android:layout_gravity="center"
                         android:layout_margin="10dp"
                         android:src="@drawable/lightly_active" />
@@ -136,6 +138,7 @@
                         android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:layout_margin="10dp"
+                        android:contentDescription="moderately_active"
                         android:src="@drawable/moderately_active" />
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -173,6 +176,7 @@
                         android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:layout_margin="10dp"
+                        android:contentDescription="very_active"
                         android:src="@drawable/very_active" />
 
                     <LinearLayout

@@ -6,9 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseFragment;
@@ -29,6 +27,10 @@ public class FillHeightFragment extends BaseFragment{
 
     public FillHeightFragment() {
         user = getSessionHandler().getUser();//get the user from preferences
+    }
+    public static FillHeightFragment newInstance()
+    {
+        return new FillHeightFragment();
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,7 +69,7 @@ public class FillHeightFragment extends BaseFragment{
                 _listener.nextStep();
             }
         });
-        setAnimation(view);
+        setAnimation();
     }
     private void setupHeightPicker(View view)
     {
@@ -94,14 +96,10 @@ public class FillHeightFragment extends BaseFragment{
             _heightPicker.setValue(user.getHeight()-100);
         }
     }
-    private void setAnimation(View view)
+    private void setAnimation()
     {
-        LinearLayout _upperLayout = view.findViewById(R.id.upperLayout);
-        Animation _slideLeft = AnimationUtils.loadAnimation(getContext(),R.anim.slide_in_right);//right to left
         Animation _slideUp = AnimationUtils.loadAnimation(getContext(),R.anim.bottom_animation_shorter);//bottom to up
-
         _heightPicker.setAnimation(_slideUp);
-        _upperLayout.setAnimation(_slideLeft);
 
     }
     private void getCurrentHeightPickerValueAndUpdateUser()
@@ -115,7 +113,8 @@ public class FillHeightFragment extends BaseFragment{
     private void loadWeightFragment()
     {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout,new FillWeightFragment());
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,R.anim.slide_in_left, R.anim.slide_out_right);//set animation
+        fragmentTransaction.replace(R.id.frameLayout,FillWeightFragment.newInstance());
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }

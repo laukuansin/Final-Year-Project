@@ -28,6 +28,10 @@ public class FillGenderFragment extends BaseFragment{
     public FillGenderFragment() {
         user = getSessionHandler().getUser();//get the user from preferences
     }
+    public static FillGenderFragment newInstance()
+    {
+        return new FillGenderFragment();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,22 +95,19 @@ public class FillGenderFragment extends BaseFragment{
         });
     }
 
-    private void loadAgeFragment()//load age fragmnet
+    private void loadAgeFragment()//load age fragment
     {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout,new FillAgeFragment());
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,R.anim.slide_in_left, R.anim.slide_out_right);//set animation
         fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.frameLayout,FillAgeFragment.newInstance());
         fragmentTransaction.commit();
     }
 
     private void setAnimation(View view)
     {
-        TextView _upperView = view.findViewById(R.id.upperView);
         LinearLayout _bottomLayout = view.findViewById(R.id.bottomLayout);
         Animation _slideUp = AnimationUtils.loadAnimation(getContext(),R.anim.bottom_animation_shorter);//bottom to up
-        Animation _slideLeft = AnimationUtils.loadAnimation(getContext(),R.anim.slide_in_right);//right to left
-
-        _upperView.setAnimation(_slideLeft);
         _bottomLayout.setAnimation(_slideUp);
     }
 

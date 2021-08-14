@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseFragment;
@@ -28,6 +27,10 @@ public class FillAgeFragment extends BaseFragment{
 
     public FillAgeFragment() {
         user = getSessionHandler().getUser();//get the user from preferences
+    }
+    public static FillAgeFragment newInstance()
+    {
+        return new FillAgeFragment();
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,7 +79,7 @@ public class FillAgeFragment extends BaseFragment{
         });
 
         //set animation
-        setAnimation(view);
+        setAnimation();
     }
 
     private void setupAgePicker(View view)
@@ -103,7 +106,7 @@ public class FillAgeFragment extends BaseFragment{
         }
         else //if the user has set the year of birth before
         {
-            _agePicker.setValue(Calendar.getInstance().get(Calendar.YEAR)-user.getYearOfBirth()-15);//use current year deduct the age to get the user's year of birth
+            _agePicker.setValue(user.getAge()-15);//use current year deduct the age to get the user's year of birth
         }
     }
 
@@ -115,20 +118,17 @@ public class FillAgeFragment extends BaseFragment{
         getSessionHandler().setUser(user);//update the user
     }
 
-    private void setAnimation(View view)
+    private void setAnimation()
     {
-        LinearLayout _upperLayout = view.findViewById(R.id.upperLayout);
-        Animation _slideLeft = AnimationUtils.loadAnimation(getContext(),R.anim.slide_in_right);//right to left
         Animation _slideUp = AnimationUtils.loadAnimation(getContext(),R.anim.bottom_animation_shorter);//bottom to up
-
         _agePicker.setAnimation(_slideUp);
-        _upperLayout.setAnimation(_slideLeft);
     }
 
     private void loadHeightFragment()//load height fragment
     {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout,new FillHeightFragment());
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,R.anim.slide_in_left, R.anim.slide_out_right);//set animation
+        fragmentTransaction.replace(R.id.frameLayout,FillHeightFragment.newInstance());
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }

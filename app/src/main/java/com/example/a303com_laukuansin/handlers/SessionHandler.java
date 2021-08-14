@@ -4,14 +4,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
-import com.example.a303com_laukuansin.activities.HomeActivity;
 import com.example.a303com_laukuansin.activities.MainActivity;
+import com.example.a303com_laukuansin.activities.HomeActivity;
 import com.example.a303com_laukuansin.activities.PersonalInformationActivity;
 import com.example.a303com_laukuansin.domains.User;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.gson.GsonBuilder;
 
 
@@ -42,33 +43,30 @@ public class SessionHandler {
     public void checkAuthorization() {//check authorization
         if(isLoggedIn())//if user is log in before
         {
-            CollectionReference userRef = database.collection("Users");//get users collection
-            Query query = userRef.whereEqualTo("UID",getUser().getUID());
-            query.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful())
+            FirebaseUser firebaseUser = auth.getCurrentUser();//get current user
+            DocumentReference docRef = database.collection("Users").document(firebaseUser.getUid());//get users document
+            docRef.get().addOnSuccessListener(documentSnapshot -> {
+                if(documentSnapshot.exists())//if user document is exists
                 {
-                    int size = task.getResult().size();//get the size of user
-                    if(size==0)//mean the user did not fill personal information before, he need go to fill personal information
-                    {
-                        Intent intent = new Intent(this._context, PersonalInformationActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        this._context.startActivity(intent);
-                    }
-                    else{//fill finish information before, go to main activity
-                        Intent intent = new Intent(this._context, MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        this._context.startActivity(intent);
-                    }
+                    loadUser(documentSnapshot,firebaseUser);
+
+                    Intent intent = new Intent(this._context, HomeActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    this._context.startActivity(intent);
                 }
-                else{
-                    Log.d("Error","Query fail!");
+                else{//else user does not exists
+                    Intent intent = new Intent(this._context, PersonalInformationActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    this._context.startActivity(intent);
                 }
+            }).addOnFailureListener(e -> {
+                Log.d("Error:","Document reference got some problem");
             });
         }
         else{//user never log in before
-            Intent intent = new Intent(this._context, HomeActivity.class);
+            Intent intent = new Intent(this._context, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             this._context.startActivity(intent);
@@ -76,6 +74,23 @@ public class SessionHandler {
 
     }
 
+    private void loadUser(DocumentSnapshot documentSnapshot,FirebaseUser firebaseUser)
+    {
+
+        User user = new User();
+        user.setUID(firebaseUser.getUid());
+        user.setEmailAddress(firebaseUser.getEmail());
+        user.setName(documentSnapshot.getString("name"));
+        user.setGender(documentSnapshot.getString("gender"));
+        user.setActivityLevel(documentSnapshot.getDouble("activityLevel"));
+        user.setHeight(documentSnapshot.getLong("height").intValue());
+        user.setStartWeight(documentSnapshot.getDouble("startWeight"));
+        user.setWeight(documentSnapshot.getDouble("weight"));
+        user.setTargetWeight(documentSnapshot.getDouble("targetWeight"));
+        user.setYearOfBirth(documentSnapshot.getLong("yearOfBirth").intValue());
+
+        setUser(user);
+    }
 
     public void setUser(User user)
     {

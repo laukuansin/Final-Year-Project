@@ -15,6 +15,7 @@
         android:layout_width="150dp"
         android:src="@drawable/ic_email_sent"
         android:layout_gravity="center"
+        android:contentDescription="email_sent_success"
         android:layout_height="150dp"/>
     <TextView
         android:layout_width="match_parent"

@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
@@ -27,6 +26,10 @@ public class FillWeightFragment extends BaseFragment{
 
     public FillWeightFragment() {
         user = getSessionHandler().getUser();//get the user from preferences
+    }
+    public static FillWeightFragment newInstance()
+    {
+        return new FillWeightFragment();
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,6 +103,7 @@ public class FillWeightFragment extends BaseFragment{
         {
             _weightPicker.setValue(20);//set 50 KG for default
             user.setWeight(Double.parseDouble(displayedValueWeight[20]));//set weight
+            user.setStartWeight(user.getWeight());
             getSessionHandler().setUser(user);//update user
         }
         else//if the user has set the weight before
@@ -136,15 +140,12 @@ public class FillWeightFragment extends BaseFragment{
     }
     private void setAnimation(View view)
     {
-        LinearLayout _upperLayout = view.findViewById(R.id.upperLayout);
         TextView _units =view.findViewById(R.id.units);
-        Animation _slideLeft = AnimationUtils.loadAnimation(getContext(),R.anim.slide_in_right);//right to left
         Animation _slideUp = AnimationUtils.loadAnimation(getContext(),R.anim.bottom_animation_shorter);//bottom to up
 
         _weightPicker.setAnimation(_slideUp);
         _weightDecimalPicker.setAnimation(_slideUp);
         _units.setAnimation(_slideUp);
-        _upperLayout.setAnimation(_slideLeft);
     }
 
     private void getCurrentWeightPickerValueAndUpdateUser()
@@ -155,6 +156,7 @@ public class FillWeightFragment extends BaseFragment{
         double frontNumber = Double.parseDouble(displayedValueWeight[_weightPicker.getValue()]);//get the front number. E.g. (54).8
         double decimalNumber = Double.parseDouble(displayedValueWeightDecimal[_weightDecimalPicker.getValue()]);//get decimal number. E.g. 54.(8)
         user.setWeight(frontNumber+(decimalNumber/10));//set weight. E.g. 54+(8/10)
+        user.setStartWeight(user.getWeight());
         getSessionHandler().setUser(user);//update user
     }
 
@@ -166,7 +168,8 @@ public class FillWeightFragment extends BaseFragment{
     private void loadTargetWeightFragment()
     {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout,new FillTargetWeightFragment());
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,R.anim.slide_in_left, R.anim.slide_out_right);//set animation
+        fragmentTransaction.replace(R.id.frameLayout,FillTargetWeightFragment.newInstance());
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }

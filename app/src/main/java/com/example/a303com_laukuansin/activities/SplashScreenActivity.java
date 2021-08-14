@@ -13,6 +13,12 @@ public class SplashScreenActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                AppController.getInstance().getSessionHandler().checkAuthorization();//check authorization, determine which activity to go
+//            }
+//        }).start();
         AppController.getInstance().getSessionHandler().checkAuthorization();//check authorization, determine which activity to go
     }
 }

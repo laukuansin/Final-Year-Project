@@ -2,6 +2,7 @@ package com.example.a303com_laukuansin.cores;
 import android.view.ViewConfiguration;
 
 import com.example.a303com_laukuansin.handlers.SessionHandler;
+import com.example.a303com_laukuansin.receivers.ConnectivityReceiver;
 
 import java.lang.reflect.Field;
 
@@ -36,5 +37,9 @@ public class AppController extends MultiDexApplication {
         } catch (Exception ex) {
             // Ignore
         }
+    }
+    //set wifi connection listener
+    public void setConnectivityListener(ConnectivityReceiver.ConnectivityReceiverListener listener) {
+        ConnectivityReceiver.connectivityReceiverListener = listener;
     }
 }

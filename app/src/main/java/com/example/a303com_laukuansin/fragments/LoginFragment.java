@@ -16,11 +16,9 @@ import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseFragment;
-import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,6 +35,10 @@ public class LoginFragment extends BaseFragment {
     public LoginFragment()
     {
 
+    }
+    public static LoginFragment newInstance()
+    {
+        return new LoginFragment();
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,7 +99,7 @@ public class LoginFragment extends BaseFragment {
             @Override
             public void onSingleClick(View v) {
                 //load forgot password fragment
-                loadFragment(new ForgotPasswordFragment());
+                loadFragment(ForgotPasswordFragment.newInstance());
             }
         });
 
@@ -112,7 +114,7 @@ public class LoginFragment extends BaseFragment {
         ClickableSpan clickableSignUp = new ClickableSpan() {
             @Override
             public void onClick(@NonNull View view) {
-                loadFragment(new SignUpFragment());
+                loadFragment(SignUpFragment.newInstance());
             }
             @Override
             public void updateDrawState(TextPaint ds) {
@@ -161,13 +163,6 @@ public class LoginFragment extends BaseFragment {
                 //if register success
                 if(task.isSuccessful())
                 {
-                    FirebaseUser firebaseUser = auth.getCurrentUser();//get current user
-                    User user = new User();
-                    user.setEmailAddress(firebaseUser.getEmail());
-                    user.setUID(firebaseUser.getUid());
-
-                    //save user detail in preferences
-                    getSessionHandler().setUser(user);
                     getSessionHandler().checkAuthorization();//check authorization, to determine which activity to go
                 }
                 else{//if register fail
