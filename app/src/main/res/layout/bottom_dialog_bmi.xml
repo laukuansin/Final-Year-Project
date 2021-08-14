@@ -1,159 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
     android:orientation="vertical"
-    android:padding="20dp">
-    <TextView
+    android:layout_height="match_parent">
+
+    <View
+        android:layout_width="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bottom_dialog_indicator"
+        android:layout_height="4dp" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:justificationMode="inter_word"
-        android:text="Body Mass Index (BMI)"
-        android:textStyle="bold"
-        android:textSize="20dp"
-        android:textColor="@color/black_1000" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:justificationMode="inter_word"
-        android:text="BMI is a measurement of a person's leanness or corpulence based on their height and weight"
-        android:textColor="@color/black_1000" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:justificationMode="inter_word"
-        android:text="Formula: BMI = Weight (Kilogram) / Height^2 (Meter)"
-        android:textColor="@color/black_1000" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:justificationMode="inter_word"
-        android:id="@+id/dialogBMIView"
-        android:textColor="@color/black_1000" />
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_marginTop="20dp"
-        android:layout_height="wrap_content">
-        <TableRow
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
             android:layout_width="match_parent"
-            android:background="@color/colorPrimary"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:layout_weight="0.5"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:layout_height="wrap_content"
-                android:text="BMI"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:layout_weight="0.5"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:layout_height="wrap_content"
-                android:text="Category"
-                />
-        </TableRow>
-        <TableRow
+            android:layout_height="wrap_content"
+            android:justificationMode="inter_word"
+            android:text="Body Mass Index (BMI)"
+            android:textColor="@color/black_1000"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <TextView
             android:layout_width="match_parent"
-            android:background="@color/blue_300"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:layout_weight="0.5"
-                android:layout_height="wrap_content"
-                android:text="&#60;18.5"
-                android:gravity="center"
-                android:textColor="@color/black_1000"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:layout_weight="0.5"
-                android:textColor="@color/black_1000"
-                android:gravity="center"
-                android:layout_height="wrap_content"
-                android:text="Underweight"
-                />
-        </TableRow>
-        <TableRow
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:justificationMode="inter_word"
+            android:text="BMI is a measurement of a person's leanness or corpulence based on their height and weight"
+            android:textColor="@color/black_1000" />
+
+        <TextView
             android:layout_width="match_parent"
-            android:background="@color/green_300"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:layout_weight="0.5"
-                android:gravity="center"
-                android:layout_height="wrap_content"
-                android:text="18.5 - 24.9"
-                android:textColor="@color/black_1000"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:layout_weight="0.5"
-                android:layout_height="wrap_content"
-                android:text="Ideal"
-                android:textColor="@color/black_1000"
-                android:gravity="center"
-                />
-        </TableRow>
-        <TableRow
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:justificationMode="inter_word"
+            android:text="Formula: BMI = Weight (Kilogram) / Height^2 (Meter)"
+            android:textColor="@color/black_1000" />
+
+        <TextView
+            android:id="@+id/dialogBMIView"
             android:layout_width="match_parent"
-            android:background="@color/yellow_300"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:layout_weight="0.5"
-                android:gravity="center"
-                android:layout_height="wrap_content"
-                android:text="25 - 29.9"
-                android:textColor="@color/black_1000"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:layout_weight="0.5"
-                android:layout_height="wrap_content"
-                android:text="Overweight"
-                android:textColor="@color/black_1000"
-                android:gravity="center"
-                />
-        </TableRow>
-        <TableRow
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:justificationMode="inter_word"
+            android:textColor="@color/black_1000" />
+
+        <TableLayout
             android:layout_width="match_parent"
-            android:background="@color/orange_300"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:layout_weight="1"
-                android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+
+            <TableRow
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="&#62;29.9"
-                android:textColor="@color/black_1000"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:padding="10dp"
-                android:layout_weight="1"
+                android:background="@color/colorPrimary">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="BMI"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="Category"
+                    android:textColor="@color/white" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Obesity"
-                android:textColor="@color/black_1000"
-                android:gravity="center"
-                />
-        </TableRow>
-    </TableLayout>
+                android:background="@color/blue_300">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="&#60;18.5"
+                    android:textColor="@color/black_1000" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="Underweight"
+                    android:textColor="@color/black_1000" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/green_300">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="18.5 - 24.9"
+                    android:textColor="@color/black_1000" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="Ideal"
+                    android:textColor="@color/black_1000" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/yellow_300">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="25 - 29.9"
+                    android:textColor="@color/black_1000" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="Overweight"
+                    android:textColor="@color/black_1000" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/orange_300">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="&#62;29.9"
+                    android:textColor="@color/black_1000" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="Obesity"
+                    android:textColor="@color/black_1000" />
+            </TableRow>
+        </TableLayout>
+
+    </LinearLayout>
 
 
 </LinearLayout>

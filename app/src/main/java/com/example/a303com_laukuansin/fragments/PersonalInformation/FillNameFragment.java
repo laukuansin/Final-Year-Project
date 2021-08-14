@@ -27,6 +27,10 @@ public class FillNameFragment extends BaseFragment {
     public FillNameFragment() {
         user = getSessionHandler().getUser();//get the user from preferences
     }
+    public static FillNameFragment newInstance()
+    {
+        return new FillNameFragment();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,8 +52,9 @@ public class FillNameFragment extends BaseFragment {
     private void loadGenderFragment()//load gender fragment
     {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout,new FillGenderFragment());
         fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,R.anim.slide_in_left, R.anim.slide_out_right);//set animation
+        fragmentTransaction.replace(R.id.frameLayout,FillGenderFragment.newInstance());
         fragmentTransaction.commit();
     }
 

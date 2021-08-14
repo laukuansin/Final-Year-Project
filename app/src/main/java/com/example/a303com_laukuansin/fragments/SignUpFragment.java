@@ -39,6 +39,11 @@ public class SignUpFragment extends BaseFragment {
     private Button _signUpButton;
     public SignUpFragment() {
     }
+    public static SignUpFragment newInstance()
+    {
+        return new SignUpFragment();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,7 +182,7 @@ public class SignUpFragment extends BaseFragment {
             public void onClick(@NonNull View view) {
                 //change fragment
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frameLayout,new LoginFragment());
+                fragmentTransaction.replace(R.id.frameLayout,LoginFragment.newInstance());
                 fragmentTransaction.commit();
             }
             @Override

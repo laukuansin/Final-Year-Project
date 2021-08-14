@@ -45,12 +45,12 @@ public class LoginSignUpActivity extends AppCompatActivity{
         //set fragment when type is 0, Go to login page
         if(type==0)
         {
-            fragmentTransaction.add(_frameLayout.getId(),new LoginFragment());
+            fragmentTransaction.add(_frameLayout.getId(),LoginFragment.newInstance());
             fragmentTransaction.commit();
         }
         else if(type==1)//set fragment when type is 1, Go to Sign Up Fragment
         {
-            fragmentTransaction.add(_frameLayout.getId(),new SignUpFragment());
+            fragmentTransaction.add(_frameLayout.getId(),SignUpFragment.newInstance());
             fragmentTransaction.commit();
         }
         else//When did not received the data
@@ -61,7 +61,7 @@ public class LoginSignUpActivity extends AppCompatActivity{
     private void receivedData()//received data
     {
         Intent intent = getIntent();
-        type = intent.getIntExtra(HomeActivity.KEY,-1);//set to -1 if did not received data
+        type = intent.getIntExtra(MainActivity.KEY,-1);//set to -1 if did not received data
     }
 
     private void setAnimation()//set animation

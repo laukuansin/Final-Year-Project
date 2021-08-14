@@ -1,6 +1,7 @@
 package com.example.a303com_laukuansin.domains;
 
 import java.io.Serializable;
+import java.util.Calendar;
 
 public class User implements Serializable {
     private String emailAddress;
@@ -11,6 +12,8 @@ public class User implements Serializable {
     private int height=0;
     private double weight=0;
     private double targetWeight=0;
+    private double startWeight=0;
+
     private double activityLevel=0;
 
     public User() {
@@ -72,6 +75,14 @@ public class User implements Serializable {
         this.weight = weight;
     }
 
+    public double getStartWeight() {
+        return startWeight;
+    }
+
+    public void setStartWeight(double startWeight) {
+        this.startWeight = startWeight;
+    }
+
     public double getTargetWeight() {
         return targetWeight;
     }
@@ -103,5 +114,48 @@ public class User implements Serializable {
     public int getMaximumIdealWeight()
     {
         return (int)Math.round(Math.pow((double)getHeight()/100,2.0)*24.9);//formula to calculate the maximum ideal weight 18.4-24.9 BMI is ideal. Round off the weight.
+    }
+    public int getAge()
+    {
+        return Calendar.getInstance().get(Calendar.YEAR)-getYearOfBirth();
+    }
+
+    public double getBasalMetabolicRate()
+    {
+        //Mifflin-St Jeor Formula common use and latest
+        double BMR = 0;
+        if(getGender().equals("Male"))
+        {
+            BMR = (10*getWeight())+(6.25*getHeight())-(5* getAge())+5;
+        }
+        else if(getGender().equals("Female")){
+            BMR = (10*getWeight())+(6.25*getHeight())-(5* getAge())-161;
+        }
+
+        return BMR;
+    }
+
+    public int getDailyCaloriesEaten()
+    {
+        double BMR =getBasalMetabolicRate();//get BMR
+        int calories = (int)(Math.round(BMR*getActivityLevel()));//Calories = BMR * activity level, then round off it
+        int recommendCalories = 0;
+        if(getStartWeight()==getTargetWeight())//if user target is to maintain weight
+        {
+            recommendCalories = calories;//calories did not changes
+        }
+        else if(getStartWeight()>getTargetWeight())//if user target is lost weight
+        {
+            recommendCalories = calories-250;//calories decrease 250
+        }
+        else{//if user target is gain weight
+            recommendCalories = calories+250;//calories increase 250
+        }
+        return recommendCalories;
+    }
+
+    public int getDailyCaloriesBurn()
+    {
+        return (int)Math.round(getDailyCaloriesEaten()*0.2);//20% of calories is for physical activity which mean, human should burn 20% of calories daily
     }
 }

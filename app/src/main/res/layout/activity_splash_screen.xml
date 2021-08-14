@@ -10,6 +10,7 @@
         android:id="@+id/logoImage"
         android:layout_width="320dp"
         android:layout_height="320dp"
+        android:contentDescription="logo"
         android:src="@drawable/logo_no_til" />
 
     <TextView

@@ -23,6 +23,10 @@ public class ForgotPasswordFragment extends BaseFragment {
     {
 
     }
+    public static ForgotPasswordFragment newInstance()
+    {
+        return new ForgotPasswordFragment();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +93,7 @@ public class ForgotPasswordFragment extends BaseFragment {
                 if(task.isSuccessful()){
                     getActivity().getSupportFragmentManager().popBackStack();
                     FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.frameLayout,new SuccessEmailFragment());
+                    fragmentTransaction.replace(R.id.frameLayout,SuccessEmailFragment.newInstance());
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
                 }

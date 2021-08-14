@@ -27,6 +27,10 @@ public class FillActivityLevelFragment extends BaseFragment{
     public FillActivityLevelFragment() {
         user = getSessionHandler().getUser();//get the user from preferences
     }
+    public static FillActivityLevelFragment newInstance()
+    {
+        return new FillActivityLevelFragment();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,13 +119,16 @@ public class FillActivityLevelFragment extends BaseFragment{
         {
             _sedentaryLayout.setBackground(getResources().getDrawable(R.drawable.border_primary_color_rectangle_shadow_layout));
         }
-        else if(activityLevel==1.375){//if click lightly active
+        else if(activityLevel==1.375)//if click lightly active
+        {
             _lightlyLayout.setBackground(getResources().getDrawable(R.drawable.border_primary_color_rectangle_shadow_layout));
         }
-        else if(activityLevel==1.55){//if click moderately active
+        else if(activityLevel==1.55)//if click moderately active
+        {
             _moderatelyLayout.setBackground(getResources().getDrawable(R.drawable.border_primary_color_rectangle_shadow_layout));
         }
-        else if(activityLevel==1.725){//if click very active
+        else if(activityLevel==1.725)//if click very active
+        {
             _veryActiveLayout.setBackground(getResources().getDrawable(R.drawable.border_primary_color_rectangle_shadow_layout));
         }
 
@@ -139,13 +146,9 @@ public class FillActivityLevelFragment extends BaseFragment{
 
     private void setAnimation(View view)
     {
-        LinearLayout _upperLayout = view.findViewById(R.id.upperLayout);
         LinearLayout _bottomLayout = view.findViewById(R.id.bottomLayout);
-        Animation _slideLeft = AnimationUtils.loadAnimation(getContext(),R.anim.slide_in_right);//right to left
         Animation _slideUp = AnimationUtils.loadAnimation(getContext(),R.anim.bottom_animation_shorter);//bottom to up
 
-
-        _upperLayout.setAnimation(_slideLeft);
         _bottomLayout.setAnimation(_slideUp);
     }
 

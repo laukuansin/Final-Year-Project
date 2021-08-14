@@ -1,12 +1,19 @@
 package com.example.a303com_laukuansin.fragments.PersonalInformation;
 
+import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
@@ -34,7 +41,10 @@ public class FillTargetWeightFragment extends BaseFragment{
         minimumIdealWeight = user.getMinimumIdealWeight();//get Minimum Ideal weight
         maximumIdealWeight = user.getMaximumIdealWeight();//get Maximum Ideal weight
     }
-
+    public static FillTargetWeightFragment newInstance()
+    {
+        return new FillTargetWeightFragment();
+    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +107,7 @@ public class FillTargetWeightFragment extends BaseFragment{
     }
     private void createBottomDialog()
     {
-        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext());
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(),R.style.BottomSheetDialogTheme);
         bottomSheetDialog.setContentView(R.layout.bottom_dialog_bmi);
         TextView _BMIView = bottomSheetDialog.findViewById(R.id.dialogBMIView);
 
@@ -118,7 +128,30 @@ public class FillTargetWeightFragment extends BaseFragment{
         {
             category = "Obesity";
         }
-        _BMIView.setText(String.format("Your BMI is %.1f, which is consider as %2$s",BMI,category));
+        String BMIText= String.format("According to National Institutes of Health, your BMI is %.1f, which is consider as %2$s",BMI,category);
+        ClickableSpan clickableSpan = new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View view) {
+                //link to the NIH article
+                String url = "https://www.nih.gov/news-events/news-releases/nih-study-identifies-ideal-body-mass-index";
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
+            }
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+                ds.setColor(getResources().getColor(R.color.colorPrimary));
+            }
+        };
+        SpannableString spannableString = new SpannableString(BMIText);
+        spannableString.setSpan(clickableSpan, 0,42, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        _BMIView.setText(spannableString);
+        _BMIView.setMovementMethod(LinkMovementMethod.getInstance());
+        _BMIView.setHighlightColor(Color.TRANSPARENT);
+
         bottomSheetDialog.show();
     }
 
@@ -174,22 +207,20 @@ public class FillTargetWeightFragment extends BaseFragment{
     private void loadActivityLevelFragment()
     {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout,new FillActivityLevelFragment());
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,R.anim.slide_in_left, R.anim.slide_out_right);//set animation
+        fragmentTransaction.replace(R.id.frameLayout,FillActivityLevelFragment.newInstance());
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
     private void setAnimation(View view)
     {
-        LinearLayout _upperLayout = view.findViewById(R.id.upperLayout);
         TextView _units =view.findViewById(R.id.units);
-        Animation _slideLeft = AnimationUtils.loadAnimation(getContext(),R.anim.slide_in_right);//right to left
         Animation _slideUp = AnimationUtils.loadAnimation(getContext(),R.anim.bottom_animation_shorter);//bottom to up
 
         _weightPicker.setAnimation(_slideUp);
         _weightDecimalPicker.setAnimation(_slideUp);
         _units.setAnimation(_slideUp);
-        _upperLayout.setAnimation(_slideLeft);
     }
     private void getCurrentTargetWeightPickerValueAndUpdateUser()
     {
