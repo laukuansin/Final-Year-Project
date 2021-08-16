@@ -13,7 +13,6 @@ public class User implements Serializable {
     private double weight=0;
     private double targetWeight=0;
     private double startWeight=0;
-
     private double activityLevel=0;
 
     public User() {
@@ -154,8 +153,77 @@ public class User implements Serializable {
         return recommendCalories;
     }
 
-    public int getDailyCaloriesBurn()
+    public int getDailyCaloriesBurnt()
     {
         return (int)Math.round(getDailyCaloriesEaten()*0.2);//20% of calories is for physical activity which mean, human should burn 20% of calories daily
+    }
+
+    public int getSuggestBreakfastCalorieEaten()
+    {
+        //book suggest is 22% for breakfast
+        return (int)(getDailyCaloriesEaten()*0.22);
+    }
+    public int getSuggestLunchCalorieEaten()
+    {
+        //book suggest is 31% for lunch
+        return (int)(getDailyCaloriesEaten()*0.31);
+    }
+    public int getSuggestDinnerCalorieEaten()
+    {
+        //book suggest is 35% for breakfast
+        return (int)(getDailyCaloriesEaten()*0.35);
+    }
+    public int getSuggestSnackCalorieEaten()
+    {
+        //book suggest is 12% for breakfast
+        return (int)(getDailyCaloriesEaten()*0.12);
+    }
+
+    public int getSuggestStepWalk()
+    {
+        return 10000;
+    }
+
+    public int getSuggestWaterIntakeInGlass()
+    {
+        int waterInMilliliter = 0;
+        if(getGender().equals("Male"))
+        {
+            if(getAge()>18)
+            {
+                waterInMilliliter = 3700;
+            }
+            else{
+                waterInMilliliter = 3300;
+            }
+        }
+        else if(getGender().equals("Female"))
+        {
+            if(getAge()>18)
+            {
+                waterInMilliliter = 2700;
+            }
+            else{
+                waterInMilliliter = 2300;
+            }
+        }
+        return (int)(Math.ceil(waterInMilliliter/250));//for easier user tracking, i will use 250Ml per glass to record
+    }
+
+    public String getTargetGoal()
+    {
+        String goal = "";
+        if(getStartWeight()>getTargetWeight())//if started weight higher than target weight
+        {
+            goal = "Lose Weight";
+        }
+        else if(getStartWeight()<getTargetWeight())
+        {
+            goal = "Gain Weight";
+        }
+        else{
+            goal = "Maintain Weight";
+        }
+        return goal;
     }
 }
