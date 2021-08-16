@@ -78,6 +78,7 @@ public class HomeActivity extends BaseActivity {
 
         initialization();
 
+        //set the default fragment
         if (savedInstanceState == null) {
             _fragment = HomeFragment.newInstance();
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
