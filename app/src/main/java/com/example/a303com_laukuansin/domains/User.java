@@ -134,49 +134,45 @@ public class User implements Serializable {
         return BMR;
     }
 
-    public int getDailyCaloriesEaten()
+    public double getDailyCaloriesEaten()
     {
         double BMR =getBasalMetabolicRate();//get BMR
-        int calories = (int)(Math.round(BMR*getActivityLevel()));//Calories = BMR * activity level, then round off it
-        int recommendCalories = 0;
-        if(getStartWeight()==getTargetWeight())//if user target is to maintain weight
+        double calories = BMR*getActivityLevel();//Calories = BMR * activity level, then round off it
+        if(getStartWeight()>getTargetWeight())//if user target is lost weight
         {
-            recommendCalories = calories;//calories did not changes
+            calories-=250;//calories decrease 250
         }
-        else if(getStartWeight()>getTargetWeight())//if user target is lost weight
-        {
-            recommendCalories = calories-250;//calories decrease 250
+        else if(getStartWeight()<getTargetWeight()){//if user target is gain weight
+            calories+=250;//calories increase 250
         }
-        else{//if user target is gain weight
-            recommendCalories = calories+250;//calories increase 250
-        }
-        return recommendCalories;
+        //user started weight is same as the target weight
+        return calories;
     }
 
-    public int getDailyCaloriesBurnt()
+    public double getDailyCaloriesBurnt()
     {
-        return (int)Math.round(getDailyCaloriesEaten()*0.2);//20% of calories is for physical activity which mean, human should burn 20% of calories daily
+        return getDailyCaloriesEaten()*0.2;//20% of calories is for physical activity which mean, human should burn 20% of calories daily
     }
 
-    public int getSuggestBreakfastCalorieEaten()
+    public double getSuggestBreakfastCalorieEaten()
     {
         //book suggest is 22% for breakfast
-        return (int)(getDailyCaloriesEaten()*0.22);
+        return getDailyCaloriesEaten()*0.22;
     }
-    public int getSuggestLunchCalorieEaten()
+    public double getSuggestLunchCalorieEaten()
     {
         //book suggest is 31% for lunch
-        return (int)(getDailyCaloriesEaten()*0.31);
+        return getDailyCaloriesEaten()*0.31;
     }
-    public int getSuggestDinnerCalorieEaten()
+    public double getSuggestDinnerCalorieEaten()
     {
         //book suggest is 35% for breakfast
-        return (int)(getDailyCaloriesEaten()*0.35);
+        return getDailyCaloriesEaten()*0.35;
     }
-    public int getSuggestSnackCalorieEaten()
+    public double getSuggestSnackCalorieEaten()
     {
         //book suggest is 12% for breakfast
-        return (int)(getDailyCaloriesEaten()*0.12);
+        return getDailyCaloriesEaten()*0.12;
     }
 
     public int getSuggestStepWalk()

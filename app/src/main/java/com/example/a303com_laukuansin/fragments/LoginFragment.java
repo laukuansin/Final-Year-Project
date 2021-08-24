@@ -158,7 +158,6 @@ public class LoginFragment extends BaseFragment {
         if(check)
         {
             _progressDialog.show();
-
             auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(task -> {//checked by authentication firebase
                 //if register success
                 if(task.isSuccessful())

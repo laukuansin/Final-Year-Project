@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:background="?attr/selectableItemBackground"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:id="@+id/item_block"
+    android:clickable="true"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="0.1"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/mealName"
+            android:layout_width="match_parent"
+            android:textColor="@color/black_1000"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/quantityServing"
+            android:textSize="12dp"
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/calories"
+        android:textColor="@color/grey_600"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="12sp"
+        android:layout_height="wrap_content"/>
+</LinearLayout>

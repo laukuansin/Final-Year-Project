@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -22,7 +22,6 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="windowNoTitle">true</item>
     </style>
-
     <!-- set the rounded drawable as background to your bottom sheet -->
     <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/border_round_corner_bottom_dialog</item>
@@ -33,5 +32,9 @@
         <item name="bottomSheetStyle">@style/BottomSheet</item>
     </style>
 
-    <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog" />
+    <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog"/>
+
+    <style name="CustomTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textColorSecondary">@color/white</item>
+    </style>
 </resources>

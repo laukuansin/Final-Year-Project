@@ -1,6 +1,10 @@
 package com.example.a303com_laukuansin.cores;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.handlers.SessionHandler;
@@ -8,10 +12,13 @@ import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.StringRes;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class BaseFragment extends Fragment {
+    private static final int PERMISSION_CODE = 100;
+
     private SessionHandler _sessionHandler;
 
     public SessionHandler getSessionHandler(){
@@ -44,30 +51,38 @@ public class BaseFragment extends Fragment {
         return ((BaseAppCompatActivity)getActivity()).initSnackbar(contentId, messageId, duration);
     }
 
+    public void isPermissionGranted() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (getActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED ||
+                    getActivity().checkSelfPermission(Manifest.permission.CAMERA)!=PackageManager.PERMISSION_GRANTED)//if storage or camera did not get permission
+            {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA},PERMISSION_CODE);//ask permission for storage and camera
+            }
+        }
+    }
 
-//    protected AlertDialog WarningAlert(@StringRes int messageResourceId, DialogInterface.OnClickListener positiveButtonAction){
-//        return AlertMessage(R.string.alert_title_warning, messageResourceId, R.string.alert_close, positiveButtonAction, 0, null);
-//    }
-//
-//    protected AlertDialog SuccessAlert(@StringRes int messageResourceId, DialogInterface.OnClickListener positiveButtonAction){
-//        return AlertMessage(R.string.alert_title_success, messageResourceId, R.string.alert_close, positiveButtonAction, 0, null);
-//    }
-//
-//    protected AlertDialog ErrorAlert(@StringRes int messageResourceId, DialogInterface.OnClickListener positiveButtonAction) {
-//        return AlertMessage(R.string.alert_title_error, messageResourceId, R.string.alert_close, positiveButtonAction, 0, null);
-//    }
-//
-//    protected AlertDialog WarningAlert(String message, DialogInterface.OnClickListener positiveButtonAction){
-//        return AlertMessage(getString(R.string.alert_title_warning), message, getString(R.string.alert_close), positiveButtonAction, "", null);
-//    }
-//
-//    protected AlertDialog SuccessAlert(String message, DialogInterface.OnClickListener positiveButtonAction){
-//        return AlertMessage(getString(R.string.alert_title_success), message, getString(R.string.alert_close), positiveButtonAction, "", null);
-//    }
-//
-//    protected AlertDialog ErrorAlert(String message, DialogInterface.OnClickListener positiveButtonAction){
-//        return AlertMessage(getString(R.string.alert_title_error), message, getString(R.string.alert_close), positiveButtonAction, "", null);
-//    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_CODE) {//if same permission code
+            if (grantResults.length > 0)
+            {
+                if(grantResults[0] != PackageManager.PERMISSION_GRANTED && grantResults[1]!=PackageManager.PERMISSION_GRANTED)//if denied camera and storage permission
+                {
+                    Toast.makeText(getContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
+                }
+                else if(grantResults[0] != PackageManager.PERMISSION_GRANTED)//if denied storage permission only
+                {
+                    Toast.makeText(getContext(), "Storage Permission Denied", Toast.LENGTH_SHORT).show();
+                }
+                else if(grantResults[1]!=PackageManager.PERMISSION_GRANTED)//if denied camera permission only
+                {
+                    Toast.makeText(getContext(), "Camera Permission Denied", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
 
     protected SweetAlertDialog ErrorAlert(String message,SweetAlertDialog.OnSweetClickListener positiveButtonAction)
     {
