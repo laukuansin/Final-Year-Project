@@ -27,6 +27,8 @@ public class LoginSignUpActivity extends AppCompatActivity{
         initialization();
     }
 
+
+
     private void initialization()
     {
         _frameLayout = findViewById(R.id.frameLayout);

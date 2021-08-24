@@ -306,5 +306,6 @@
 
 <color name="white">#fff</color>
 <color name="transparent">@null</color>
+<color name="transparent_1st">#00000000</color>
 <color name="black_overlay">#66000000</color>
 </resources>

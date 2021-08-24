@@ -17,6 +17,14 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
+            android:contentInsetLeft="0dp"
+            android:contentInsetStart="0dp"
+            app:contentInsetLeft="0dp"
+            app:contentInsetStart="0dp"
+            android:contentInsetRight="0dp"
+            android:contentInsetEnd="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetEnd="0dp"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/white"
@@ -135,8 +143,6 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     app:cardCornerRadius="15dp"
@@ -186,6 +192,7 @@
                                 android:id="@+id/dailyCaloriesEaten"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
+                                android:transitionName="mealProgressView"
                                 android:textColor="@color/black_1000"
                                 android:textSize="16dp" />
 
@@ -194,6 +201,7 @@
                                 android:layout_height="wrap_content"
                                 android:id="@+id/dailyCaloriesEatenProgress"
                                 android:layout_marginTop="10dp"
+                                android:transitionName="mealProgressBar"
                                 android:indeterminate="false"
                                 app:indicatorColor="@color/green_A700"
                                 app:trackColor="@color/grey_100"
@@ -240,8 +248,6 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     app:cardCornerRadius="15dp"
@@ -317,8 +323,6 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     app:cardCornerRadius="15dp"
@@ -393,8 +397,6 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     app:cardCornerRadius="15dp"
@@ -469,8 +471,6 @@
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     app:cardCornerRadius="15dp"

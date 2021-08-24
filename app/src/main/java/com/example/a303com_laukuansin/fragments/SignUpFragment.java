@@ -106,6 +106,10 @@ public class SignUpFragment extends BaseFragment {
                 //if register success
                 if(task.isSuccessful())
                 {
+                    //close progress dialog
+                    if (_progressDialog.isShowing())
+                        _progressDialog.dismiss();
+
                     FirebaseUser firebaseUser = auth.getCurrentUser();//get user
                     User user = new User();
                     user.setEmailAddress(firebaseUser.getEmail());
@@ -118,11 +122,6 @@ public class SignUpFragment extends BaseFragment {
                     // Add new Flag to start new Activity
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-
-                    //close progress dialog
-                    if (_progressDialog.isShowing())
-                        _progressDialog.dismiss();
-
                 }
                 else{//if register fail
 

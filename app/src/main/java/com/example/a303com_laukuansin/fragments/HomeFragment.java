@@ -1,10 +1,14 @@
 package com.example.a303com_laukuansin.fragments;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
+import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,18 +17,28 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
+import com.example.a303com_laukuansin.activities.MealActivity;
 import com.example.a303com_laukuansin.adapters.MealAdapter;
 import com.example.a303com_laukuansin.cores.BaseFragment;
-import com.example.a303com_laukuansin.domains.Meal;
+import com.example.a303com_laukuansin.domains.MealType;
 import com.example.a303com_laukuansin.domains.User;
+import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.example.a303com_laukuansin.utilities.ProgressAnimation;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +47,7 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import devs.mulham.horizontalcalendar.HorizontalCalendar;
 import devs.mulham.horizontalcalendar.model.CalendarItemStyle;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
@@ -40,12 +55,15 @@ import devs.mulham.horizontalcalendar.utils.HorizontalCalendarPredicate;
 
 public class HomeFragment extends BaseFragment {
     private final User user;
-    private TextView dateView;
+    private TextView _dateView;
     private SimpleDateFormat dateFormat;
     private RecyclerView _mealRecyclerView;
-    private TextView _dailyCaloriesEatenView, _dailyCaloriesBurntView, _dailyStepView, _dailyWaterView,_goalView;
+    private TextView _dailyCaloriesEatenView, _dailyCaloriesBurntView, _dailyStepView, _dailyWaterView;
     private LinearProgressIndicator _dailyCaloriesEatenProgress, _dailyCaloriesBurntProgress,_dailyStepProgress,_dailyWaterProgress;
     private RetrieveDailyData _retrieveData = null;
+    private FirebaseFirestore database;
+    private String realDate;
+    MaterialCardView _mealCardView;
 
     public HomeFragment() {
         user = getSessionHandler().getUser();
@@ -65,14 +83,15 @@ public class HomeFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-
         initialization(view);
-        loadData(user);//load data
-
         return view;
     }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadData(user);//load data
+    }
 
     private void initialization(View view) {
         getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//  set status text dark
@@ -86,10 +105,10 @@ public class HomeFragment extends BaseFragment {
         //bind view with id
         LinearLayout _containerLayout = view.findViewById(R.id.containerLayout);
         LinearLayout _calendarContainer = view.findViewById(R.id.containerCalendar);
-        MaterialCardView _mealCardView = view.findViewById(R.id.mealCardView);
+         _mealCardView = view.findViewById(R.id.mealCardView);
         MaterialCardView _exerciseCardView = view.findViewById(R.id.exerciseCardView);
         TextView _viewMoreMealButton = view.findViewById(R.id.viewMoreMealButton);
-        dateView = view.findViewById(R.id.date_view);
+        _dateView = view.findViewById(R.id.date_view);
         ImageView arrow = view.findViewById(R.id.arrowView);
         LinearLayout datePickerButton = view.findViewById(R.id.datePickerLayout);
         TextView _welcomeView = view.findViewById(R.id.welcomeText);
@@ -101,7 +120,7 @@ public class HomeFragment extends BaseFragment {
         _dailyStepProgress = view.findViewById(R.id.dailyStepProgress);
         _dailyWaterView = view.findViewById(R.id.dailyWater);
         _dailyWaterProgress = view.findViewById(R.id.dailyWaterProgress);
-        _goalView = view.findViewById(R.id.goal);
+        TextView _goalView = view.findViewById(R.id.goal);
         _mealRecyclerView = view.findViewById(R.id.mealRecyclerView);
         _mealRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         _mealRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -110,10 +129,10 @@ public class HomeFragment extends BaseFragment {
         setupCalendar(view);
         //set today date
         setDate(Calendar.getInstance());
-
+        //setup database
+        database = FirebaseFirestore.getInstance();
         //set target goal
         _goalView.setText(String.format("Target goal: %1$s",user.getTargetGoal()));
-
         //click view more meal
         _viewMoreMealButton.setOnClickListener(v -> {
             TransitionManager.beginDelayedTransition(_containerLayout, new AutoTransition());//delay the transition
@@ -139,10 +158,27 @@ public class HomeFragment extends BaseFragment {
             }
         });
 
+        _mealCardView.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                Intent intent = new Intent(getContext(), MealActivity.class);
+                intent.putExtra(MealActivity.DATE_KEY,_dateView.getText().toString());
+                startActivity(intent);
+                //add animation sliding to next activity
+                getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
+
+            }
+        });
+        _exerciseCardView.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+
+            }
+        });
+
         //set first name of user
         _welcomeView.setText(String.format("Hi %1$s!", user.getName().split(" ")[0]));
     }
-
     private void loadData(User user) {
         if (_retrieveData == null)//if retrieve data class is null, by default will null
         {
@@ -158,10 +194,11 @@ public class HomeFragment extends BaseFragment {
         String currDate = dateFormat.format(Calendar.getInstance().getTime());
         //if the date is same as current date
         if (date.equals(currDate)) {
-            dateView.setText("Today");
+            _dateView.setText("Today");
         } else {
-            dateView.setText(date);
+            _dateView.setText(date);
         }
+        realDate = date;
     }
 
     private void setupCalendar(View view) {
@@ -194,12 +231,9 @@ public class HomeFragment extends BaseFragment {
 
     private class RetrieveDailyData extends AsyncTask<Void, Void, Void> {
         private User user;
-        private List<Meal> _mealList;
 
         public RetrieveDailyData(User user) {
             this.user = user;
-            _mealList = new ArrayList<>();
-
         }
 
         @Override
@@ -210,48 +244,103 @@ public class HomeFragment extends BaseFragment {
         @Override
         protected Void doInBackground(Void... voids) {
             getActivity().runOnUiThread(() -> {
-                //set text for daily calories eaten
-                _dailyCaloriesEatenView.setText(String.format("%1$d of %2$d Calories Eaten",2000, user.getDailyCaloriesEaten()));
+                //load meal data
+                loadMealData();
+
                 //set text for daily calories burned
-                _dailyCaloriesBurntView.setText(String.format("%1$d of %2$d Calories Burnt",200,user.getDailyCaloriesBurnt()));
+                _dailyCaloriesBurntView.setText(String.format("%1$d of %2$d Calories Burnt",200,(int)Math.round(user.getDailyCaloriesBurnt())));
                 //set text for daily step walked
                 _dailyStepView.setText(String.format("%1$d of %2$d Steps walked",300,user.getSuggestStepWalk()));
                 //set text for daily water consumed
                 _dailyWaterView.setText(String.format("%1$d of %2$d Glasses water consumed",10, user.getSuggestWaterIntakeInGlass()));
 
-                //setup progress bar and animation for meal
-                setupProgressAndAnimation(_dailyCaloriesEatenProgress,2000,user.getDailyCaloriesEaten());
+
                 //setup progress bar and animation for exercise
-                setupProgressAndAnimation(_dailyCaloriesBurntProgress,200,user.getDailyCaloriesBurnt());
+                setupProgressAndAnimation(_dailyCaloriesBurntProgress,200,(int)Math.round(user.getDailyCaloriesBurnt()));
                 //setup progress bar and animation for step
                 setupProgressAndAnimation(_dailyStepProgress,300,user.getSuggestStepWalk());
                 //setup progress bar and animation for water
                 setupProgressAndAnimation(_dailyWaterProgress,10,user.getSuggestWaterIntakeInGlass());
 
-
-                //add different meal type to the meal list
-                addMeal(_mealList, "Breakfast", user.getSuggestBreakfastCalorieEaten(), 100);
-                addMeal(_mealList, "Lunch", user.getSuggestLunchCalorieEaten(), 100);
-                addMeal(_mealList, "Dinner", user.getSuggestDinnerCalorieEaten(), 100);
-                addMeal(_mealList, "Snack", user.getSuggestSnackCalorieEaten(), 100);
-
-                //create meal adapter
-                MealAdapter _mealAdapter = new MealAdapter(getContext(), _mealList);
-                //set adapter for meal recyclerview
-                _mealRecyclerView.setAdapter(_mealAdapter);
                 _retrieveData = null;
             });
             return null;
         }
     }
 
-    private void addMeal(List<Meal> _mealList, String mealType, int suggestCalories, int currentCalories) {
+    private void loadMealData()
+    {
+        //meal collection path
+        String MEAL_COLLECTION_PATH = String.format("MealRecords/%1$s/%2$s", user.getUID(),realDate);
+
+        //get meal collection reference
+        CollectionReference mealCollectionRef = database.collection(MEAL_COLLECTION_PATH);
+        mealCollectionRef.addSnapshotListener((value, error) -> {
+            if(error!=null)//if appear error
+            {
+                ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+            }
+
+            double totalCalories=0,breakfastCalories=0,lunchCalories=0,dinnerCalories=0,snackCalories=0;
+            List<MealType> _mealTypeList = new ArrayList<>();
+
+            for(DocumentSnapshot document:value.getDocuments())
+            {
+                Map<String, Object> documentMapData = document.getData();
+                String mealType = documentMapData.get("mealType").toString();
+                double calories = (double) documentMapData.get("calories");
+                //switch case see the meal type
+                switch (mealType) {
+                    case "Breakfast": {
+                        breakfastCalories += calories;
+                        break;
+                    }
+                    case "Lunch": {
+                        lunchCalories += calories;
+                        break;
+                    }
+                    case "Dinner": {
+                        dinnerCalories += calories;
+                        break;
+                    }
+                    case "Snack": {
+                        snackCalories += calories;
+                        break;
+                    }
+                    default: {
+                        Log.d("Error:", "Unknown class");
+                        break;
+                    }
+                }
+            }
+            //get total calories
+            totalCalories = breakfastCalories+lunchCalories+dinnerCalories+snackCalories;
+
+            //set text for daily calories eaten
+            _dailyCaloriesEatenView.setText(String.format("%1$d of %2$d Calories Eaten",(int)Math.round(totalCalories), (int)Math.round(user.getDailyCaloriesEaten())));
+            //setup progress bar and animation for meal
+            setupProgressAndAnimation(_dailyCaloriesEatenProgress,(int)Math.round(totalCalories),(int)Math.round(user.getDailyCaloriesEaten()));
+
+            //add different meal type to the meal list
+            addMeal(_mealTypeList, "Breakfast", user.getSuggestBreakfastCalorieEaten(), breakfastCalories);
+            addMeal(_mealTypeList, "Lunch", user.getSuggestLunchCalorieEaten(), lunchCalories);
+            addMeal(_mealTypeList, "Dinner", user.getSuggestDinnerCalorieEaten(), dinnerCalories);
+            addMeal(_mealTypeList, "Snack", user.getSuggestSnackCalorieEaten(), snackCalories);
+
+            //create meal adapter
+            MealAdapter _mealAdapter = new MealAdapter(getContext(), _mealTypeList);
+            //set adapter for meal recyclerview
+            _mealRecyclerView.setAdapter(_mealAdapter);
+        });
+    }
+
+    private void addMeal(List<MealType> _mealTypeList, String mealType, double suggestCalories, double currentCalories) {
         //create meal
-        Meal meal = new Meal(mealType);
+        MealType meal = new MealType(mealType);
         meal.setSuggestCalorie(suggestCalories);
         meal.setCurrentCalorie(currentCalories);
         //add meal in meal list
-        _mealList.add(meal);
+        _mealTypeList.add(meal);
     }
 
     private void setupProgressAndAnimation(LinearProgressIndicator _progressBar,int currentValue,int targetValue)

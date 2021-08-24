@@ -35,6 +35,7 @@
         android:layout_marginTop="40dp"
         android:background="@drawable/border_white_color_button"
         android:text="login"
+        android:clickable="true"
         android:textAllCaps="true"
         android:textColor="@color/colorPrimary" />
 
