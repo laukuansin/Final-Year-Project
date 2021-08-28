@@ -1,8 +1,12 @@
 package com.example.a303com_laukuansin.fragments;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,8 +16,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
+import com.example.a303com_laukuansin.activities.BarcodeScannerActivity;
 import com.example.a303com_laukuansin.activities.MealDetailActivity;
 import com.example.a303com_laukuansin.activities.SearchMealActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
@@ -26,6 +32,8 @@ import com.example.a303com_laukuansin.utilities.ApiClient;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
 
 import java.util.ArrayList;
@@ -36,6 +44,7 @@ import java.util.TreeSet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,21 +52,23 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SearchMealFragment extends BaseFragment{
+public class SearchMealFragment extends BaseFragment {
     private String date;
     private String mealType;
     private View _divider;
-    private LinearLayout _barcodeImageLayout,_viewContainer,_waitingOrErrorLayout;
+    private LinearLayout _barcodeImageLayout, _viewContainer, _waitingOrErrorLayout;
     private SearchMealWithAPI _searchMeal = null;//default is null
     private FastItemAdapter<CommonFoodItem> _commonFoodAdapter;
     private FastItemAdapter<BrandedFoodItem> _brandedFoodAdapter;
-    private TextView _waitingOrErrorView,_commonFoodLabel,_brandedFoodLabel;
+    private TextView _waitingOrErrorView, _commonFoodLabel, _brandedFoodLabel;
     private SpinKitView _loadingView;
+    private static final int CAMERA_PERMISSION_CODE = 100;
+    private static final int STORAGE_PERMISSION_CODE = 101;
 
     public SearchMealFragment() {
     }
-    public static SearchMealFragment newInstance(String date, String mealType)
-    {
+
+    public static SearchMealFragment newInstance(String date, String mealType) {
         SearchMealFragment fragment = new SearchMealFragment();
         Bundle args = new Bundle();
         args.putString(SearchMealActivity.DATE_KEY, date);
@@ -65,6 +76,7 @@ public class SearchMealFragment extends BaseFragment{
         fragment.setArguments(args);
         return fragment;
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,8 +104,7 @@ public class SearchMealFragment extends BaseFragment{
         return view;
     }
 
-    private void initialization(View view)
-    {
+    private void initialization(View view) {
         //bind view with ID
         _divider = view.findViewById(R.id.divider);
         _barcodeImageLayout = view.findViewById(R.id.barcodeImageLayout);
@@ -112,20 +123,20 @@ public class SearchMealFragment extends BaseFragment{
         //setup recyclerview
         _commonFoodAdapter = new FastItemAdapter<>();
         _brandedFoodAdapter = new FastItemAdapter<>();
-        _commonFoodRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()) );
+        _commonFoodRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         _commonFoodRecyclerView.setItemAnimator(new DefaultItemAnimator());
         _commonFoodRecyclerView.setAdapter(_commonFoodAdapter);
-        _brandedFoodRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()) );
+        _brandedFoodRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         _brandedFoodRecyclerView.setItemAnimator(new DefaultItemAnimator());
         _brandedFoodRecyclerView.setAdapter(_brandedFoodAdapter);
 
         //set adapter item click
         _commonFoodAdapter.withOnClickListener((v, adapter, item, position) -> {
-            goToMealDetailActivity(item.getCommonFood().getName(),"");
+            goToMealDetailActivity(item.getCommonFood().getName(), "");
             return false;
         });
         _brandedFoodAdapter.withOnClickListener((v, adapter, item, position) -> {
-            goToMealDetailActivity("",item.getBrandedFood().getID());
+            goToMealDetailActivity("", item.getBrandedFood().getID());
             return false;
         });
 
@@ -133,7 +144,13 @@ public class SearchMealFragment extends BaseFragment{
         _scanBarcodeLayout.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
+                if(checkCameraPermission())
+                {
+                    openBarcodeScanner();
+                }
+                else{
 
+                }
             }
         });
 
@@ -146,22 +163,87 @@ public class SearchMealFragment extends BaseFragment{
         });
 
     }
-
-    private void goToMealDetailActivity(String foodName,String foodID)
+    private boolean isDeviceSupportCamera() {
+        //check device is support camera or not
+        return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
+    }
+    private boolean checkCameraPermission()
     {
-        Intent intent = new Intent(getContext(), MealDetailActivity.class);
-        intent.putExtra(MealDetailActivity.DATE_KEY,date);
-        intent.putExtra(MealDetailActivity.MEAL_TYPE_KEY,mealType);
-        if(!foodName.isEmpty())
-        {
-            intent.putExtra(MealDetailActivity.FOOD_NAME_KEY,foodName);
+        if (!isDeviceSupportCamera()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.System.canWrite(getContext())) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+
+                    return false;
+                }
+            } else {
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                    final Snackbar snackbar = super.initSnackbar(android.R.id.content, "Your device does not support camera", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.show();
+                    return false;
+                }
+            }
         }
-        if(!foodID.isEmpty())
-        {
-            intent.putExtra(MealDetailActivity.FOOD_ID_KEY,foodID);
+        return true;
+    }
+    private void openBarcodeScanner()
+    {
+        IntentIntegrator.forSupportFragment(SearchMealFragment.this)
+                .setDesiredBarcodeFormats(IntentIntegrator.PRODUCT_CODE_TYPES)
+                .setOrientationLocked(false)
+                .setCaptureActivity(BarcodeScannerActivity.class)
+                .initiateScan();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 2909: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Checking camera availability
+                    if (!isDeviceSupportCamera()) {
+                        final Snackbar snackbar = super.initSnackbar(android.R.id.content, "Your device does not support camera", Snackbar.LENGTH_INDEFINITE);
+                        snackbar.show();
+                    } else {
+                        openBarcodeScanner();
+                    }
+                } else {
+                    final Snackbar snackbar = super.initSnackbar(android.R.id.content, "Your device does not support camera", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.show();
+                }
+                return;
+            }
+        }
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if(result != null) {
+            if(result.getContents() == null) {
+                Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getContext(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+
+    private void goToMealDetailActivity(String foodName, String foodID) {
+        Intent intent = new Intent(getContext(), MealDetailActivity.class);
+        intent.putExtra(MealDetailActivity.DATE_KEY, date);
+        intent.putExtra(MealDetailActivity.MEAL_TYPE_KEY, mealType);
+        if (!foodName.isEmpty()) {
+            intent.putExtra(MealDetailActivity.FOOD_NAME_KEY, foodName);
+        }
+        if (!foodID.isEmpty()) {
+            intent.putExtra(MealDetailActivity.FOOD_ID_KEY, foodID);
         }
         startActivity(intent);
-        getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
+        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 
     @Override
@@ -211,28 +293,27 @@ public class SearchMealFragment extends BaseFragment{
         });
 
     }
+
     //function to search meal with query
-    private void searchMeal(String query)
-    {
-        if(_searchMeal==null)
-        {
+    private void searchMeal(String query) {
+        if (_searchMeal == null) {
             _searchMeal = new SearchMealWithAPI(query);
             _searchMeal.execute();
         }
     }
+
     //create instance of common food
-    private CommonFoodItem createInstanceOfCommonFoodItem(CommonFood commonFood){
+    private CommonFoodItem createInstanceOfCommonFoodItem(CommonFood commonFood) {
         return new CommonFoodItem().withCommonFoodView(commonFood);
     }
 
     //create instance of branded food
-    private BrandedFoodItem createInstanceOfBrandedFoodItem(BrandedFood brandedFood){
+    private BrandedFoodItem createInstanceOfBrandedFoodItem(BrandedFood brandedFood) {
         return new BrandedFoodItem().withBrandedFoodView(brandedFood);
     }
 
     //async task to call the API
-    private class SearchMealWithAPI extends AsyncTask<Void,Void,Void>
-    {
+    private class SearchMealWithAPI extends AsyncTask<Void, Void, Void> {
         private final String query;
 
         public SearchMealWithAPI(String query) {
@@ -255,45 +336,37 @@ public class SearchMealFragment extends BaseFragment{
                 @Override
                 public void onResponse(Call<MealResponse> call, Response<MealResponse> response) {
                     //if API call success
-                    if(response.isSuccessful())
-                    {
+                    if (response.isSuccessful()) {
                         getActivity().runOnUiThread(() -> {
                             _loadingView.setVisibility(View.GONE);
-                            if(response.body().commonFood.length>0||response.body().brandedFood.length>0) {
+                            if (response.body().commonFood.length > 0 || response.body().brandedFood.length > 0) {
                                 _viewContainer.setVisibility(View.GONE);
-                                if(response.body().brandedFood.length>0&&response.body().commonFood.length>0)
-                                {
+                                if (response.body().brandedFood.length > 0 && response.body().commonFood.length > 0) {
                                     _divider.setVisibility(View.VISIBLE);
                                 }
-                                if(response.body().commonFood.length>0)
-                                {
+                                if (response.body().commonFood.length > 0) {
                                     _commonFoodLabel.setVisibility(View.VISIBLE);
                                     List<CommonFood> _commonFoodList = removeDuplicate(Arrays.asList(response.body().commonFood));//remove duplicate food
                                     //loop the response of meal
-                                    for(CommonFood commonFood:_commonFoodList)
-                                    {
-                                        _commonFoodAdapter.add(_commonFoodAdapter.getAdapterItemCount(),createInstanceOfCommonFoodItem(commonFood));
+                                    for (CommonFood commonFood : _commonFoodList) {
+                                        _commonFoodAdapter.add(_commonFoodAdapter.getAdapterItemCount(), createInstanceOfCommonFoodItem(commonFood));
                                     }
                                 }
-                                if(response.body().brandedFood.length>0)
-                                {
+                                if (response.body().brandedFood.length > 0) {
                                     _brandedFoodLabel.setVisibility(View.VISIBLE);
                                     List<BrandedFood> _brandedFoodList = Arrays.asList(response.body().brandedFood);
                                     //loop the response of meal
-                                    for(BrandedFood brandedFood:_brandedFoodList)
-                                    {
-                                        _brandedFoodAdapter.add(_brandedFoodAdapter.getAdapterItemCount(),createInstanceOfBrandedFoodItem(brandedFood));
+                                    for (BrandedFood brandedFood : _brandedFoodList) {
+                                        _brandedFoodAdapter.add(_brandedFoodAdapter.getAdapterItemCount(), createInstanceOfBrandedFoodItem(brandedFood));
                                     }
                                 }
 
-                            }
-                            else {
-                                _waitingOrErrorView.setText(String.format("No meal found for key word \"%1$s\"",query));
+                            } else {
+                                _waitingOrErrorView.setText(String.format("No meal found for key word \"%1$s\"", query));
                                 _waitingOrErrorLayout.setVisibility(View.VISIBLE);
                             }
                         });
-                    }
-                    else{//response fail
+                    } else {//response fail
                         _viewContainer.setVisibility(View.GONE);
                         //if API call failure
                         final Snackbar snackbar = SearchMealFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(response.message()) ? response.message() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
@@ -302,6 +375,7 @@ public class SearchMealFragment extends BaseFragment{
                     }
 
                 }
+
                 @Override
                 public void onFailure(Call<MealResponse> call, Throwable t) {
                     _viewContainer.setVisibility(View.GONE);
@@ -316,8 +390,7 @@ public class SearchMealFragment extends BaseFragment{
         }
     }
 
-    public List<CommonFood> removeDuplicate(List<CommonFood>duplicate)
-    {
+    public List<CommonFood> removeDuplicate(List<CommonFood> duplicate) {
         //create a set data structure, to remove duplicate mealID
         Set<CommonFood> set = new TreeSet<>((mealA, mealB) -> {
             if (mealA.getID().equalsIgnoreCase(mealB.getID())) {

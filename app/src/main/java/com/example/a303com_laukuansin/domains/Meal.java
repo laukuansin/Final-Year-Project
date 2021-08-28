@@ -6,7 +6,7 @@ public class Meal {
     private String mealRecordID;
     private String UID;
     private String mealName;
-    private String nixItemID;
+    private String nixItemID="";
     private double calories;
     private String foodType;
     private String mealType;

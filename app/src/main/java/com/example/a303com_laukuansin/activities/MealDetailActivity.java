@@ -15,15 +15,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 public class MealDetailActivity extends BaseActivity {
-    private Fragment _fragment;
     public static final String DATE_KEY = "date_key";
     public static final String MEAL_TYPE_KEY = "meal_type_key";
     public static final String FOOD_NAME_KEY = "food_name_key";
     public static final String FOOD_ID_KEY = "food_id_key";
+    public static final String MEAL_RECORD_ID_KEY = "meal_record_id_key";
     private String mealType;
     private String date;
     private String foodName = "";
     private String foodID = "";
+    private String mealRecordID = "";
 
     @Override
     protected int ContentView() {
@@ -37,7 +38,7 @@ public class MealDetailActivity extends BaseActivity {
 
     @Override
     protected void AttemptSave() {
-        ((MealDetailFragment)_fragment).saveMeal();
+
     }
 
     @Override
@@ -67,12 +68,12 @@ public class MealDetailActivity extends BaseActivity {
 
     @Override
     protected int MenuResource() {
-        return R.menu.save_only;
+        return 0;
     }
 
     @Override
     protected boolean DisableActionMenu() {
-        return false;
+        return true;
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,13 +96,17 @@ public class MealDetailActivity extends BaseActivity {
             {
                 foodID = bundle.getString(FOOD_ID_KEY);
             }
+            if(bundle.containsKey(MEAL_RECORD_ID_KEY))
+            {
+                mealRecordID = bundle.getString(MEAL_RECORD_ID_KEY);
+            }
         }
 
         setToolbar();
 
         //set the default fragment
         if (savedInstanceState == null) {
-            _fragment = MealDetailFragment.newInstance(date, mealType,foodName,foodID);
+            Fragment _fragment = MealDetailFragment.newInstance(date, mealType,foodName,foodID,mealRecordID);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.frame_container, _fragment).commit();
         }
@@ -129,6 +134,7 @@ public class MealDetailActivity extends BaseActivity {
         outState.putString(MEAL_TYPE_KEY, mealType);
         outState.putString(FOOD_NAME_KEY, foodName);
         outState.putString(FOOD_ID_KEY, foodID);
+        outState.putString(MEAL_RECORD_ID_KEY, mealRecordID);
     }
 
     @Override
@@ -138,6 +144,7 @@ public class MealDetailActivity extends BaseActivity {
         mealType = savedInstanceState.getString(MEAL_TYPE_KEY);
         foodName = savedInstanceState.getString(FOOD_NAME_KEY);
         foodID = savedInstanceState.getString(FOOD_ID_KEY);
+        mealRecordID = savedInstanceState.getString(MEAL_RECORD_ID_KEY);
     }
 
     @Override

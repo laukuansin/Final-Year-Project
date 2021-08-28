@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.activities.MealActivity;
+import com.example.a303com_laukuansin.activities.MealDetailActivity;
 import com.example.a303com_laukuansin.activities.SearchMealActivity;
 import com.example.a303com_laukuansin.adapters.MealRecordAdapter;
 import com.example.a303com_laukuansin.cores.BaseFragment;
@@ -197,6 +198,10 @@ public class MealFragment extends BaseFragment {
                         Meal meal = new Meal();
                         meal.setMealRecordID(document.getId());
                         Map<String, Object> documentMapData = document.getData();
+                        if(documentMapData.get("foodID")!=null)
+                        {
+                            meal.setNixItemID(documentMapData.get("foodID").toString());
+                        }
                         meal.setCalories((double) documentMapData.get("calories"));
                         meal.setMealName(documentMapData.get("foodName").toString());
                         meal.setQuantity((double) documentMapData.get("quantity"));
@@ -308,5 +313,20 @@ public class MealFragment extends BaseFragment {
                 getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
+    }
+
+    public void editMealRecord(Meal meal)
+    {
+        Intent intent = new Intent(getContext(), MealDetailActivity.class);
+        intent.putExtra(MealDetailActivity.DATE_KEY, date);
+        intent.putExtra(MealDetailActivity.MEAL_TYPE_KEY, meal.getMealType());
+        if(!meal.getNixItemID().isEmpty())
+        {
+            intent.putExtra(MealDetailActivity.FOOD_ID_KEY,meal.getNixItemID());
+        }
+        intent.putExtra(MealDetailActivity.MEAL_RECORD_ID_KEY,meal.getMealRecordID());
+        intent.putExtra(MealDetailActivity.FOOD_NAME_KEY,meal.getMealName());
+        startActivity(intent);
+        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.a303com_laukuansin.fragments;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,11 +9,13 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +41,10 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 
 import java.text.DateFormat;
@@ -59,31 +65,31 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MealDetailFragment extends BaseFragment {
-    private String date;
-    private String mealType;
-    private String foodName;
-    private String foodID;
+    private String date,mealType,foodName,foodID,mealRecordID;
     private double calories, proteins, carbs, fiber, fats, grams;
     private double caloriesMultipliers, proteinsMultipliers, carbsMultipliers, fiberMultipliers, fatsMultipliers;
     private TextView _foodNameView, _foodBrandView, _caloriesView, _proteinsView, _carbohydratesView, _fatsView, _fiberView;
     private TextInputLayout _inputQuantity;
     private AutoCompleteTextView _autoCompleteServing;
     private ImageView _foodImage, _proteinIcon, _fatIcon, _carbsIcon, _fiberIcon;
-    private HashMap<String, Double> servingUnitMap;
+    private Map<String, Double> servingUnitMap;
     private RetrieveCommonFoodDetail _getCommonFoodDetail = null;
     private RetrieveBrandedFoodDetail _getBrandedFoodDetail = null;
     private FirebaseFirestore database;
+    private DocumentReference documentReference;
+    private Button _addButton,_deleteButton,_updateButton;
 
     public MealDetailFragment() {
     }
 
-    public static MealDetailFragment newInstance(String date, String mealType, String foodName, String foodID) {
+    public static MealDetailFragment newInstance(String date, String mealType, String foodName, String foodID,String mealRecordID) {
         MealDetailFragment fragment = new MealDetailFragment();
         Bundle args = new Bundle();
         args.putString(MealDetailActivity.DATE_KEY, date);
         args.putString(MealDetailActivity.MEAL_TYPE_KEY, mealType);
         args.putString(MealDetailActivity.FOOD_ID_KEY, foodID);
         args.putString(MealDetailActivity.FOOD_NAME_KEY, foodName);
+        args.putString(MealDetailActivity.MEAL_RECORD_ID_KEY, mealRecordID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -103,6 +109,9 @@ public class MealDetailFragment extends BaseFragment {
             }
             if (getArguments().containsKey(MealDetailActivity.FOOD_ID_KEY)) {
                 foodID = getArguments().getString(MealDetailActivity.FOOD_ID_KEY, "");
+            }
+            if (getArguments().containsKey(MealDetailActivity.MEAL_RECORD_ID_KEY)) {
+                mealRecordID = getArguments().getString(MealDetailActivity.MEAL_RECORD_ID_KEY, "");
             }
         }
         setHasOptionsMenu(false);
@@ -141,6 +150,9 @@ public class MealDetailFragment extends BaseFragment {
         _fatIcon = view.findViewById(R.id.fatIcon);
         _fiberIcon = view.findViewById(R.id.fiberIcon);
         _carbsIcon = view.findViewById(R.id.carbsIcon);
+        _addButton = view.findViewById(R.id.addButton);
+        _updateButton = view.findViewById(R.id.updateButton);
+        _deleteButton = view.findViewById(R.id.deleteButton);
 
         //initialize database
         database = FirebaseFirestore.getInstance();
@@ -159,7 +171,19 @@ public class MealDetailFragment extends BaseFragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (!charSequence.toString().isEmpty()) {
+                if (charSequence.toString().isEmpty()) {
+                    //disable add and update button
+                    _addButton.setAlpha(0.2f);
+                    _addButton.setEnabled(false);
+                    _updateButton.setAlpha(0.2f);
+                    _updateButton.setEnabled(false);
+                }
+                else{
+                    //enable add and update button
+                    _addButton.setAlpha(1.0f);
+                    _addButton.setEnabled(true);
+                    _updateButton.setAlpha(1.0f);
+                    _updateButton.setEnabled(true);
                     calculateFoodNutrition();
                 }
             }
@@ -167,6 +191,31 @@ public class MealDetailFragment extends BaseFragment {
             @Override
             public void afterTextChanged(Editable editable) {
 
+            }
+        });
+
+        _addButton.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                saveMeal();
+            }
+        });
+        _updateButton.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                updateMeal();
+            }
+        });
+        _deleteButton.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                SweetAlertDialog warningDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.WARNING_TYPE);
+                warningDialog.setTitleText("Are you sure?")
+                        .setContentText("Won't be able to recover this record!")
+                        .setConfirmText("Yes")
+                        .setCancelText("No")
+                        .setConfirmClickListener(sweetAlertDialog -> deleteMeal(sweetAlertDialog))
+                        .setCancelClickListener(Dialog::dismiss).show();
             }
         });
 
@@ -193,21 +242,21 @@ public class MealDetailFragment extends BaseFragment {
         }
     }
 
-    public void saveMeal() {
+    private void saveMeal() {
         String servingUnit = _autoCompleteServing.getText().toString();
         double quantity = 0;
         boolean check = true;
-        if (servingUnit.isEmpty()) {
+        if (servingUnit.isEmpty()) {//if serving unit is empty
             ErrorAlert("Please select one serving unit.", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
             check = false;
         }
         String quantityStr = _inputQuantity.getEditText().getText().toString();
-        if (quantityStr.isEmpty()) {
+        if (quantityStr.isEmpty()) {//if quantity is empty
             ErrorAlert("Quantity cannot be empty!", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
             check = false;
         } else {
             quantity = Double.parseDouble(_inputQuantity.getEditText().getText().toString());
-            if (quantity <= 0) {
+            if (quantity <= 0) {//if(quantity is 0
                 ErrorAlert("Quantity less than 0!", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
                 check = false;
             } else {
@@ -221,6 +270,69 @@ public class MealDetailFragment extends BaseFragment {
             addMealRecordToDatabase(servingUnit,quantity);
         }
     }
+    private void updateMeal()
+    {
+        String servingUnit = _autoCompleteServing.getText().toString();
+        double quantity = 0;
+        boolean check = true;
+        if (servingUnit.isEmpty()) {//if serving unit is empty
+            ErrorAlert("Please select one serving unit.", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+            check = false;
+        }
+        String quantityStr = _inputQuantity.getEditText().getText().toString();
+        if (quantityStr.isEmpty()) {//if quantity is empty
+            ErrorAlert("Quantity cannot be empty!", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+            check = false;
+        } else {
+            quantity = Double.parseDouble(_inputQuantity.getEditText().getText().toString());
+            if (quantity <= 0) {//if(quantity is 0
+                ErrorAlert("Quantity less than 0!", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+                check = false;
+            } else {
+                _inputQuantity.setError(null);
+            }
+        }
+
+        if(check)//if no error
+        {
+            //add meal record to database
+            updateMealRecordToDatabase(servingUnit,quantity);
+        }
+    }
+    private void deleteMeal(SweetAlertDialog sweetAlertDialog)
+    {
+        sweetAlertDialog.dismiss();
+        //create progress dialog
+        SweetAlertDialog _progressDialog = new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
+        _progressDialog.setContentText("Deleting...");
+        _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
+        _progressDialog.setCancelable(false);
+        _progressDialog.show();
+
+        //date format
+        DateFormat format = new SimpleDateFormat("dd MMM yyyy");
+        //if the date argument is not "Today"
+        if(date.equals("Today"))
+        {
+            date = format.format(new Date());//get current date
+        }
+        //the document path, example: MealRecords/UID/Date/MealType/MealRecordID
+        String DOCUMENT_PATH = String.format("MealRecords/%1$s/%2$s/%3$s",getSessionHandler().getUser().getUID(),date,mealRecordID);
+        //get meal record document
+        DocumentReference mealRecordRef = database.document(DOCUMENT_PATH);
+        mealRecordRef.delete().addOnSuccessListener(unused -> {
+            if(_progressDialog.isShowing())
+                _progressDialog.dismiss();
+            Toast.makeText(getContext(), "Delete meal success", Toast.LENGTH_SHORT).show();
+            //finish current activity
+            getActivity().finish();
+        }).addOnFailureListener(e -> {
+            if(_progressDialog.isShowing())
+                _progressDialog.dismiss();
+            Log.d("Error:",e.getMessage());
+        });
+    }
+
 
     private void addMealRecordToDatabase(String servingUnit, double quantity)
     {
@@ -275,6 +387,50 @@ public class MealDetailFragment extends BaseFragment {
 
     }
 
+    private void updateMealRecordToDatabase(String servingUnit, double quantity)
+    {
+        //create progress dialog
+        SweetAlertDialog _progressDialog = new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
+        _progressDialog.setContentText("Updating...");
+        _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
+        _progressDialog.setCancelable(false);
+        _progressDialog.show();
+
+        //date format
+        DateFormat format = new SimpleDateFormat("dd MMM yyyy");
+        //if the date argument is not "Today"
+        if(date.equals("Today"))
+        {
+            date = format.format(new Date());//get current date
+        }
+        //the document path, example: MealRecords/UID/Date/MealType/MealRecordID
+        String DOCUMENT_PATH = String.format("MealRecords/%1$s/%2$s/%3$s",getSessionHandler().getUser().getUID(),date,mealRecordID);
+        //get meal record document
+        DocumentReference mealRecordRef = database.document(DOCUMENT_PATH);
+        //create meal record class
+        Map<String, Object> mealRecordMap = new HashMap<>();//create hash map to store the user's data
+        mealRecordMap.put("quantity",quantity);
+        mealRecordMap.put("servingUnit",servingUnit);
+        mealRecordMap.put("calories",calories);
+        mealRecordMap.put("foodWeight",grams);
+
+        mealRecordRef.update(mealRecordMap).addOnSuccessListener(documentReference -> {
+            if (_progressDialog.isShowing())//cancel dialog
+                _progressDialog.dismiss();
+
+            //toast success message
+            Toast.makeText(getContext(), "Update Meal Success", Toast.LENGTH_SHORT).show();
+            //finish current activity
+            getActivity().finish();
+        }).addOnFailureListener(e -> {
+            if (_progressDialog.isShowing())//cancel dialog
+                _progressDialog.dismiss();
+            //show error dialog
+            ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+        });
+
+    }
+
     private class RetrieveCommonFoodDetail extends AsyncTask<Void, Void, Void> {
         //progress dialog
         private SweetAlertDialog _progressDialog;
@@ -290,7 +446,7 @@ public class MealDetailFragment extends BaseFragment {
             super.onPreExecute();
             //show progress dialog
             _progressDialog.setContentText("Loading...");
-            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimary));
+            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
             _progressDialog.setCancelable(false);
             _progressDialog.show();
         }
@@ -319,7 +475,6 @@ public class MealDetailFragment extends BaseFragment {
                         snackbar.setAction("Dismiss", view -> snackbar.dismiss());
                         snackbar.show();
                     }
-                    _getCommonFoodDetail = null;
                 }
 
                 @Override
@@ -381,7 +536,6 @@ public class MealDetailFragment extends BaseFragment {
                         snackbar.setAction("Dismiss", view -> snackbar.dismiss());
                         snackbar.show();
                     }
-                    _getCommonFoodDetail = null;
                 }
 
                 @Override
@@ -408,10 +562,44 @@ public class MealDetailFragment extends BaseFragment {
             _foodBrandView.setVisibility(View.VISIBLE);
             _foodBrandView.setText(foodDetail.brandName);
         }
-        //set the default drop down text
-        _autoCompleteServing.setText(foodDetail.servingUnit, false);
-        //set the default quantity
-        _inputQuantity.getEditText().setText(String.valueOf(foodDetail.quantity));
+
+
+        //to get the multipliers of each nutrition, which mean 1 gram have x nutrition value
+        caloriesMultipliers = foodDetail.calories / foodDetail.weightGrams;
+        carbsMultipliers = foodDetail.carbohydrate / foodDetail.weightGrams;
+        proteinsMultipliers = foodDetail.proteins / foodDetail.weightGrams;
+        fatsMultipliers = foodDetail.fats / foodDetail.weightGrams;
+        fiberMultipliers = foodDetail.fiber / foodDetail.weightGrams;
+
+
+        if(mealRecordID.isEmpty())//if add meal
+        {
+            _addButton.setVisibility(View.VISIBLE);
+            _updateButton.setVisibility(View.GONE);
+            _deleteButton.setVisibility(View.GONE);
+
+            //set the default drop down text
+            _autoCompleteServing.setText(foodDetail.servingUnit, false);
+            //set the default quantity
+            _inputQuantity.getEditText().setText(String.valueOf(Math.round(foodDetail.quantity*10.0)/10.0));
+
+            //get the food weight gram
+            grams = foodDetail.weightGrams/(Math.round(foodDetail.quantity*10.0)/10.0);
+            //get nutrition value
+            calories = foodDetail.calories;
+            carbs = foodDetail.carbohydrate;
+            proteins = foodDetail.proteins;
+            fats = foodDetail.fats;
+            fiber = foodDetail.fiber;
+        }
+        else{//if update meal
+            _addButton.setVisibility(View.GONE);
+            _updateButton.setVisibility(View.VISIBLE);
+            _deleteButton.setVisibility(View.VISIBLE);
+
+            getFoodDetailFromDatabase(date);
+        }
+
 
         //get food image detail
         FoodPhoto foodPhoto = foodDetail.photo;
@@ -429,7 +617,7 @@ public class MealDetailFragment extends BaseFragment {
                 new StfalconImageViewer.Builder<>(getContext(), new String[]{foodPhoto.highres},
                         (imageView, image) ->
                                 Glide.with(getContext())
-                                        .load(image)
+                                        .load(image==null?foodPhoto.thumb:image)
                                         .centerInside()
                                         .placeholder(R.drawable.ic_image_holder)
                                         .into(imageView))
@@ -442,33 +630,59 @@ public class MealDetailFragment extends BaseFragment {
         });
         //set the string list of the serving unit, the purpose is to display at drop down, because drop down required string array or list
         List<String> servingUnitList = new ArrayList<>();
-        if (foodDetail.measures == null) {
-            servingUnitMap.put(foodDetail.servingUnit, foodDetail.weightGrams);
-        } else {
+
+        servingUnitMap.put(foodDetail.servingUnit, foodDetail.weightGrams/foodDetail.quantity);
+        if(foodDetail.measures!=null&&foodDetail.measures.length>0) {
             for (Measure measure : foodDetail.measures) {
-                servingUnitList.add(measure.servingUnit);
-                servingUnitMap.put(measure.servingUnit, measure.getGramPerServing());
+                if(!servingUnitMap.containsKey(measure.servingUnit))
+                {
+                    servingUnitList.add(measure.servingUnit);
+                    servingUnitMap.put(measure.servingUnit, measure.getGramPerServing());
+                }
             }
         }
         ArrayAdapter arrayAdapter = new ArrayAdapter(getContext(), R.layout.item_serving_unit, servingUnitList);
         _autoCompleteServing.setAdapter(arrayAdapter);
 
-        //get nutrition value
-        calories = foodDetail.calories;
-        carbs = foodDetail.carbohydrate;
-        proteins = foodDetail.proteins;
-        fats = foodDetail.fats;
-        fiber = foodDetail.fiber;
-        grams = foodDetail.weightGrams;
-
-        //to get the multipliers of each nutrition, which mean 1 gram have x nutrition value
-        caloriesMultipliers = foodDetail.calories / grams;
-        carbsMultipliers = foodDetail.carbohydrate / grams;
-        proteinsMultipliers = foodDetail.proteins / grams;
-        fatsMultipliers = foodDetail.fats / grams;
-        fiberMultipliers = foodDetail.fiber / grams;
-
         setNutritionView();
+    }
+
+    private void getFoodDetailFromDatabase(String date)
+    {
+        //date format
+        DateFormat format = new SimpleDateFormat("dd MMM yyyy");
+        //if the date argument is not "Today"
+        if (date.equals("Today")) {
+            date = format.format(new Date());//get current date
+        }
+        String DOCUMENT_PATH = String.format("MealRecords/%1$s/%2$s/%3$s", getSessionHandler().getUser().getUID(), date,mealRecordID);
+        //get the Document reference
+        //document path = MealRecords/UID/Date/MealRecordID
+        documentReference = database.document(DOCUMENT_PATH);
+        //get meal record detail
+        documentReference.get().addOnSuccessListener((value) -> {
+//            if(error!=null)
+//            {
+//                //show error with dialog
+//                ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+//                return;
+//            }
+            //set the default drop down text
+            _autoCompleteServing.setText(value.getString("servingUnit"), false);
+            //set the default quantity
+            _inputQuantity.getEditText().setText(String.valueOf(value.getDouble("quantity")));
+
+            grams = value.getDouble("foodWeight");
+            //get nutrition value
+            calories = caloriesMultipliers*grams;
+            carbs = carbsMultipliers*grams;
+            proteins = proteinsMultipliers*grams;
+            fats = fatsMultipliers*grams;
+            fiber = fiberMultipliers*grams;
+        }).addOnFailureListener(e -> {
+            //show error with dialog
+            ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+        });
     }
 
     private void calculateFoodNutrition() {
