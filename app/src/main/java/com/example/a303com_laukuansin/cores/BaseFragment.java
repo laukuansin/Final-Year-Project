@@ -2,6 +2,7 @@ package com.example.a303com_laukuansin.cores;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,12 +51,22 @@ public class BaseFragment extends Fragment {
         return ((BaseAppCompatActivity)getActivity()).initSnackbar(contentId, messageId, duration);
     }
 
-    protected SweetAlertDialog ErrorAlert(String message,SweetAlertDialog.OnSweetClickListener positiveButtonAction)
+    protected SweetAlertDialog ErrorAlert(String message,SweetAlertDialog.OnSweetClickListener positiveButtonAction,boolean cancelable)
     {
         SweetAlertDialog dialog = new SweetAlertDialog(this.getContext(),SweetAlertDialog.ERROR_TYPE);
         dialog.setTitleText(R.string.alert_title_error);
         dialog.setContentText(message);
         dialog.setConfirmButton(R.string.alert_ok,positiveButtonAction);
+        dialog.setCancelable(cancelable);
+        return dialog;
+    }
+
+    protected SweetAlertDialog showProgressDialog(String message, int color)
+    {
+        SweetAlertDialog dialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+        dialog.setContentText(message);
+        dialog.getProgressHelper().setBarColor(color);
+        dialog.setCancelable(false);
         return dialog;
     }
 }

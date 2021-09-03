@@ -45,6 +45,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.squareup.picasso.Picasso;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 
 import java.text.DateFormat;
@@ -65,7 +66,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MealDetailFragment extends BaseFragment {
-    private String date,mealType,foodName,foodID,mealRecordID;
+    private String date,mealType,foodName,foodID,mealRecordID,foodBarcode;
     private double calories, proteins, carbs, fiber, fats, grams;
     private double caloriesMultipliers, proteinsMultipliers, carbsMultipliers, fiberMultipliers, fatsMultipliers;
     private TextView _foodNameView, _foodBrandView, _caloriesView, _proteinsView, _carbohydratesView, _fatsView, _fiberView;
@@ -75,14 +76,14 @@ public class MealDetailFragment extends BaseFragment {
     private Map<String, Double> servingUnitMap;
     private RetrieveCommonFoodDetail _getCommonFoodDetail = null;
     private RetrieveBrandedFoodDetail _getBrandedFoodDetail = null;
+    private RetrieveBarcodeFoodDetail _getBarcodeFoodDetail = null;
     private FirebaseFirestore database;
-    private DocumentReference documentReference;
     private Button _addButton,_deleteButton,_updateButton;
 
     public MealDetailFragment() {
     }
 
-    public static MealDetailFragment newInstance(String date, String mealType, String foodName, String foodID,String mealRecordID) {
+    public static MealDetailFragment newInstance(String date, String mealType, String foodName, String foodID,String mealRecordID,String foodBarcode) {
         MealDetailFragment fragment = new MealDetailFragment();
         Bundle args = new Bundle();
         args.putString(MealDetailActivity.DATE_KEY, date);
@@ -90,6 +91,7 @@ public class MealDetailFragment extends BaseFragment {
         args.putString(MealDetailActivity.FOOD_ID_KEY, foodID);
         args.putString(MealDetailActivity.FOOD_NAME_KEY, foodName);
         args.putString(MealDetailActivity.MEAL_RECORD_ID_KEY, mealRecordID);
+        args.putString(MealDetailActivity.FOOD_BARCODE_KEY, foodBarcode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -113,6 +115,9 @@ public class MealDetailFragment extends BaseFragment {
             if (getArguments().containsKey(MealDetailActivity.MEAL_RECORD_ID_KEY)) {
                 mealRecordID = getArguments().getString(MealDetailActivity.MEAL_RECORD_ID_KEY, "");
             }
+            if (getArguments().containsKey(MealDetailActivity.FOOD_BARCODE_KEY)) {
+                foodBarcode = getArguments().getString(MealDetailActivity.FOOD_BARCODE_KEY, "");
+            }
         }
         setHasOptionsMenu(false);
     }
@@ -126,7 +131,12 @@ public class MealDetailFragment extends BaseFragment {
         //the reason to differentiate is because the API to get common food and branded food is different
         if (!foodID.isEmpty()) {
             loadBrandedFood(foodID);
-        } else{
+        }
+        else if(!foodBarcode.isEmpty())
+        {
+            loadBarcodeFood(foodBarcode);
+        }
+        else{
             loadCommonFood(foodName);
         }
         return view;
@@ -242,22 +252,30 @@ public class MealDetailFragment extends BaseFragment {
         }
     }
 
+    private void loadBarcodeFood(String foodBarcode) {
+        //load the barcode food detail
+        if (_getBarcodeFoodDetail == null) {
+            _getBarcodeFoodDetail = new RetrieveBarcodeFoodDetail(foodBarcode);
+            _getBarcodeFoodDetail.execute();
+        }
+    }
+
     private void saveMeal() {
         String servingUnit = _autoCompleteServing.getText().toString();
         double quantity = 0;
         boolean check = true;
         if (servingUnit.isEmpty()) {//if serving unit is empty
-            ErrorAlert("Please select one serving unit.", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+            ErrorAlert("Please select one serving unit.", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
             check = false;
         }
         String quantityStr = _inputQuantity.getEditText().getText().toString();
         if (quantityStr.isEmpty()) {//if quantity is empty
-            ErrorAlert("Quantity cannot be empty!", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+            ErrorAlert("Quantity cannot be empty!", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
             check = false;
         } else {
             quantity = Double.parseDouble(_inputQuantity.getEditText().getText().toString());
             if (quantity <= 0) {//if(quantity is 0
-                ErrorAlert("Quantity less than 0!", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+                ErrorAlert("Quantity less than 0!", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
                 check = false;
             } else {
                 _inputQuantity.setError(null);
@@ -276,17 +294,17 @@ public class MealDetailFragment extends BaseFragment {
         double quantity = 0;
         boolean check = true;
         if (servingUnit.isEmpty()) {//if serving unit is empty
-            ErrorAlert("Please select one serving unit.", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+            ErrorAlert("Please select one serving unit.", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
             check = false;
         }
         String quantityStr = _inputQuantity.getEditText().getText().toString();
         if (quantityStr.isEmpty()) {//if quantity is empty
-            ErrorAlert("Quantity cannot be empty!", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+            ErrorAlert("Quantity cannot be empty!", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
             check = false;
         } else {
             quantity = Double.parseDouble(_inputQuantity.getEditText().getText().toString());
             if (quantity <= 0) {//if(quantity is 0
-                ErrorAlert("Quantity less than 0!", sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+                ErrorAlert("Quantity less than 0!", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
                 check = false;
             } else {
                 _inputQuantity.setError(null);
@@ -361,6 +379,10 @@ public class MealDetailFragment extends BaseFragment {
         {
             mealRecordMap.put("foodID",foodID);
         }
+        if(!foodBarcode.isEmpty())
+        {
+            mealRecordMap.put("foodBarcode",foodBarcode);
+        }
         mealRecordMap.put("quantity",quantity);
         mealRecordMap.put("servingUnit",servingUnit);
         mealRecordMap.put("calories",calories);
@@ -382,7 +404,7 @@ public class MealDetailFragment extends BaseFragment {
             if (_progressDialog.isShowing())//cancel dialog
                 _progressDialog.dismiss();
             //show error dialog
-            ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+            ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
         });
 
     }
@@ -426,7 +448,7 @@ public class MealDetailFragment extends BaseFragment {
             if (_progressDialog.isShowing())//cancel dialog
                 _progressDialog.dismiss();
             //show error dialog
-            ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+            ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
         });
 
     }
@@ -546,7 +568,68 @@ public class MealDetailFragment extends BaseFragment {
                     final Snackbar snackbar = MealDetailFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(t.getMessage()) ? t.getMessage() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
                     snackbar.setAction("Dismiss", view -> snackbar.dismiss());
                     snackbar.show();
-                    _getCommonFoodDetail = null;
+                    _getBrandedFoodDetail = null;
+                }
+            });
+            return null;
+        }
+    }
+
+    private class RetrieveBarcodeFoodDetail extends AsyncTask<Void, Void, Void> {
+        //progress dialog
+        private SweetAlertDialog _progressDialog;
+        private String barcode;//create meal detail request which is POST
+
+        public RetrieveBarcodeFoodDetail(String barcode) {
+            _progressDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+            this.barcode = barcode;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //show progress dialog
+            _progressDialog.setContentText("Loading...");
+            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
+            _progressDialog.setCancelable(false);
+            _progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Call<MealDetailResponse> callBarcodeFoodDetailAPI = ApiClient.getNutritionixService().getBarcodeFoodDetail(barcode);
+            callBarcodeFoodDetailAPI.enqueue(new Callback<MealDetailResponse>() {
+                @Override
+                public void onResponse(Call<MealDetailResponse> call, Response<MealDetailResponse> response) {
+                    //close progress dialog
+                    if (_progressDialog.isShowing())
+                        _progressDialog.dismiss();
+                    if (response.isSuccessful()) {
+                        if (response.body().foodDetail != null) {
+                            getActivity().runOnUiThread(() -> setupFoodDetail(response.body().foodDetail[0]));
+                        } else {
+                            //if API call failure
+                            final Snackbar snackbar = MealDetailFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(response.body().message) ? response.body().message : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
+                            snackbar.setAction("Dismiss", view -> snackbar.dismiss());
+                            snackbar.show();
+                        }
+                    } else {
+                        //if API call failure
+                        final Snackbar snackbar = MealDetailFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(response.message()) ? response.message() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
+                        snackbar.setAction("Dismiss", view -> snackbar.dismiss());
+                        snackbar.show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<MealDetailResponse> call, Throwable t) {
+                    if (_progressDialog.isShowing())
+                        _progressDialog.dismiss();
+                    //if API call failure
+                    final Snackbar snackbar = MealDetailFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(t.getMessage()) ? t.getMessage() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction("Dismiss", view -> snackbar.dismiss());
+                    snackbar.show();
+                    _getBarcodeFoodDetail = null;
                 }
             });
             return null;
@@ -658,15 +741,9 @@ public class MealDetailFragment extends BaseFragment {
         String DOCUMENT_PATH = String.format("MealRecords/%1$s/%2$s/%3$s", getSessionHandler().getUser().getUID(), date,mealRecordID);
         //get the Document reference
         //document path = MealRecords/UID/Date/MealRecordID
-        documentReference = database.document(DOCUMENT_PATH);
+        DocumentReference documentReference = database.document(DOCUMENT_PATH);
         //get meal record detail
         documentReference.get().addOnSuccessListener((value) -> {
-//            if(error!=null)
-//            {
-//                //show error with dialog
-//                ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
-//                return;
-//            }
             //set the default drop down text
             _autoCompleteServing.setText(value.getString("servingUnit"), false);
             //set the default quantity
@@ -681,7 +758,7 @@ public class MealDetailFragment extends BaseFragment {
             fiber = fiberMultipliers*grams;
         }).addOnFailureListener(e -> {
             //show error with dialog
-            ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+            ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
         });
     }
 

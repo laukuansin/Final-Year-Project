@@ -1,0 +1,121 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/green_A700"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/buttonRotateLeft"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="16dp"
+                android:src="@drawable/ic_rotate_left_white" />
+
+            <ImageButton
+                android:id="@+id/buttonRotateRight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="16dp"
+                android:src="@drawable/ic_rotate_right_white" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/buttonDone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="16dp"
+            android:src="@drawable/ic_done" />
+    </RelativeLayout>
+    <com.isseiaoki.simplecropview.CropImageView
+        android:id="@+id/cropImageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="24dp"
+        custom:scv_background_color="@color/black_1000"
+        custom:scv_crop_mode="fit_image"
+        custom:scv_frame_color="@color/white_1000"
+        custom:scv_frame_stroke_weight="1dp"
+        custom:scv_guide_color="@color/white_1000"
+        custom:scv_guide_show_mode="show_on_touch"
+        custom:scv_guide_stroke_weight="1dp"
+        custom:scv_handle_color="@color/white_1000"
+        custom:scv_handle_show_mode="show_always"
+        custom:scv_handle_size="14dp"
+        custom:scv_min_frame_size="50dp"
+        custom:scv_overlay_color="#AA1C1C1C"
+        custom:scv_touch_padding="8dp" />
+
+
+
+    <LinearLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:background="@color/green_A700">
+
+        <Button
+            android:id="@+id/buttonFitImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="8dp"
+            android:layout_weight="0.3"
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp"
+            android:text="FIT IMAGE"
+            android:stateListAnimator="@null"
+            android:textColor="@color/white_1000" />
+
+        <Button
+            android:id="@+id/button4_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp"
+            android:layout_weight="0.3"
+            android:text="4:3"
+            android:stateListAnimator="@null"
+            android:textColor="@color/white_1000" />
+
+        <Button
+            android:id="@+id/button16_9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:padding="8dp"
+            android:layout_weight="0.3"
+            android:text="16:9"
+            android:stateListAnimator="@null"
+            android:textColor="@color/white_1000" />
+
+
+    </LinearLayout>
+</LinearLayout>

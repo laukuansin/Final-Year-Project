@@ -182,7 +182,7 @@ public class MealFragment extends BaseFragment {
                 //if error appears
                 if (error != null) {
                     //show error with dialog
-                    ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+                    ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
                     _retrieveMealRecord = null;
                     return;
                 }
@@ -201,6 +201,10 @@ public class MealFragment extends BaseFragment {
                         if(documentMapData.get("foodID")!=null)
                         {
                             meal.setNixItemID(documentMapData.get("foodID").toString());
+                        }
+                        if(documentMapData.get("foodBarcode")!=null)
+                        {
+                            meal.setFoodBarcode(documentMapData.get("foodBarcode").toString());
                         }
                         meal.setCalories((double) documentMapData.get("calories"));
                         meal.setMealName(documentMapData.get("foodName").toString());
@@ -323,6 +327,10 @@ public class MealFragment extends BaseFragment {
         if(!meal.getNixItemID().isEmpty())
         {
             intent.putExtra(MealDetailActivity.FOOD_ID_KEY,meal.getNixItemID());
+        }
+        if(!meal.getFoodBarcode().isEmpty())
+        {
+            intent.putExtra(MealDetailActivity.FOOD_BARCODE_KEY,meal.getFoodBarcode());
         }
         intent.putExtra(MealDetailActivity.MEAL_RECORD_ID_KEY,meal.getMealRecordID());
         intent.putExtra(MealDetailActivity.FOOD_NAME_KEY,meal.getMealName());

@@ -12,8 +12,6 @@ import androidx.core.content.ContextCompat;
 
 public class BarcodeScannerActivity extends BaseActivity{
     private CaptureManager _capture;
-
-
     @Override
     protected int ContentView() {
         return R.layout.activity_barcode_scanner;
@@ -66,13 +64,8 @@ public class BarcodeScannerActivity extends BaseActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.green_700));// set status background dark green
-        }
 
+        setToolbar();
 
         DecoratedBarcodeView _barcodeScannerView = (DecoratedBarcodeView)findViewById(R.id.zxing_barcode_scanner);
         _capture = new CaptureManager(this, _barcodeScannerView);
@@ -81,6 +74,17 @@ public class BarcodeScannerActivity extends BaseActivity{
 
 
     }
+
+    private void setToolbar()
+    {
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.green_700));// set status background dark green
+        }
+    }
+
 
     @Override
     protected void onResume() {

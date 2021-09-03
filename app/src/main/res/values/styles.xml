@@ -37,4 +37,5 @@
     <style name="CustomTheme" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:textColorSecondary">@color/white</item>
     </style>
+
 </resources>

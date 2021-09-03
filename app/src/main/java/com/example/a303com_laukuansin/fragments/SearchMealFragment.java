@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,11 +23,13 @@ import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.activities.BarcodeScannerActivity;
 import com.example.a303com_laukuansin.activities.MealDetailActivity;
 import com.example.a303com_laukuansin.activities.SearchMealActivity;
+import com.example.a303com_laukuansin.activities.TrackWithImageActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.BrandedFood;
 import com.example.a303com_laukuansin.domains.CommonFood;
 import com.example.a303com_laukuansin.items.BrandedFoodItem;
 import com.example.a303com_laukuansin.items.CommonFoodItem;
+import com.example.a303com_laukuansin.responses.MealDetailResponse;
 import com.example.a303com_laukuansin.responses.MealResponse;
 import com.example.a303com_laukuansin.utilities.ApiClient;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
@@ -48,6 +51,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -58,12 +62,12 @@ public class SearchMealFragment extends BaseFragment {
     private View _divider;
     private LinearLayout _barcodeImageLayout, _viewContainer, _waitingOrErrorLayout;
     private SearchMealWithAPI _searchMeal = null;//default is null
+    private CheckBarcode _checkBarcode = null;
     private FastItemAdapter<CommonFoodItem> _commonFoodAdapter;
     private FastItemAdapter<BrandedFoodItem> _brandedFoodAdapter;
     private TextView _waitingOrErrorView, _commonFoodLabel, _brandedFoodLabel;
     private SpinKitView _loadingView;
-    private static final int CAMERA_PERMISSION_CODE = 100;
-    private static final int STORAGE_PERMISSION_CODE = 101;
+    private static final int CAMERA_PERMISSION_CODE = 101;
 
     public SearchMealFragment() {
     }
@@ -132,11 +136,11 @@ public class SearchMealFragment extends BaseFragment {
 
         //set adapter item click
         _commonFoodAdapter.withOnClickListener((v, adapter, item, position) -> {
-            goToMealDetailActivity(item.getCommonFood().getName(), "");
+            goToMealDetailActivity(item.getCommonFood().getName(), "","");
             return false;
         });
         _brandedFoodAdapter.withOnClickListener((v, adapter, item, position) -> {
-            goToMealDetailActivity("", item.getBrandedFood().getID());
+            goToMealDetailActivity("", item.getBrandedFood().getID(),"");
             return false;
         });
 
@@ -144,12 +148,9 @@ public class SearchMealFragment extends BaseFragment {
         _scanBarcodeLayout.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                if(checkCameraPermission())
-                {
+                //check the camera permission
+                if (checkCameraPermission()) {
                     openBarcodeScanner();
-                }
-                else{
-
                 }
             }
         });
@@ -158,22 +159,36 @@ public class SearchMealFragment extends BaseFragment {
         _trackImageLayout.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-
+                Intent intent = new Intent(getContext(), TrackWithImageActivity.class);
+                intent.putExtra(MealDetailActivity.DATE_KEY, date);
+                intent.putExtra(MealDetailActivity.MEAL_TYPE_KEY, mealType);
+                startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
     }
+    private void checkBarcode(String barcode)
+    {
+        if(_checkBarcode==null)
+        {
+            _checkBarcode = new CheckBarcode(barcode);
+            _checkBarcode.execute();
+        }
+    }
+
     private boolean isDeviceSupportCamera() {
         //check device is support camera or not
         return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
     }
-    private boolean checkCameraPermission()
-    {
+
+    private boolean checkCameraPermission() {
+        //if the device is no support camera
         if (!isDeviceSupportCamera()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (!Settings.System.canWrite(getContext())) {
+                    //check permission
                     ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
-
                     return false;
                 }
             } else {
@@ -186,10 +201,11 @@ public class SearchMealFragment extends BaseFragment {
         }
         return true;
     }
-    private void openBarcodeScanner()
-    {
+
+    private void openBarcodeScanner() {
+        //open the barcode scanner
         IntentIntegrator.forSupportFragment(SearchMealFragment.this)
-                .setDesiredBarcodeFormats(IntentIntegrator.PRODUCT_CODE_TYPES)
+                .setDesiredBarcodeFormats(IntentIntegrator.PRODUCT_CODE_TYPES)//product code
                 .setOrientationLocked(false)
                 .setCaptureActivity(BarcodeScannerActivity.class)
                 .initiateScan();
@@ -197,42 +213,76 @@ public class SearchMealFragment extends BaseFragment {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case 2909: {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Checking camera availability
-                    if (!isDeviceSupportCamera()) {
-                        final Snackbar snackbar = super.initSnackbar(android.R.id.content, "Your device does not support camera", Snackbar.LENGTH_INDEFINITE);
-                        snackbar.show();
-                    } else {
-                        openBarcodeScanner();
-                    }
-                } else {
+        //permission call back
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Checking camera availability
+                if (!isDeviceSupportCamera()) {
                     final Snackbar snackbar = super.initSnackbar(android.R.id.content, "Your device does not support camera", Snackbar.LENGTH_INDEFINITE);
                     snackbar.show();
+                } else {
+                    openBarcodeScanner();
                 }
-                return;
+            } else {
+                final Snackbar snackbar = super.initSnackbar(android.R.id.content, "Your device does not support camera", Snackbar.LENGTH_INDEFINITE);
+                snackbar.show();
             }
         }
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //result return by barcode scanner
 
+        //get result
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if(result != null) {
-            if(result.getContents() == null) {
-                Toast.makeText(getContext(), "Cancelled", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(getContext(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
+        if (result != null) {
+            if (result.getContents() != null) {
+                String barcode = result.getContents();
+                String barcodeFormat = result.getFormatName();
+
+                //if the barcode format is UPC_E, the reason to change is because the food database UPC_E will not get the result
+                //therefore when barcode format is upc e, it will convert to upc a format
+                Log.d("format",result.getFormatName());
+                if(barcodeFormat.equals("UPC_E"))
+                {
+                    barcode = convertUPCE_To_UPCA(barcode);
+                }
+                checkBarcode(barcode);
             }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
         }
     }
+    private String convertUPCE_To_UPCA(String barcode)
+    {
+        switch (barcode.charAt(6)) {
+            case '0':
+            case '1':
+            case '2': {
+                barcode = barcode.substring(1, 3) + barcode.charAt(6) + "0000"  + barcode.substring(3, 6) + barcode.charAt(7);
+                break;
+            }
+            case '3': {
+                barcode = barcode.substring(1, 4) + "00000" + barcode.substring(4,6) + barcode.charAt(7);
+                break;
+            }
+            case '4': {
+                barcode = barcode.substring(1, 5) + "00000" + barcode.charAt(5) + barcode.charAt(7);
+                break;
+            }
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9': {
+                barcode = barcode.substring(1, 6) + "0000" + barcode.charAt(6) + barcode.charAt(7);
+                break;
+            }
+        }
+        return "0" + barcode;
+    }
 
-
-    private void goToMealDetailActivity(String foodName, String foodID) {
+    private void goToMealDetailActivity(String foodName, String foodID,String foodBarcode) {
         Intent intent = new Intent(getContext(), MealDetailActivity.class);
         intent.putExtra(MealDetailActivity.DATE_KEY, date);
         intent.putExtra(MealDetailActivity.MEAL_TYPE_KEY, mealType);
@@ -241,6 +291,9 @@ public class SearchMealFragment extends BaseFragment {
         }
         if (!foodID.isEmpty()) {
             intent.putExtra(MealDetailActivity.FOOD_ID_KEY, foodID);
+        }
+        if(!foodBarcode.isEmpty()) {
+            intent.putExtra(MealDetailActivity.FOOD_BARCODE_KEY, foodBarcode);
         }
         startActivity(intent);
         getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -310,6 +363,68 @@ public class SearchMealFragment extends BaseFragment {
     //create instance of branded food
     private BrandedFoodItem createInstanceOfBrandedFoodItem(BrandedFood brandedFood) {
         return new BrandedFoodItem().withBrandedFoodView(brandedFood);
+    }
+
+    private class CheckBarcode extends AsyncTask<Void,Void,Void>
+    {
+        private String barcode;
+        private SweetAlertDialog _progressDialog;
+
+        public CheckBarcode(String barcode) {
+            this.barcode = barcode;
+            _progressDialog = new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            _progressDialog.setContentText("Scanning...");
+            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
+            _progressDialog.setCancelable(false);
+            _progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            //call get barcode food detail
+            Call<MealDetailResponse> getBarcodeFoodAPICall = ApiClient.getNutritionixService().getBarcodeFoodDetail(barcode);
+            getBarcodeFoodAPICall.enqueue(new Callback<MealDetailResponse>() {
+                @Override
+                public void onResponse(Call<MealDetailResponse> call, Response<MealDetailResponse> response) {
+                    //close progress dialog
+                    if (_progressDialog.isShowing())
+                        _progressDialog.dismiss();
+                    if(response.isSuccessful())
+                    {
+                        getActivity().runOnUiThread(() -> {
+                            if(response.body().foodDetail==null)
+                            {
+                                ErrorAlert("Food barcode does not exists in food database", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
+                            }
+                            else{
+                                goToMealDetailActivity("", "",barcode);
+                            }
+                        });
+                    }
+                    else{
+                        ErrorAlert("Food barcode does not exists in food database", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<MealDetailResponse> call, Throwable t) {
+                    //close progress dialog
+                    if (_progressDialog.isShowing())
+                        _progressDialog.dismiss();
+                    //if API call failure
+                    final Snackbar snackbar = SearchMealFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(t.getMessage()) ? t.getMessage() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
+                    snackbar.setAction("Dismiss", view -> snackbar.dismiss());
+                    snackbar.show();
+                }
+            });
+            _checkBarcode = null;
+            return null;
+        }
     }
 
     //async task to call the API

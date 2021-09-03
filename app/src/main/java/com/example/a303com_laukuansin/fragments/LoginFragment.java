@@ -168,7 +168,7 @@ public class LoginFragment extends BaseFragment {
                     //appear alert dialog
                     if(_progressDialog.isShowing())
                         _progressDialog.dismiss();
-                    ErrorAlert(task.getException().getMessage(), sweetAlertDialog -> sweetAlertDialog.cancel()).show();
+                    ErrorAlert(task.getException().getMessage(), sweetAlertDialog -> sweetAlertDialog.cancel(),true).show();
                 }
             });
         }

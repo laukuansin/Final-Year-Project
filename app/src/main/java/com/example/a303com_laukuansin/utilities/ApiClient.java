@@ -1,6 +1,8 @@
 package com.example.a303com_laukuansin.utilities;
 
+import com.example.a303com_laukuansin.interceptors.IBMWatsonInterceptor;
 import com.example.a303com_laukuansin.interceptors.NutritionixInterceptor;
+import com.example.a303com_laukuansin.services.IBMWatsonService;
 import com.example.a303com_laukuansin.services.NutritionixService;
 
 import okhttp3.Interceptor;
@@ -30,5 +32,10 @@ public class ApiClient {
     {
         NutritionixService nutritionixService = getRetrofit("https://trackapi.nutritionix.com/v2/",new NutritionixInterceptor()).create(NutritionixService.class);
         return nutritionixService;
+    }
+    public static IBMWatsonService getIBMWatsonService()
+    {
+        IBMWatsonService watsonService = getRetrofit("https://api.us-south.visual-recognition.watson.cloud.ibm.com/instances/d65e1c77-e0f9-4c45-a934-e7b8bab12676/v3/", new IBMWatsonInterceptor()).create(IBMWatsonService.class);
+        return watsonService;
     }
 }

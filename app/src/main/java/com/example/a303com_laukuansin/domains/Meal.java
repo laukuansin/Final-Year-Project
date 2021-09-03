@@ -7,6 +7,7 @@ public class Meal {
     private String UID;
     private String mealName;
     private String nixItemID="";
+    private String foodBarcode="";
     private double calories;
     private String foodType;
     private String mealType;
@@ -80,6 +81,14 @@ public class Meal {
 
     public void setServingUnit(String servingUnit) {
         this.servingUnit = servingUnit;
+    }
+
+    public String getFoodBarcode() {
+        return foodBarcode;
+    }
+
+    public void setFoodBarcode(String foodBarcode) {
+        this.foodBarcode = foodBarcode;
     }
 
     public Date getDate() {
