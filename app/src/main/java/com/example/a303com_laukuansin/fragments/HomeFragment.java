@@ -278,7 +278,7 @@ public class HomeFragment extends BaseFragment {
         mealCollectionRef.addSnapshotListener((value, error) -> {
             if(error!=null)//if appear error
             {
-                ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+                ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
             }
 
             double totalCalories=0,breakfastCalories=0,lunchCalories=0,dinnerCalories=0,snackCalories=0;

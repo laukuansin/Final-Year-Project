@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.activities.MealActivity;
+import com.example.a303com_laukuansin.activities.MealDetailActivity;
 import com.example.a303com_laukuansin.activities.SearchMealActivity;
 import com.example.a303com_laukuansin.adapters.MealRecordAdapter;
 import com.example.a303com_laukuansin.cores.BaseFragment;
@@ -181,7 +182,7 @@ public class MealFragment extends BaseFragment {
                 //if error appears
                 if (error != null) {
                     //show error with dialog
-                    ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss()).show();
+                    ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
                     _retrieveMealRecord = null;
                     return;
                 }
@@ -197,6 +198,14 @@ public class MealFragment extends BaseFragment {
                         Meal meal = new Meal();
                         meal.setMealRecordID(document.getId());
                         Map<String, Object> documentMapData = document.getData();
+                        if(documentMapData.get("foodID")!=null)
+                        {
+                            meal.setNixItemID(documentMapData.get("foodID").toString());
+                        }
+                        if(documentMapData.get("foodBarcode")!=null)
+                        {
+                            meal.setFoodBarcode(documentMapData.get("foodBarcode").toString());
+                        }
                         meal.setCalories((double) documentMapData.get("calories"));
                         meal.setMealName(documentMapData.get("foodName").toString());
                         meal.setQuantity((double) documentMapData.get("quantity"));
@@ -308,5 +317,24 @@ public class MealFragment extends BaseFragment {
                 getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
+    }
+
+    public void editMealRecord(Meal meal)
+    {
+        Intent intent = new Intent(getContext(), MealDetailActivity.class);
+        intent.putExtra(MealDetailActivity.DATE_KEY, date);
+        intent.putExtra(MealDetailActivity.MEAL_TYPE_KEY, meal.getMealType());
+        if(!meal.getNixItemID().isEmpty())
+        {
+            intent.putExtra(MealDetailActivity.FOOD_ID_KEY,meal.getNixItemID());
+        }
+        if(!meal.getFoodBarcode().isEmpty())
+        {
+            intent.putExtra(MealDetailActivity.FOOD_BARCODE_KEY,meal.getFoodBarcode());
+        }
+        intent.putExtra(MealDetailActivity.MEAL_RECORD_ID_KEY,meal.getMealRecordID());
+        intent.putExtra(MealDetailActivity.FOOD_NAME_KEY,meal.getMealName());
+        startActivity(intent);
+        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
 }

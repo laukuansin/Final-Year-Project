@@ -57,6 +57,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:28.3.0')
     implementation 'com.google.firebase:firebase-auth:19.3.5'
     implementation 'com.google.firebase:firebase-firestore:23.0.3'
+    implementation 'com.google.firebase:firebase-storage:20.0.0'
 
     //gson library to encode the class, so that class can save to shared preferred
     implementation 'com.google.code.gson:gson:2.8.7'
@@ -86,7 +87,20 @@ dependencies {
 
     //load image with url
     implementation 'com.github.bumptech.glide:glide:4.12.0'
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
     //zoom in image view
     implementation 'com.github.stfalcon-studio:StfalconImageViewer:master-SNAPSHOT'
+
+    //barcode scanner
+    implementation 'com.journeyapps:zxing-android-embedded:3.3.0'
+
+    //crop image
+    compile 'com.isseiaoki:simplecropview:1.1.8'
+
+    //compress the image
+    implementation 'id.zelory:compressor:2.1.1'
+
+    //
+
 }

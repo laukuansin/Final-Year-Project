@@ -130,7 +130,7 @@ public class SignUpFragment extends BaseFragment {
                         _progressDialog.dismiss();
 
                     //appear alert dialog
-                    ErrorAlert(task.getException().getMessage(), (sweetAlertDialog) -> sweetAlertDialog.cancel()).show();
+                    ErrorAlert(task.getException().getMessage(), (sweetAlertDialog) -> sweetAlertDialog.cancel(),true).show();
                 }
             });
         }

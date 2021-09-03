@@ -98,7 +98,7 @@ public class ForgotPasswordFragment extends BaseFragment {
                     fragmentTransaction.commit();
                 }
                 else{
-                    ErrorAlert(task.getException().getMessage(), (sweetAlertDialog) -> sweetAlertDialog.cancel()).show();
+                    ErrorAlert(task.getException().getMessage(), (sweetAlertDialog) -> sweetAlertDialog.cancel(),true).show();
                 }
             });
         }

@@ -5,7 +5,10 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 
 import com.example.a303com_laukuansin.R;
+import com.example.a303com_laukuansin.adapters.MealAdapter;
+import com.example.a303com_laukuansin.adapters.MealRecordAdapter;
 import com.example.a303com_laukuansin.cores.BaseActivity;
+import com.example.a303com_laukuansin.domains.Meal;
 import com.example.a303com_laukuansin.fragments.MealFragment;
 
 import androidx.appcompat.widget.Toolbar;
@@ -13,8 +16,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-public class MealActivity extends BaseActivity {
+public class MealActivity extends BaseActivity implements MealRecordAdapter.OnActionListener {
     public static final String DATE_KEY = "date_key";
+    private Fragment _fragment;
     private String date;
 
     @Override
@@ -82,7 +86,7 @@ public class MealActivity extends BaseActivity {
 
         //set the default fragment
         if (savedInstanceState == null) {
-            Fragment _fragment = MealFragment.newInstance(date);
+            _fragment = MealFragment.newInstance(date);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.frame_container, _fragment).commit();
         }
@@ -122,5 +126,10 @@ public class MealActivity extends BaseActivity {
     public void finish() {
         super.finish();
         overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+    }
+
+    @Override
+    public void editMealRecord(Meal meal) {
+        ((MealFragment)_fragment).editMealRecord(meal);
     }
 }

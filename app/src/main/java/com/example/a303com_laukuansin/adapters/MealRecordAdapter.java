@@ -19,10 +19,17 @@ import androidx.recyclerview.widget.RecyclerView;
 public class MealRecordAdapter extends RecyclerView.Adapter<MealRecordAdapter.ViewHolder> {
     private List<Meal> _mealList;
     private Context _context;
+    private OnActionListener _listener;
 
     public MealRecordAdapter(List<Meal> _mealList, Context _context) {
         this._mealList = _mealList;
         this._context = _context;
+
+        if (_context instanceof OnActionListener){
+            _listener = (OnActionListener)_context;
+        } else{
+            throw new RuntimeException(_context.toString() + " must implement OnActionListener");
+        }
     }
 
     @NonNull
@@ -39,14 +46,14 @@ public class MealRecordAdapter extends RecyclerView.Adapter<MealRecordAdapter.Vi
         //set meal name
         holder._mealNameView.setText(meal.getMealName());
         //set quantity and serving
-        holder._quantityServingView.setText(String.format("%.2f %2$s", meal.getQuantity(), meal.getServingUnit()));
+        holder._quantityServingView.setText(String.format("%.1f %2$s", meal.getQuantity(), meal.getServingUnit()));
         //set calories
         holder._caloriesView.setText(String.format("%1$d Calories",(int) Math.round(meal.getCalories())));
         //when click the layout
         holder._layout.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-
+                _listener.editMealRecord(meal);
             }
         });
     }
@@ -68,6 +75,10 @@ public class MealRecordAdapter extends RecyclerView.Adapter<MealRecordAdapter.Vi
             _quantityServingView = itemView.findViewById(R.id.quantityServing);
             _caloriesView = itemView.findViewById(R.id.calories);
         }
+    }
+
+    public interface OnActionListener{
+        void editMealRecord(Meal meal);
     }
 }
 

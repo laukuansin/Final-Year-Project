@@ -22,4 +22,7 @@ public interface NutritionixService {
     @GET("search/item")
     Call<MealDetailResponse> getBrandedFoodDetail(@Query("nix_item_id") String itemID);
 
+    @GET("search/item")
+    Call<MealDetailResponse> getBarcodeFoodDetail(@Query("upc") String barcode);
+
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.a303com_laukuansin">
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -19,7 +20,16 @@
         android:roundIcon="@mipmap/logo_no_til"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.a303com_laukuansin.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_path" />
 
+        </provider>
         <activity
             android:name=".activities.SplashScreenActivity"
             android:screenOrientation="portrait">
@@ -59,6 +69,20 @@
             android:label="Food Detail"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".activities.BarcodeScannerActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".activities.TrackWithImageActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:label="Track food with image">
+        </activity>
+        <activity android:name=".activities.CropImageActivity"
+            android:screenOrientation="portrait"
+            android:label="Crop Image">
+        </activity>
+
     </application>
 
 </manifest>
