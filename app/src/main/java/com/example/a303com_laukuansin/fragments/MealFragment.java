@@ -196,8 +196,8 @@ public class MealFragment extends BaseFragment {
                     //loop the document
                     for (DocumentSnapshot document : value.getDocuments()) {
                         Meal meal = new Meal();
-                        meal.setMealRecordID(document.getId());
                         Map<String, Object> documentMapData = document.getData();
+                        meal.setMealRecordID(document.getId());
                         if(documentMapData.get("foodID")!=null)
                         {
                             meal.setNixItemID(documentMapData.get("foodID").toString());

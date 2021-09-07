@@ -82,7 +82,20 @@
             android:screenOrientation="portrait"
             android:label="Crop Image">
         </activity>
-
+        <activity android:name=".activities.ExerciseActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".activities.ExerciseListActivity"
+            android:launchMode="singleTask"
+            android:label="Exercise List"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".activities.ExerciseDetailActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

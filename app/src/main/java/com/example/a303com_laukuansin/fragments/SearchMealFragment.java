@@ -372,15 +372,12 @@ public class SearchMealFragment extends BaseFragment {
 
         public CheckBarcode(String barcode) {
             this.barcode = barcode;
-            _progressDialog = new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
+            _progressDialog = showProgressDialog("Scanning...",getResources().getColor(R.color.green_A700)) ;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            _progressDialog.setContentText("Scanning...");
-            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
-            _progressDialog.setCancelable(false);
             _progressDialog.show();
         }
 

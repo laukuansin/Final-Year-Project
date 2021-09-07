@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
+import com.example.a303com_laukuansin.activities.ExerciseActivity;
 import com.example.a303com_laukuansin.activities.MealActivity;
 import com.example.a303com_laukuansin.adapters.MealAdapter;
 import com.example.a303com_laukuansin.cores.BaseFragment;
@@ -172,7 +173,11 @@ public class HomeFragment extends BaseFragment {
         _exerciseCardView.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-
+                Intent intent = new Intent(getContext(), ExerciseActivity.class);
+                intent.putExtra(ExerciseActivity.DATE_KEY,_dateView.getText().toString());
+                startActivity(intent);
+                //add animation sliding to next activity
+                getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
             }
         });
 
@@ -231,14 +236,8 @@ public class HomeFragment extends BaseFragment {
 
     private class RetrieveDailyData extends AsyncTask<Void, Void, Void> {
         private User user;
-
         public RetrieveDailyData(User user) {
             this.user = user;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
         }
 
         @Override
@@ -246,17 +245,14 @@ public class HomeFragment extends BaseFragment {
             getActivity().runOnUiThread(() -> {
                 //load meal data
                 loadMealData();
+                //load exercise data
+                loadExerciseData();
 
-                //set text for daily calories burned
-                _dailyCaloriesBurntView.setText(String.format("%1$d of %2$d Calories Burnt",200,(int)Math.round(user.getDailyCaloriesBurnt())));
-                //set text for daily step walked
+                   //set text for daily step walked
                 _dailyStepView.setText(String.format("%1$d of %2$d Steps walked",300,user.getSuggestStepWalk()));
                 //set text for daily water consumed
                 _dailyWaterView.setText(String.format("%1$d of %2$d Glasses water consumed",10, user.getSuggestWaterIntakeInGlass()));
 
-
-                //setup progress bar and animation for exercise
-                setupProgressAndAnimation(_dailyCaloriesBurntProgress,200,(int)Math.round(user.getDailyCaloriesBurnt()));
                 //setup progress bar and animation for step
                 setupProgressAndAnimation(_dailyStepProgress,300,user.getSuggestStepWalk());
                 //setup progress bar and animation for water
@@ -266,6 +262,7 @@ public class HomeFragment extends BaseFragment {
             });
             return null;
         }
+
     }
 
     private void loadMealData()
@@ -279,6 +276,7 @@ public class HomeFragment extends BaseFragment {
             if(error!=null)//if appear error
             {
                 ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
+                return;
             }
 
             double totalCalories=0,breakfastCalories=0,lunchCalories=0,dinnerCalories=0,snackCalories=0;
@@ -331,6 +329,39 @@ public class HomeFragment extends BaseFragment {
             MealAdapter _mealAdapter = new MealAdapter(getContext(), _mealTypeList);
             //set adapter for meal recyclerview
             _mealRecyclerView.setAdapter(_mealAdapter);
+        });
+    }
+
+    private void loadExerciseData()
+    {
+        //meal collection path
+        String EXERCISE_COLLECTION_PATH = String.format("ExerciseRecords/%1$s/%2$s", user.getUID(),realDate);
+
+        //get exercise collection reference
+        CollectionReference exerciseCollectionRef = database.collection(EXERCISE_COLLECTION_PATH);
+        exerciseCollectionRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if(error!=null)//if appear error
+                {
+                    ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
+                    return;
+                }
+                double totalCalories = 0;
+                for(DocumentSnapshot document:value.getDocuments())
+                {
+                    Map<String, Object> documentMapData = document.getData();
+                    Long duration = (Long) documentMapData.get("duration");
+                    double caloriesBurnedPerKGPerMin = (double) documentMapData.get("caloriesPerKGPerMin");
+                    double calories = (caloriesBurnedPerKGPerMin*duration*user.getWeight());
+                    totalCalories+=calories;
+                }
+                //set text for daily calories burned
+                _dailyCaloriesBurntView.setText(String.format("%1$d of %2$d Calories Burnt",(int)Math.round(totalCalories),(int)Math.round(user.getDailyCaloriesBurnt())));
+                //setup progress bar and animation for exercise
+                setupProgressAndAnimation(_dailyCaloriesBurntProgress,(int)Math.round(totalCalories),(int)Math.round(user.getDailyCaloriesBurnt()));
+
+            }
         });
     }
 

@@ -79,11 +79,7 @@ public class LoginFragment extends BaseFragment {
 
 
         //create progress dialog
-        _progressDialog = new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
-        _progressDialog.setContentText("Logging in...");
-        _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimary));
-        _progressDialog.setCancelable(false);
-
+        _progressDialog = showProgressDialog("Logging in...",getResources().getColor(R.color.colorPrimary));
 
         //when click login button action
         _loginButton.setOnClickListener(new OnSingleClickListener() {
