@@ -79,10 +79,7 @@ public class ForgotPasswordFragment extends BaseFragment {
         if(check)//no error occurs
         {
             //progress dialog
-            SweetAlertDialog _progressDialog= new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
-            _progressDialog.setContentText("Sending reset password email.");
-            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimary));
-            _progressDialog.setCancelable(false);
+            SweetAlertDialog _progressDialog = showProgressDialog("Sending reset password email.",getResources().getColor(R.color.colorPrimary));
             _progressDialog.show();
             //firebase instance
             FirebaseAuth auth = FirebaseAuth.getInstance();

@@ -95,10 +95,7 @@ public class SignUpFragment extends BaseFragment {
         if(check)//all input is correct
         {
             //progress dialog
-            SweetAlertDialog _progressDialog= new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
-            _progressDialog.setContentText("Creating account...");
-            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimary));
-            _progressDialog.setCancelable(false);
+            SweetAlertDialog _progressDialog = showProgressDialog("Creating account...",getResources().getColor(R.color.colorPrimary));
             _progressDialog.show();
             //firebase instance
             FirebaseAuth auth = FirebaseAuth.getInstance();

@@ -17,12 +17,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class MealRecordAdapter extends RecyclerView.Adapter<MealRecordAdapter.ViewHolder> {
-    private List<Meal> _mealList;
+    private List<Meal> _mealRecordList;
     private Context _context;
     private OnActionListener _listener;
 
-    public MealRecordAdapter(List<Meal> _mealList, Context _context) {
-        this._mealList = _mealList;
+    public MealRecordAdapter(List<Meal> _mealRecordList, Context _context) {
+        this._mealRecordList = _mealRecordList;
         this._context = _context;
 
         if (_context instanceof OnActionListener){
@@ -41,26 +41,26 @@ public class MealRecordAdapter extends RecyclerView.Adapter<MealRecordAdapter.Vi
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Meal meal = _mealList.get(position);
+        Meal mealRecord = _mealRecordList.get(position);
 
         //set meal name
-        holder._mealNameView.setText(meal.getMealName());
+        holder._mealNameView.setText(mealRecord.getMealName());
         //set quantity and serving
-        holder._quantityServingView.setText(String.format("%.1f %2$s", meal.getQuantity(), meal.getServingUnit()));
+        holder._quantityServingView.setText(String.format("%.1f %2$s", mealRecord.getQuantity(), mealRecord.getServingUnit()));
         //set calories
-        holder._caloriesView.setText(String.format("%1$d Calories",(int) Math.round(meal.getCalories())));
+        holder._caloriesView.setText(String.format("%1$d Calories",(int) Math.round(mealRecord.getCalories())));
         //when click the layout
         holder._layout.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                _listener.editMealRecord(meal);
+                _listener.editMealRecord(mealRecord);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return _mealList.size();
+        return _mealRecordList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

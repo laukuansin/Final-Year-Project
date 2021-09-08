@@ -26,8 +26,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black_1000"
-                android:textSize="16dp"
-                android:transitionName="mealProgressView" />
+                android:textSize="16dp"/>
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/mealProgressBar"
@@ -38,8 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:indeterminate="false"
-                android:transitionName="mealProgressBar" />
+                android:indeterminate="false"/>
         </LinearLayout>
 
         <LinearLayout

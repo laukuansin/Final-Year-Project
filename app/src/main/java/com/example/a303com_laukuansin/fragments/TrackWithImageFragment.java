@@ -110,9 +110,7 @@ public class TrackWithImageFragment extends BaseFragment {
         _imageView = view.findViewById(R.id.imageView);
 
         //set progress dialog
-        _progressDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
-        _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
-        _progressDialog.setCancelable(false);
+        _progressDialog = showProgressDialog("",getResources().getColor(R.color.green_A700));
 
         //setup storage
         storage = FirebaseStorage.getInstance();

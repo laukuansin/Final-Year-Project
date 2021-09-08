@@ -192,7 +192,6 @@
                                 android:id="@+id/dailyCaloriesEaten"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:transitionName="mealProgressView"
                                 android:textColor="@color/black_1000"
                                 android:textSize="16dp" />
 
@@ -201,7 +200,6 @@
                                 android:layout_height="wrap_content"
                                 android:id="@+id/dailyCaloriesEatenProgress"
                                 android:layout_marginTop="10dp"
-                                android:transitionName="mealProgressBar"
                                 android:indeterminate="false"
                                 app:indicatorColor="@color/green_A700"
                                 app:trackColor="@color/grey_100"

@@ -1,6 +1,5 @@
 package com.example.a303com_laukuansin.fragments;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -26,7 +25,6 @@ import com.example.a303com_laukuansin.activities.MealActivity;
 import com.example.a303com_laukuansin.activities.MealDetailActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.FoodDetail;
-import com.example.a303com_laukuansin.domains.Meal;
 import com.example.a303com_laukuansin.domains.Measure;
 import com.example.a303com_laukuansin.domains.FoodPhoto;
 import com.example.a303com_laukuansin.requests.MealDetailRequest;
@@ -34,25 +32,17 @@ import com.example.a303com_laukuansin.responses.MealDetailResponse;
 import com.example.a303com_laukuansin.utilities.ApiClient;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.example.a303com_laukuansin.utilities.QuantityValueFilter;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.squareup.picasso.Picasso;
 import com.stfalcon.imageviewer.StfalconImageViewer;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -273,12 +263,10 @@ public class MealDetailFragment extends BaseFragment {
             ErrorAlert("Quantity cannot be empty!", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
             check = false;
         } else {
-            quantity = Double.parseDouble(_inputQuantity.getEditText().getText().toString());
+            quantity = Double.parseDouble(quantityStr);
             if (quantity <= 0) {//if(quantity is 0
                 ErrorAlert("Quantity less than 0!", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
                 check = false;
-            } else {
-                _inputQuantity.setError(null);
             }
         }
 
@@ -302,12 +290,10 @@ public class MealDetailFragment extends BaseFragment {
             ErrorAlert("Quantity cannot be empty!", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
             check = false;
         } else {
-            quantity = Double.parseDouble(_inputQuantity.getEditText().getText().toString());
-            if (quantity <= 0) {//if(quantity is 0
+            quantity = Double.parseDouble(quantityStr);
+            if (quantity <= 0) {//if quantity is 0
                 ErrorAlert("Quantity less than 0!", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
                 check = false;
-            } else {
-                _inputQuantity.setError(null);
             }
         }
 
@@ -321,10 +307,7 @@ public class MealDetailFragment extends BaseFragment {
     {
         sweetAlertDialog.dismiss();
         //create progress dialog
-        SweetAlertDialog _progressDialog = new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
-        _progressDialog.setContentText("Deleting...");
-        _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
-        _progressDialog.setCancelable(false);
+        SweetAlertDialog _progressDialog = showProgressDialog("Deleting...",getResources().getColor(R.color.green_A700));
         _progressDialog.show();
 
         //date format
@@ -334,7 +317,7 @@ public class MealDetailFragment extends BaseFragment {
         {
             date = format.format(new Date());//get current date
         }
-        //the document path, example: MealRecords/UID/Date/MealType/MealRecordID
+        //the document path, example: MealRecords/UID/Date/MealRecordID
         String DOCUMENT_PATH = String.format("MealRecords/%1$s/%2$s/%3$s",getSessionHandler().getUser().getUID(),date,mealRecordID);
         //get meal record document
         DocumentReference mealRecordRef = database.document(DOCUMENT_PATH);
@@ -355,10 +338,7 @@ public class MealDetailFragment extends BaseFragment {
     private void addMealRecordToDatabase(String servingUnit, double quantity)
     {
         //create progress dialog
-        SweetAlertDialog _progressDialog = new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
-        _progressDialog.setContentText("Adding...");
-        _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
-        _progressDialog.setCancelable(false);
+        SweetAlertDialog _progressDialog = showProgressDialog("Adding...",getResources().getColor(R.color.green_A700));
         _progressDialog.show();
 
         //date format
@@ -368,12 +348,12 @@ public class MealDetailFragment extends BaseFragment {
         {
             date = format.format(new Date());//get current date
         }
-        //the collection path, example: MealRecords/UID/Date/MealType
+        //the collection path, example: MealRecords/UID/Date
         String COLLECTION_PATH = String.format("MealRecords/%1$s/%2$s",getSessionHandler().getUser().getUID(),date);
         //get meal record reference
         CollectionReference mealRecordRef = database.collection(COLLECTION_PATH);
         //create meal record class
-        Map<String, Object> mealRecordMap = new HashMap<>();//create hash map to store the user's data
+        Map<String, Object> mealRecordMap = new HashMap<>();//create hash map to store the meal record's data
         mealRecordMap.put("foodName",foodName);
         if(!foodID.isEmpty())
         {
@@ -412,10 +392,7 @@ public class MealDetailFragment extends BaseFragment {
     private void updateMealRecordToDatabase(String servingUnit, double quantity)
     {
         //create progress dialog
-        SweetAlertDialog _progressDialog = new SweetAlertDialog(getContext(),SweetAlertDialog.PROGRESS_TYPE);
-        _progressDialog.setContentText("Updating...");
-        _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
-        _progressDialog.setCancelable(false);
+        SweetAlertDialog _progressDialog = showProgressDialog("Updating...",getResources().getColor(R.color.green_A700));
         _progressDialog.show();
 
         //date format
@@ -425,12 +402,12 @@ public class MealDetailFragment extends BaseFragment {
         {
             date = format.format(new Date());//get current date
         }
-        //the document path, example: MealRecords/UID/Date/MealType/MealRecordID
+        //the document path, example: MealRecords/UID/Date/MealRecordID
         String DOCUMENT_PATH = String.format("MealRecords/%1$s/%2$s/%3$s",getSessionHandler().getUser().getUID(),date,mealRecordID);
         //get meal record document
         DocumentReference mealRecordRef = database.document(DOCUMENT_PATH);
         //create meal record class
-        Map<String, Object> mealRecordMap = new HashMap<>();//create hash map to store the user's data
+        Map<String, Object> mealRecordMap = new HashMap<>();//create hash map to store the meal record's data
         mealRecordMap.put("quantity",quantity);
         mealRecordMap.put("servingUnit",servingUnit);
         mealRecordMap.put("calories",calories);
@@ -459,7 +436,7 @@ public class MealDetailFragment extends BaseFragment {
         private MealDetailRequest _request;//create meal detail request which is POST
 
         public RetrieveCommonFoodDetail(String foodName) {
-            _progressDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+            _progressDialog = showProgressDialog("Loading...",getResources().getColor(R.color.green_A700));
             _request = new MealDetailRequest(foodName);
         }
 
@@ -467,9 +444,6 @@ public class MealDetailFragment extends BaseFragment {
         protected void onPreExecute() {
             super.onPreExecute();
             //show progress dialog
-            _progressDialog.setContentText("Loading...");
-            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
-            _progressDialog.setCancelable(false);
             _progressDialog.show();
         }
 
@@ -486,12 +460,14 @@ public class MealDetailFragment extends BaseFragment {
                         if (response.body().foodDetail != null) {
                             getActivity().runOnUiThread(() -> setupFoodDetail(response.body().foodDetail[0]));
                         } else {
+                            _getCommonFoodDetail = null;
                             //if API call failure
                             final Snackbar snackbar = MealDetailFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(response.body().message) ? response.body().message : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
                             snackbar.setAction("Dismiss", view -> snackbar.dismiss());
                             snackbar.show();
                         }
                     } else {
+                        _getCommonFoodDetail = null;
                         //if API call failure
                         final Snackbar snackbar = MealDetailFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(response.message()) ? response.message() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
                         snackbar.setAction("Dismiss", view -> snackbar.dismiss());
@@ -520,7 +496,7 @@ public class MealDetailFragment extends BaseFragment {
         private String foodID;//create meal detail request which is POST
 
         public RetrieveBrandedFoodDetail(String foodID) {
-            _progressDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+            _progressDialog = showProgressDialog("Loading...",getResources().getColor(R.color.green_A700));
             this.foodID = foodID;
         }
 
@@ -528,9 +504,6 @@ public class MealDetailFragment extends BaseFragment {
         protected void onPreExecute() {
             super.onPreExecute();
             //show progress dialog
-            _progressDialog.setContentText("Loading...");
-            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
-            _progressDialog.setCancelable(false);
             _progressDialog.show();
         }
 
@@ -547,12 +520,14 @@ public class MealDetailFragment extends BaseFragment {
                         if (response.body().foodDetail != null) {
                             getActivity().runOnUiThread(() -> setupFoodDetail(response.body().foodDetail[0]));
                         } else {
+                            _getBrandedFoodDetail = null;
                             //if API call failure
                             final Snackbar snackbar = MealDetailFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(response.body().message) ? response.body().message : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
                             snackbar.setAction("Dismiss", view -> snackbar.dismiss());
                             snackbar.show();
                         }
                     } else {
+                        _getBrandedFoodDetail = null;
                         //if API call failure
                         final Snackbar snackbar = MealDetailFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(response.message()) ? response.message() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
                         snackbar.setAction("Dismiss", view -> snackbar.dismiss());
@@ -581,7 +556,7 @@ public class MealDetailFragment extends BaseFragment {
         private String barcode;//create meal detail request which is POST
 
         public RetrieveBarcodeFoodDetail(String barcode) {
-            _progressDialog = new SweetAlertDialog(getContext(), SweetAlertDialog.PROGRESS_TYPE);
+            _progressDialog = showProgressDialog("Loading...",getResources().getColor(R.color.green_A700));
             this.barcode = barcode;
         }
 
@@ -589,9 +564,6 @@ public class MealDetailFragment extends BaseFragment {
         protected void onPreExecute() {
             super.onPreExecute();
             //show progress dialog
-            _progressDialog.setContentText("Loading...");
-            _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.green_A700));
-            _progressDialog.setCancelable(false);
             _progressDialog.show();
         }
 
@@ -608,12 +580,14 @@ public class MealDetailFragment extends BaseFragment {
                         if (response.body().foodDetail != null) {
                             getActivity().runOnUiThread(() -> setupFoodDetail(response.body().foodDetail[0]));
                         } else {
+                            _getBarcodeFoodDetail = null;
                             //if API call failure
                             final Snackbar snackbar = MealDetailFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(response.body().message) ? response.body().message : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
                             snackbar.setAction("Dismiss", view -> snackbar.dismiss());
                             snackbar.show();
                         }
                     } else {
+                        _getBarcodeFoodDetail = null;
                         //if API call failure
                         final Snackbar snackbar = MealDetailFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(response.message()) ? response.message() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
                         snackbar.setAction("Dismiss", view -> snackbar.dismiss());
@@ -680,7 +654,7 @@ public class MealDetailFragment extends BaseFragment {
             _updateButton.setVisibility(View.VISIBLE);
             _deleteButton.setVisibility(View.VISIBLE);
 
-            getFoodDetailFromDatabase(date);
+            getFoodRecordDetailFromDatabase(date);
         }
 
 
@@ -730,7 +704,7 @@ public class MealDetailFragment extends BaseFragment {
         setNutritionView();
     }
 
-    private void getFoodDetailFromDatabase(String date)
+    private void getFoodRecordDetailFromDatabase(String date)
     {
         //date format
         DateFormat format = new SimpleDateFormat("dd MMM yyyy");
