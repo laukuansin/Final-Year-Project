@@ -28,8 +28,6 @@ public class ExerciseRecordAdapter extends RecyclerView.Adapter<ExerciseRecordAd
 
         if (_context instanceof OnActionListener){
             _listener = (OnActionListener)_context;
-        } else{
-            throw new RuntimeException(_context.toString() + " must implement OnActionListener");
         }
     }
     @NonNull

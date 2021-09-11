@@ -38,7 +38,7 @@ public class SessionHandler {
         database = FirebaseFirestore.getInstance();//get database
     }
 
-    private boolean isLoggedIn()
+    public boolean isLoggedIn()
     {
         return auth.getCurrentUser() != null;
     }

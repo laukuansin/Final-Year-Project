@@ -1,20 +1,23 @@
 package com.example.a303com_laukuansin.fragments;
 
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.activities.ExerciseActivity;
@@ -28,16 +31,16 @@ import com.example.a303com_laukuansin.utilities.ProgressAnimation;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
+
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +57,7 @@ import devs.mulham.horizontalcalendar.model.CalendarItemStyle;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarPredicate;
 
-public class HomeFragment extends BaseFragment {
+public class HomeFragment extends BaseFragment{
     private final User user;
     private TextView _dateView;
     private SimpleDateFormat dateFormat;
@@ -63,8 +66,9 @@ public class HomeFragment extends BaseFragment {
     private LinearProgressIndicator _dailyCaloriesEatenProgress, _dailyCaloriesBurntProgress,_dailyStepProgress,_dailyWaterProgress;
     private RetrieveDailyData _retrieveData = null;
     private FirebaseFirestore database;
+    private int stepWalked = 0;
     private String realDate;
-    MaterialCardView _mealCardView;
+    private SyncDailyStepData _syncStepData = null;
 
     public HomeFragment() {
         user = getSessionHandler().getUser();
@@ -106,8 +110,9 @@ public class HomeFragment extends BaseFragment {
         //bind view with id
         LinearLayout _containerLayout = view.findViewById(R.id.containerLayout);
         LinearLayout _calendarContainer = view.findViewById(R.id.containerCalendar);
-         _mealCardView = view.findViewById(R.id.mealCardView);
+        MaterialCardView _mealCardView = view.findViewById(R.id.mealCardView);
         MaterialCardView _exerciseCardView = view.findViewById(R.id.exerciseCardView);
+        MaterialCardView _stepCardView = view.findViewById(R.id.stepCardView);
         TextView _viewMoreMealButton = view.findViewById(R.id.viewMoreMealButton);
         _dateView = view.findViewById(R.id.date_view);
         ImageView arrow = view.findViewById(R.id.arrowView);
@@ -125,6 +130,7 @@ public class HomeFragment extends BaseFragment {
         _mealRecyclerView = view.findViewById(R.id.mealRecyclerView);
         _mealRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         _mealRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        ImageButton _syncStepButton = view.findViewById(R.id.syncStepButton);
 
         //setup calendar
         setupCalendar(view);
@@ -159,6 +165,7 @@ public class HomeFragment extends BaseFragment {
             }
         });
 
+        //when click the meal card view
         _mealCardView.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
@@ -170,6 +177,8 @@ public class HomeFragment extends BaseFragment {
 
             }
         });
+
+        //when click exercise card view
         _exerciseCardView.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
@@ -181,9 +190,18 @@ public class HomeFragment extends BaseFragment {
             }
         });
 
+        //when sync button clicked
+        _syncStepButton.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                syncStepData(_syncStepButton);
+            }
+        });
+
         //set first name of user
         _welcomeView.setText(String.format("Hi %1$s!", user.getName().split(" ")[0]));
     }
+
     private void loadData(User user) {
         if (_retrieveData == null)//if retrieve data class is null, by default will null
         {
@@ -228,14 +246,63 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onDateSelected(Calendar date, int position) {
                 setDate(date);//set date
-                loadData(user);
-                //load data
+                loadData(user);//load data
             }
         });
     }
 
+    private void syncStepData(ImageButton imageButton)
+    {
+        if(_syncStepData==null)
+        {
+            _syncStepData = new SyncDailyStepData(imageButton);
+            _syncStepData.execute();
+        }
+    }
+
+    //to sync the step data
+    private class SyncDailyStepData extends AsyncTask<Void,Void,Void>
+    {
+        private ImageButton _syncStepButton;
+
+        public SyncDailyStepData(ImageButton _syncStepButton) {
+            this._syncStepButton = _syncStepButton;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //rotation animation
+            getActivity().runOnUiThread(() -> {
+                Animation animation = AnimationUtils.loadAnimation(getContext(),R.anim.rotate_animation);
+                _syncStepButton.startAnimation(animation);
+                _syncStepButton.setEnabled(false);
+            });
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            getActivity().runOnUiThread(() -> {
+                //load step data
+                loadStepData(false);
+                //delay 2s
+                Handler handler = new Handler();
+                handler.postDelayed(() -> {
+                    _syncStepButton.clearAnimation();
+                    _syncStepButton.setEnabled(true);
+
+                    Toast.makeText(getContext(), "Synchronized the step data", Toast.LENGTH_SHORT).show();
+               },2000);
+                
+            });
+            _syncStepData = null;
+            return null;
+        }
+    }
+
     private class RetrieveDailyData extends AsyncTask<Void, Void, Void> {
         private User user;
+
         public RetrieveDailyData(User user) {
             this.user = user;
         }
@@ -245,24 +312,18 @@ public class HomeFragment extends BaseFragment {
             getActivity().runOnUiThread(() -> {
                 //load meal data
                 loadMealData();
-                //load exercise data
-                loadExerciseData();
-
-                   //set text for daily step walked
-                _dailyStepView.setText(String.format("%1$d of %2$d Steps walked",300,user.getSuggestStepWalk()));
+                //load step data
+                loadStepData(true);
                 //set text for daily water consumed
-                _dailyWaterView.setText(String.format("%1$d of %2$d Glasses water consumed",10, user.getSuggestWaterIntakeInGlass()));
+                _dailyWaterView.setText(String.format("%1$d of %2$d Glasses water consumed", 10, user.getSuggestWaterIntakeInGlass()));
 
-                //setup progress bar and animation for step
-                setupProgressAndAnimation(_dailyStepProgress,300,user.getSuggestStepWalk());
                 //setup progress bar and animation for water
-                setupProgressAndAnimation(_dailyWaterProgress,10,user.getSuggestWaterIntakeInGlass());
+                setupProgressAndAnimation(_dailyWaterProgress, 10, user.getSuggestWaterIntakeInGlass());
 
                 _retrieveData = null;
             });
             return null;
         }
-
     }
 
     private void loadMealData()
@@ -334,35 +395,73 @@ public class HomeFragment extends BaseFragment {
 
     private void loadExerciseData()
     {
-        //meal collection path
+        //exercise collection path
         String EXERCISE_COLLECTION_PATH = String.format("ExerciseRecords/%1$s/%2$s", user.getUID(),realDate);
 
         //get exercise collection reference
         CollectionReference exerciseCollectionRef = database.collection(EXERCISE_COLLECTION_PATH);
-        exerciseCollectionRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                if(error!=null)//if appear error
-                {
-                    ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
-                    return;
-                }
-                double totalCalories = 0;
-                for(DocumentSnapshot document:value.getDocuments())
-                {
-                    Map<String, Object> documentMapData = document.getData();
-                    Long duration = (Long) documentMapData.get("duration");
-                    double caloriesBurnedPerKGPerMin = (double) documentMapData.get("caloriesPerKGPerMin");
-                    double calories = (caloriesBurnedPerKGPerMin*duration*user.getWeight());
-                    totalCalories+=calories;
-                }
-                //set text for daily calories burned
-                _dailyCaloriesBurntView.setText(String.format("%1$d of %2$d Calories Burnt",(int)Math.round(totalCalories),(int)Math.round(user.getDailyCaloriesBurnt())));
-                //setup progress bar and animation for exercise
-                setupProgressAndAnimation(_dailyCaloriesBurntProgress,(int)Math.round(totalCalories),(int)Math.round(user.getDailyCaloriesBurnt()));
-
+        exerciseCollectionRef.addSnapshotListener((value, error) -> {
+            if(error!=null)//if appear error
+            {
+                ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
+                return;
             }
+            double totalCalories = 0;
+            for(DocumentSnapshot document:value.getDocuments())
+            {
+                Map<String, Object> documentMapData = document.getData();
+                Long duration = (Long) documentMapData.get("duration");
+                double caloriesBurnedPerKGPerMin = (double) documentMapData.get("caloriesPerKGPerMin");
+                double calories = (caloriesBurnedPerKGPerMin*duration*user.getWeight());
+                totalCalories+=calories;
+            }
+            //total calories add up with the calories of step walked
+            totalCalories += stepWalked*user.getCaloriesBurnedPerStepWalked();
+
+            //set text for daily calories burned
+            _dailyCaloriesBurntView.setText(String.format("%1$d of %2$d Calories Burnt",(int)Math.round(totalCalories),(int)Math.round(user.getDailyCaloriesBurnt())));
+            //setup progress bar and animation for exercise
+            setupProgressAndAnimation(_dailyCaloriesBurntProgress,(int)Math.round(totalCalories),(int)Math.round(user.getDailyCaloriesBurnt()));
+
         });
+    }
+
+    private void loadStepData(boolean showDialog)
+    {
+        SweetAlertDialog _progressDialog = showProgressDialog("Loading...",getResources().getColor(R.color.colorPrimary));
+
+        if(showDialog)
+        {
+            _progressDialog.show();
+        }
+
+        //initialize the step count
+        stepWalked = 0;
+        //step document path
+        String STEP_DOCUMENT_PATH = String.format("StepRecords/%1$s/%2$s/Step", user.getUID(),realDate);
+        //get step document reference
+        DocumentReference stepDocumentRef = database.document(STEP_DOCUMENT_PATH);
+        stepDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
+            if(showDialog)
+            {
+                if(_progressDialog.isShowing())
+                    _progressDialog.dismiss();
+            }
+            //if have the step count
+            if(documentSnapshot.exists())
+            {
+                stepWalked = documentSnapshot.getLong("stepCount").intValue();
+            }
+            //set text for daily step walked
+            _dailyStepView.setText(String.format("%1$d of %2$d Steps Walked",stepWalked,user.getSuggestStepWalk()));
+            //setup progress bar and animation for step
+            setupProgressAndAnimation(_dailyStepProgress,stepWalked,user.getSuggestStepWalk());
+
+            //load exercise data
+            loadExerciseData();
+
+        }).addOnFailureListener(e -> ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show());
+
     }
 
     private void addMeal(List<MealType> _mealTypeList, String mealType, double suggestCalories, double currentCalories) {

@@ -10,6 +10,7 @@ import android.widget.Button;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.activities.MainActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
+import com.example.a303com_laukuansin.pedometer.SensorListener;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -37,6 +38,7 @@ public class AccountFragment extends BaseFragment{
         logout.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
+                getActivity().stopService(new Intent(getContext(), SensorListener.class));
                 FirebaseAuth auth=FirebaseAuth.getInstance();
                 Intent intent = new Intent(getContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

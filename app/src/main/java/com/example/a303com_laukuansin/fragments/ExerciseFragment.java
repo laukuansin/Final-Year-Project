@@ -23,8 +23,11 @@ import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.example.a303com_laukuansin.utilities.ProgressAnimation;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import org.w3c.dom.Text;
 
@@ -44,12 +47,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ExerciseFragment extends BaseFragment {
     private String date;
-    private User user;
+    private final User user;
     private LinearProgressIndicator _exerciseProgressBar;
     private TextView _exerciseProgressView;
     private LinearLayout _emptyExerciseLayout;
     private RecyclerView _exerciseRecyclerView;
-    private RetrieveExerciseRecord _retrieveExerciseRecord = null;
+    private RetrieveExerciseRecordAndStepData _retrieveExerciseRecordAndStep = null;
+    private LinearLayout _stepLayout;
+    private TextView _stepCaloriesView, _stepCountView;
     private FirebaseFirestore database;
 
     public ExerciseFragment() {
@@ -75,11 +80,13 @@ public class ExerciseFragment extends BaseFragment {
         }
         setHasOptionsMenu(false);
     }
+
     @Override
     public void onResume() {
         super.onResume();
         loadData(date, user);//load data
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -87,20 +94,23 @@ public class ExerciseFragment extends BaseFragment {
         initialization(view);
         return view;
     }
+
     private void loadData(String date, User user) {
-        if (_retrieveExerciseRecord == null) {
-            _retrieveExerciseRecord = new RetrieveExerciseRecord(date, user);
-            _retrieveExerciseRecord.execute();
+        if (_retrieveExerciseRecordAndStep == null) {
+            _retrieveExerciseRecordAndStep = new RetrieveExerciseRecordAndStepData(date, user);
+            _retrieveExerciseRecordAndStep.execute();
         }
     }
 
-    private void initialization(View view)
-    {
+    private void initialization(View view) {
         //bind view with id
         _exerciseProgressView = view.findViewById(R.id.exerciseProgressView);
         _exerciseProgressBar = view.findViewById(R.id.exerciseProgressBar);
         _emptyExerciseLayout = view.findViewById(R.id.emptyExerciseLayout);
         _exerciseRecyclerView = view.findViewById(R.id.exerciseRecyclerView);
+        _stepLayout = view.findViewById(R.id.stepLayout);
+        _stepCaloriesView = view.findViewById(R.id.stepCaloriesView);
+        _stepCountView = view.findViewById(R.id.stepCountView);
         Button _addExerciseButton = view.findViewById(R.id.addExerciseButton);
 
         //setup recyclerview
@@ -123,14 +133,19 @@ public class ExerciseFragment extends BaseFragment {
         });
     }
 
-    private class RetrieveExerciseRecord extends AsyncTask<Void, Void, Void> {
+    private class RetrieveExerciseRecordAndStepData extends AsyncTask<Void, Void, Void> {
         private String date;
         private User user;
+        private List<Exercise> _exerciseRecordList;
         private double totalCalories = 0;
+        private double stepCalories = 0;
+        private int stepWalked = 0;
 
-        public RetrieveExerciseRecord(String date, User user) {
+        public RetrieveExerciseRecordAndStepData(String date, User user) {
             this.date = date;
             this.user = user;
+            //initialize the exercise list
+            _exerciseRecordList = new ArrayList<>();
         }
 
         @Override
@@ -142,26 +157,25 @@ public class ExerciseFragment extends BaseFragment {
                 date = format.format(new Date());//get current date
             }
 
-            //set collection path
-            String COLLECTION_PATH = String.format("ExerciseRecords/%1$s/%2$s", user.getUID(), date);
+            getActivity().runOnUiThread(() -> {
 
-            //get the Collection reference
-            //collection path = ExerciseRecords/UID/Date
-            CollectionReference collectionReference = database.collection(COLLECTION_PATH);
-            //get the exercise record
-            collectionReference.addSnapshotListener(getActivity(), (value, error) -> {
-                //if error appears
-                if (error != null) {
-                    //show error with dialog
-                    ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
-                    _retrieveExerciseRecord = null;
-                    return;
-                }
-                getActivity().runOnUiThread(() -> {
-                    //initialize the exercise list
-                    List<Exercise> _exerciseRecordList = new ArrayList<>();
+                //set exercise collection path
+                String EXERCISE_COLLECTION_PATH = String.format("ExerciseRecords/%1$s/%2$s", user.getUID(), date);
+                //get the Exercise record Collection reference
+                //collection path = ExerciseRecords/UID/Date
+                CollectionReference exerciseCollectionReference = database.collection(EXERCISE_COLLECTION_PATH);
+                //get the exercise record
+                exerciseCollectionReference.addSnapshotListener(getActivity(), (exerciseValue, exerciseError) -> {
+                    //if error appears
+                    if (exerciseError != null) {
+                        //show error with dialog
+                        ErrorAlert(exerciseError.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
+                        _retrieveExerciseRecordAndStep = null;
+                        return;
+                    }
+
                     //loop the document
-                    for (DocumentSnapshot document : value.getDocuments()) {
+                    for (DocumentSnapshot document : exerciseValue.getDocuments()) {
                         Exercise exercise = new Exercise();
                         Map<String, Object> documentMapData = document.getData();
                         Long duration = (Long) documentMapData.get("duration");
@@ -173,51 +187,77 @@ public class ExerciseFragment extends BaseFragment {
                         exercise.setDuration(duration.intValue());
                         exercise.setCaloriesBurnedPerKGPerMin(caloriesBurnedPerKGPerMin);
                         //get the current weight * duration * calories burned per min per kg
-                        double calories = (caloriesBurnedPerKGPerMin*duration*user.getWeight());
-                        totalCalories+=calories;
+                        double calories = (caloriesBurnedPerKGPerMin * duration * user.getWeight());
+                        totalCalories += calories;
                         exercise.setCalories(calories);
 
                         _exerciseRecordList.add(exercise);
                     }
 
-                    //set progress bar
-                    _exerciseProgressBar.setMax((int) Math.round(user.getDailyCaloriesBurnt()));
-                    _exerciseProgressBar.clearAnimation();
+                    //set step document path
+                    String STEP_DOCUMENT_PATH = String.format("StepRecords/%1$s/%2$s/Step", user.getUID(), date);
+                    //get the step record document reference
+                    //document path = StepRecords/UID/Date/Step
+                    DocumentReference stepDocumentReference = database.document(STEP_DOCUMENT_PATH);
+                    stepDocumentReference.addSnapshotListener((stepValue, stepError) -> {
+                        if (stepError != null)//if appear error
+                        {
+                            ErrorAlert(stepError.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
+                            _retrieveExerciseRecordAndStep = null;
+                            return;
+                        }
+                        if (stepValue.exists()) {
+                            stepWalked = stepValue.getLong("stepCount").intValue();
+                            _stepCountView.setText(String.format("%1$d steps", stepWalked));
+                            stepCalories = stepWalked * user.getCaloriesBurnedPerStepWalked();
+                            _stepCaloriesView.setText(String.format("%1$d Calories", (int) Math.round(stepCalories)));
+                        }
+                        totalCalories += stepCalories;
+                        //set progress bar
+                        _exerciseProgressBar.setMax((int) Math.round(user.getDailyCaloriesBurnt()));
+                        _exerciseProgressBar.clearAnimation();
+                        //create animation, from 0 animate to current value
+                        ProgressAnimation animation = new ProgressAnimation(_exerciseProgressBar, 0, (int) Math.round(totalCalories));
+                        animation.setDuration(1000);//set 2 milliseconds animation
+                        _exerciseProgressBar.setAnimation(animation);//start animation
 
-                    //create animation, from 0 animate to current value
-                    ProgressAnimation animation = new ProgressAnimation(_exerciseProgressBar, 0, (int) Math.round(totalCalories));
-                    animation.setDuration(1000);//set 2 milliseconds animation
-                    _exerciseProgressBar.setAnimation(animation);//start animation
 
+                        _exerciseProgressView.setText(String.format("%1$s of %2$s Calories Burnt", (int) Math.round(totalCalories), (int) Math.round(user.getDailyCaloriesBurnt())));
 
-                    _exerciseProgressView.setText(String.format("%1$s of %2$s Calories Burnt", (int)Math.round(totalCalories), (int) Math.round(user.getDailyCaloriesBurnt())));
+                        //if no exercise record and step walked today
+                        if (_exerciseRecordList.isEmpty() && stepWalked <= 0) {
+                            _emptyExerciseLayout.setVisibility(View.VISIBLE);
+                            _exerciseRecyclerView.setVisibility(View.GONE);
+                            _stepLayout.setVisibility(View.GONE);
+                        } else {
+                            _emptyExerciseLayout.setVisibility(View.GONE);
+                            //when the exercise record list is not empty;
+                            if (!_exerciseRecordList.isEmpty()) {
+                                _exerciseRecyclerView.setVisibility(View.VISIBLE);
+                                ExerciseRecordAdapter adapter = new ExerciseRecordAdapter(getContext(), _exerciseRecordList);
+                                _exerciseRecyclerView.setAdapter(adapter);
+                            }
+                            //when the step walk is high than 0
+                            if (stepWalked > 0) {
+                                _stepLayout.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
 
-                    //if no exercise record at today
-                    if(_exerciseRecordList.isEmpty())
-                    {
-                        _emptyExerciseLayout.setVisibility(View.VISIBLE);
-                        _exerciseRecyclerView.setVisibility(View.GONE);
-                    }
-                    else{
-                        _emptyExerciseLayout.setVisibility(View.GONE);
-                        _exerciseRecyclerView.setVisibility(View.VISIBLE);
-                        ExerciseRecordAdapter adapter = new ExerciseRecordAdapter( getContext(),_exerciseRecordList);
-                        _exerciseRecyclerView.setAdapter(adapter);
-                    }
 
                 });
-            });
 
-            _retrieveExerciseRecord = null;
+            });
+            _retrieveExerciseRecordAndStep = null;
             return null;
         }
     }
-    public void editExerciseRecord(Exercise exercise)
-    {
+
+    public void editExerciseRecord(Exercise exercise) {
         Intent intent = new Intent(getContext(), ExerciseDetailActivity.class);
         intent.putExtra(ExerciseDetailActivity.DATE_KEY, date);
-        intent.putExtra(ExerciseDetailActivity.EXERCISE_RECORD_ID_KEY,exercise.getExerciseRecordID());
-        intent.putExtra(ExerciseDetailActivity.EXERCISE_ID_KEY,exercise.getExerciseID());
+        intent.putExtra(ExerciseDetailActivity.EXERCISE_RECORD_ID_KEY, exercise.getExerciseRecordID());
+        intent.putExtra(ExerciseDetailActivity.EXERCISE_ID_KEY, exercise.getExerciseID());
         startActivity(intent);
         getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }

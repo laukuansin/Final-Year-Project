@@ -34,10 +34,11 @@ public abstract class BaseActivity extends BaseAppCompatActivity {
     public void isPermissionGranted() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED ||
-                    checkSelfPermission(Manifest.permission.CAMERA)!=PackageManager.PERMISSION_GRANTED)//if storage or camera did not get permission
+                    checkSelfPermission(Manifest.permission.CAMERA)!=PackageManager.PERMISSION_GRANTED||
+                    checkSelfPermission(Manifest.permission.BODY_SENSORS)!=PackageManager.PERMISSION_GRANTED)//if storage, camera, or body sensor did not get permission
             {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.CAMERA},PERMISSION_CODE);//ask permission for storage and camera
+                        Manifest.permission.CAMERA,Manifest.permission.BODY_SENSORS},PERMISSION_CODE);//ask permission for storage, camera, and body sensor
             }
         }
     }
@@ -48,7 +49,8 @@ public abstract class BaseActivity extends BaseAppCompatActivity {
         if (requestCode == PERMISSION_CODE) {//if same permission code
             if (grantResults.length > 0)
             {
-                if(grantResults[0] != PackageManager.PERMISSION_GRANTED && grantResults[1]!=PackageManager.PERMISSION_GRANTED)//if denied camera and storage permission
+                if(grantResults[0] != PackageManager.PERMISSION_GRANTED && grantResults[1]!=PackageManager.PERMISSION_GRANTED
+                  && grantResults[2] != PackageManager.PERMISSION_GRANTED)//if denied camera, storage, body sensor permission
                 {
                     Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
                 }
@@ -59,6 +61,10 @@ public abstract class BaseActivity extends BaseAppCompatActivity {
                 else if(grantResults[1]!=PackageManager.PERMISSION_GRANTED)//if denied camera permission only
                 {
                     Toast.makeText(this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
+                }
+                else if(grantResults[2]!=PackageManager.PERMISSION_GRANTED)//if denied camera permission only
+                {
+                    Toast.makeText(this, "Body Sensor Permission Denied", Toast.LENGTH_SHORT).show();
                 }
             }
         }
