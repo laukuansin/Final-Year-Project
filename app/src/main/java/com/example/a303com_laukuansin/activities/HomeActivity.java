@@ -1,14 +1,14 @@
 package com.example.a303com_laukuansin.activities;
 
-import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
@@ -16,11 +16,11 @@ import com.example.a303com_laukuansin.cores.BaseActivity;
 import com.example.a303com_laukuansin.fragments.AccountFragment;
 import com.example.a303com_laukuansin.fragments.AnalyticFragment;
 import com.example.a303com_laukuansin.fragments.HomeFragment;
+import com.example.a303com_laukuansin.pedometer.SensorListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends BaseActivity {
-    public Fragment _fragment;
-
+    private Fragment _fragment;
 
     @Override
     protected int ContentView() {
@@ -77,6 +77,11 @@ public class HomeActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         isPermissionGranted();//check permission
 
+        //if the user is log in only start track the step
+        if (getSessionHandler().isLoggedIn()) {
+            ContextCompat.startForegroundService(this, new Intent(this, SensorListener.class));
+        }
+
         initialization();
 
         //set the default fragment
@@ -87,10 +92,9 @@ public class HomeActivity extends BaseActivity {
         }
     }
 
-    private void initialization()
-    {
+    private void initialization() {
         //setup bottom navigation bar
-        BottomNavigationView btmNavBar = (BottomNavigationView)findViewById(R.id.bottomNavigationBar);
+        BottomNavigationView btmNavBar = (BottomNavigationView) findViewById(R.id.bottomNavigationBar);
         btmNavBar.getMenu().getItem(0).setEnabled(false);//because on default first item at bottom navigation did not disable
 
         btmNavBar.setOnNavigationItemSelectedListener(item -> {
@@ -123,11 +127,12 @@ public class HomeActivity extends BaseActivity {
     private boolean loadFragment(Fragment fragment) {
         if (fragment != null) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.setCustomAnimations(R.anim.fade_in,R.anim.fade_out,R.anim.fade_in,R.anim.fade_out);//set animation
+            fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out, R.anim.fade_in, R.anim.fade_out);//set animation
             fragmentTransaction.replace(R.id.frame_container, fragment);
             fragmentTransaction.commit();
             return true;
         }
         return false;
     }
+
 }

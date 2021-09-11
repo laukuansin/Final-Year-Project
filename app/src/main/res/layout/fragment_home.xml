@@ -320,6 +320,8 @@
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
+                    android:id="@+id/stepCardView"
+                    android:background="@color/white_1000"
                     android:layout_height="wrap_content"
                     android:clipChildren="false"
                     android:clipToPadding="false"
@@ -340,20 +342,32 @@
                             android:gravity="center"
                             android:orientation="horizontal">
 
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:contentDescription="step"
-                                android:src="@drawable/ic_step" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="0.1"
+                                android:orientation="horizontal"
+                                android:layout_height="wrap_content">
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:contentDescription="step"
+                                    android:src="@drawable/ic_step" />
 
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="10dp"
-                                android:text="Step"
-                                android:textColor="@color/purple_A700"
-                                android:textStyle="bold" />
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:text="Step"
+                                    android:textColor="@color/purple_A700"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
 
+                            <ImageButton
+                                android:id="@+id/syncStepButton"
+                                android:layout_width="25dp"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:src="@drawable/ic_refresh"
+                                android:layout_height="25dp"/>
                         </LinearLayout>
 
                         <LinearLayout

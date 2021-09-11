@@ -222,4 +222,22 @@ public class User implements Serializable {
         }
         return goal;
     }
+
+    public double getCaloriesBurnedPerStepWalked()
+    {
+        double stepMultipliersPerKG = 0;
+        //when the user height is higher or equal than 183
+        if(getHeight()>=183)
+        {
+            stepMultipliersPerKG = 0.0006;
+        }
+        else if(getHeight()<=165)//when the user height is lower or equal than 165
+        {
+            stepMultipliersPerKG = 0.0005;
+        }
+        else{//when the user height is in between 166 to 182
+            stepMultipliersPerKG = 0.00055;
+        }
+        return getWeight()*stepMultipliersPerKG;
+    }
 }
