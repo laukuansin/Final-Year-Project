@@ -101,6 +101,8 @@ dependencies {
     //compress the image
     implementation 'id.zelory:compressor:2.1.1'
 
-    //
+    //wave progress view
+    implementation 'com.yangping:ypwaveview:1.0.3'
+
 
 }
