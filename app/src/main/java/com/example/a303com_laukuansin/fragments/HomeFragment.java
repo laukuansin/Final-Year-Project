@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.activities.ExerciseActivity;
 import com.example.a303com_laukuansin.activities.MealActivity;
+import com.example.a303com_laukuansin.activities.WaterActivity;
 import com.example.a303com_laukuansin.adapters.MealAdapter;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.MealType;
@@ -66,7 +67,7 @@ public class HomeFragment extends BaseFragment{
     private LinearProgressIndicator _dailyCaloriesEatenProgress, _dailyCaloriesBurntProgress,_dailyStepProgress,_dailyWaterProgress;
     private RetrieveDailyData _retrieveData = null;
     private FirebaseFirestore database;
-    private int stepWalked = 0;
+    private int stepWalked = 0,glassOfWaterDrink = 0;
     private String realDate;
     private SyncDailyStepData _syncStepData = null;
 
@@ -112,7 +113,7 @@ public class HomeFragment extends BaseFragment{
         LinearLayout _calendarContainer = view.findViewById(R.id.containerCalendar);
         MaterialCardView _mealCardView = view.findViewById(R.id.mealCardView);
         MaterialCardView _exerciseCardView = view.findViewById(R.id.exerciseCardView);
-        MaterialCardView _stepCardView = view.findViewById(R.id.stepCardView);
+        MaterialCardView _waterCardView = view.findViewById(R.id.waterCardView);
         TextView _viewMoreMealButton = view.findViewById(R.id.viewMoreMealButton);
         _dateView = view.findViewById(R.id.date_view);
         ImageView arrow = view.findViewById(R.id.arrowView);
@@ -195,6 +196,18 @@ public class HomeFragment extends BaseFragment{
             @Override
             public void onSingleClick(View v) {
                 syncStepData(_syncStepButton);
+            }
+        });
+
+        //when click water card view
+        _waterCardView.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                Intent intent = new Intent(getContext(), WaterActivity.class);
+                intent.putExtra(WaterActivity.DATE_KEY,_dateView.getText().toString());
+                startActivity(intent);
+                //add animation sliding to next activity
+                getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
             }
         });
 
@@ -284,7 +297,7 @@ public class HomeFragment extends BaseFragment{
         protected Void doInBackground(Void... voids) {
             getActivity().runOnUiThread(() -> {
                 //load step data
-                loadStepData(false);
+                loadStepAndExerciseData(false);
                 //delay 2s
                 Handler handler = new Handler();
                 handler.postDelayed(() -> {
@@ -313,13 +326,9 @@ public class HomeFragment extends BaseFragment{
                 //load meal data
                 loadMealData();
                 //load step data
-                loadStepData(true);
-                //set text for daily water consumed
-                _dailyWaterView.setText(String.format("%1$d of %2$d Glasses water consumed", 10, user.getSuggestWaterIntakeInGlass()));
-
-                //setup progress bar and animation for water
-                setupProgressAndAnimation(_dailyWaterProgress, 10, user.getSuggestWaterIntakeInGlass());
-
+                loadStepAndExerciseData(true);
+                //load water data
+                loadWaterData();
                 _retrieveData = null;
             });
             return null;
@@ -426,7 +435,7 @@ public class HomeFragment extends BaseFragment{
         });
     }
 
-    private void loadStepData(boolean showDialog)
+    private void loadStepAndExerciseData(boolean showDialog)
     {
         SweetAlertDialog _progressDialog = showProgressDialog("Loading...",getResources().getColor(R.color.colorPrimary));
 
@@ -462,6 +471,33 @@ public class HomeFragment extends BaseFragment{
 
         }).addOnFailureListener(e -> ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show());
 
+    }
+
+    private void loadWaterData()
+    {
+        //initialize water drink to 0
+        glassOfWaterDrink = 0;
+        //water document path
+        String WATER_DOCUMENT_PATH = String.format("WaterRecords/%1$s/%2$s/Water", user.getUID(),realDate);
+        //get water document reference
+        DocumentReference waterDocumentRef = database.document(WATER_DOCUMENT_PATH);
+        waterDocumentRef.addSnapshotListener((value, error) -> {
+            if(error!=null)//if appear error
+            {
+                ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
+                return;
+            }
+            if(value.exists())
+            {
+                glassOfWaterDrink = value.getLong("glassOfWater").intValue();
+            }
+            //set text for daily water consumed
+            _dailyWaterView.setText(String.format("%1$d of %2$d Glasses water consumed", glassOfWaterDrink, user.getSuggestWaterIntakeInGlass()));
+
+            //setup progress bar and animation for water
+            setupProgressAndAnimation(_dailyWaterProgress, glassOfWaterDrink, user.getSuggestWaterIntakeInGlass());
+
+        });
     }
 
     private void addMeal(List<MealType> _mealTypeList, String mealType, double suggestCalories, double currentCalories) {
