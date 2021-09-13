@@ -2,6 +2,7 @@ package com.example.a303com_laukuansin.domains;
 
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.Date;
 
 public class User implements Serializable {
     private String emailAddress;
@@ -14,6 +15,7 @@ public class User implements Serializable {
     private double targetWeight=0;
     private double startWeight=0;
     private double activityLevel=0;
+    private Date dateCreated;
 
     public User() {
     }
@@ -96,6 +98,14 @@ public class User implements Serializable {
 
     public void setActivityLevel(double activityLevel) {
         this.activityLevel = activityLevel;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreateAccount(Date dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
     public double getBMI()

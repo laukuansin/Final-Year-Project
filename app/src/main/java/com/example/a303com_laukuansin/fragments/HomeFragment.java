@@ -29,6 +29,8 @@ import com.example.a303com_laukuansin.domains.MealType;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.example.a303com_laukuansin.utilities.ProgressAnimation;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.firestore.CollectionReference;
@@ -37,6 +39,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
@@ -96,7 +99,7 @@ public class HomeFragment extends BaseFragment{
     @Override
     public void onResume() {
         super.onResume();
-        loadData(user);//load data
+        loadData();//load data
     }
 
     private void initialization(View view) {
@@ -215,10 +218,10 @@ public class HomeFragment extends BaseFragment{
         _welcomeView.setText(String.format("Hi %1$s!", user.getName().split(" ")[0]));
     }
 
-    private void loadData(User user) {
+    private void loadData() {
         if (_retrieveData == null)//if retrieve data class is null, by default will null
         {
-            _retrieveData = new RetrieveDailyData(user);
+            _retrieveData = new RetrieveDailyData();
             _retrieveData.execute();
         }
     }
@@ -259,7 +262,7 @@ public class HomeFragment extends BaseFragment{
             @Override
             public void onDateSelected(Calendar date, int position) {
                 setDate(date);//set date
-                loadData(user);//load data
+                loadData();//load data
             }
         });
     }
@@ -314,10 +317,8 @@ public class HomeFragment extends BaseFragment{
     }
 
     private class RetrieveDailyData extends AsyncTask<Void, Void, Void> {
-        private User user;
 
-        public RetrieveDailyData(User user) {
-            this.user = user;
+        public RetrieveDailyData() {
         }
 
         @Override
@@ -446,20 +447,20 @@ public class HomeFragment extends BaseFragment{
 
         //initialize the step count
         stepWalked = 0;
-        //step document path
-        String STEP_DOCUMENT_PATH = String.format("StepRecords/%1$s/%2$s/Step", user.getUID(),realDate);
-        //get step document reference
-        DocumentReference stepDocumentRef = database.document(STEP_DOCUMENT_PATH);
-        stepDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
+        //step collection path
+        String STEP_COLLECTION_PATH = String.format("StepRecords/%1$s/%2$s", user.getUID(),realDate);
+        //get step collection reference
+        CollectionReference stepCollectionRef = database.collection(STEP_COLLECTION_PATH);
+        stepCollectionRef.get().addOnSuccessListener(queryDocumentSnapshots -> {
             if(showDialog)
             {
                 if(_progressDialog.isShowing())
                     _progressDialog.dismiss();
             }
-            //if have the step count
-            if(documentSnapshot.exists())
+            //if has record
+            if(!queryDocumentSnapshots.isEmpty())
             {
-                stepWalked = documentSnapshot.getLong("stepCount").intValue();
+                stepWalked = queryDocumentSnapshots.getDocuments().get(0).getLong("stepCount").intValue();
             }
             //set text for daily step walked
             _dailyStepView.setText(String.format("%1$d of %2$d Steps Walked",stepWalked,user.getSuggestStepWalk()));
@@ -468,7 +469,6 @@ public class HomeFragment extends BaseFragment{
 
             //load exercise data
             loadExerciseData();
-
         }).addOnFailureListener(e -> ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show());
 
     }
@@ -477,19 +477,14 @@ public class HomeFragment extends BaseFragment{
     {
         //initialize water drink to 0
         glassOfWaterDrink = 0;
-        //water document path
-        String WATER_DOCUMENT_PATH = String.format("WaterRecords/%1$s/%2$s/Water", user.getUID(),realDate);
-        //get water document reference
-        DocumentReference waterDocumentRef = database.document(WATER_DOCUMENT_PATH);
-        waterDocumentRef.addSnapshotListener((value, error) -> {
-            if(error!=null)//if appear error
+        //water collection path
+        String WATER_COLLECTION_PATH = String.format("WaterRecords/%1$s/%2$s", user.getUID(),realDate);
+        //get water collection reference
+        CollectionReference waterCollectionRef = database.collection(WATER_COLLECTION_PATH);
+        waterCollectionRef.get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if(!queryDocumentSnapshots.isEmpty())
             {
-                ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
-                return;
-            }
-            if(value.exists())
-            {
-                glassOfWaterDrink = value.getLong("glassOfWater").intValue();
+                glassOfWaterDrink = queryDocumentSnapshots.getDocuments().get(0).getLong("glassOfWater").intValue();
             }
             //set text for daily water consumed
             _dailyWaterView.setText(String.format("%1$d of %2$d Glasses water consumed", glassOfWaterDrink, user.getSuggestWaterIntakeInGlass()));
@@ -497,7 +492,8 @@ public class HomeFragment extends BaseFragment{
             //setup progress bar and animation for water
             setupProgressAndAnimation(_dailyWaterProgress, glassOfWaterDrink, user.getSuggestWaterIntakeInGlass());
 
-        });
+        }).addOnFailureListener(e -> ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show());
+
     }
 
     private void addMeal(List<MealType> _mealTypeList, String mealType, double suggestCalories, double currentCalories) {

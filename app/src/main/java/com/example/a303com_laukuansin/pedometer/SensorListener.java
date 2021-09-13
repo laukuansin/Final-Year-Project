@@ -17,7 +17,11 @@ import android.os.IBinder;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.AppController;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,6 +33,7 @@ public class SensorListener extends Service implements SensorEventListener {
     private final String CHANNEL_ID = "100";//channel id
     private final String CHANNEL_NAME = "StepService";// channel name
     private final int NOTIFY_ID = 1;//notification id
+    private String stepRecordID = "";//step record id
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");//date format example 11 Sep 2021
     private String currentDate = "";//today date
     private int currentStep = 0;//today step
@@ -120,17 +125,15 @@ public class SensorListener extends Service implements SensorEventListener {
     private void saveStepData() {
         //if the user is log in
         if (AppController.getInstance().getSessionHandler().getUser().getUID()!=null) {
-            String path = String.format("StepRecords/%1$s/%2$s/Step", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate);
-            database.document(path).get().addOnSuccessListener(documentSnapshot -> {
-                //if today step record is exists
-                if(documentSnapshot.exists())
+            String path = String.format("StepRecords/%1$s/%2$s", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate);
+            database.collection(path).get().addOnSuccessListener(queryDocumentSnapshots -> {
+                if(queryDocumentSnapshots.isEmpty())
                 {
-                    //then only update the step
-                    updateStep();
+                    addStep();
                 }
                 else{
-                    //else add the step record
-                    addStep();
+                    stepRecordID = queryDocumentSnapshots.getDocuments().get(0).getId();
+                    updateStep();
                 }
             });
             //update the notification
@@ -142,17 +145,16 @@ public class SensorListener extends Service implements SensorEventListener {
         if (AppController.getInstance().getSessionHandler().getUser()!=null) {
             Map<String, Object> stepRecordMap = new HashMap<>();//create hash map to store the step record's data
             stepRecordMap.put("stepCount", currentStep);
-            String path = String.format("StepRecords/%1$s/%2$s/Step", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate);
-
-            database.document(path).set(stepRecordMap);
+            String path = String.format("StepRecords/%1$s/%2$s", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate);
+            database.collection(path).document().set(stepRecordMap);
         }
     }
 
     private void updateStep() {
-        if (AppController.getInstance().getSessionHandler().getUser()!=null) {
+        if (AppController.getInstance().getSessionHandler().getUser()!=null&&!stepRecordID.isEmpty()) {
             Map<String, Object> stepRecordMap = new HashMap<>();//create hash map to store the step record's data
             stepRecordMap.put("stepCount", currentStep);
-            String path = String.format("StepRecords/%1$s/%2$s/Step", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate);
+            String path = String.format("StepRecords/%1$s/%2$s/%3$s", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate,stepRecordID);
             database.document(path).update(stepRecordMap);
         }
     }
@@ -163,14 +165,17 @@ public class SensorListener extends Service implements SensorEventListener {
             //get today day
             currentDate = dateFormat.format(new Date());
             //get the path of database
-            String path = String.format("StepRecords/%1$s/%2$s/Step", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate);
+            String path = String.format("StepRecords/%1$s/%2$s", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate);
             //get the today step data
-            database.document(path).get().addOnSuccessListener(documentSnapshot -> {
-                //if today have load the step data, then get the value
-                if (documentSnapshot.exists()) {
-                    currentStep = documentSnapshot.getLong("stepCount").intValue();
-                } else {//otherwise set current step to 0
+            database.collection(path).get().addOnSuccessListener(queryDocumentSnapshots -> {
+                if(queryDocumentSnapshots.isEmpty())
+                {
                     currentStep = 0;
+                }
+                else{
+                    //because the record in each day will only have 1 so get(0)
+                    stepRecordID = queryDocumentSnapshots.getDocuments().get(0).getId();
+                    currentStep = queryDocumentSnapshots.getDocuments().get(0).getLong("stepCount").intValue();
                 }
             });
         }

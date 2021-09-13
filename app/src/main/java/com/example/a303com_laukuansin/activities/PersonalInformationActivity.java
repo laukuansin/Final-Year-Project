@@ -21,6 +21,8 @@ import com.example.a303com_laukuansin.fragments.PersonalInformation.FillWeightFr
 import com.example.a303com_laukuansin.receivers.ConnectivityReceiver;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +38,7 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
 
     private StepProgressBar _progressBar;
     private int step;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,8 +48,7 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
         initialization();
     }
 
-    private void initialization()
-    {
+    private void initialization() {
         _progressBar = findViewById(R.id.progressBar);
         FrameLayout _frameLayout = findViewById(R.id.frameLayout);
 
@@ -62,25 +64,25 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
 
         //load fill name fragment on the default
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(_frameLayout.getId(),FillNameFragment.newInstance());
+        fragmentTransaction.add(_frameLayout.getId(), FillNameFragment.newInstance());
         fragmentTransaction.commit();
     }
 
     @Override
     public void nextStep() {
         //update the step number
-       incrementStep();
+        incrementStep();
     }
 
     private void incrementStep()//increase step
     {
-        step +=1;
+        step += 1;
         _progressBar.setStep(step);
     }
 
     private void decrementStep()//decrease step
     {
-        step-=1;
+        step -= 1;
         _progressBar.setStep(step);
     }
 
@@ -90,8 +92,7 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
         //when click back button
 
         //if(step is bigger than 1 only minus 1 and update the step
-        if(step>1)
-        {
+        if (step > 1) {
             decrementStep();
             super.onBackPressed();
         }
@@ -107,29 +108,30 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
     @Override
     public void completed() {//when user fill all information
         //create progress dialog
-        SweetAlertDialog _progressDialog = new SweetAlertDialog(this,SweetAlertDialog.PROGRESS_TYPE);
+        SweetAlertDialog _progressDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
         _progressDialog.setContentText("Loading...");
         _progressDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.colorPrimary));
         _progressDialog.setCancelable(false);
         _progressDialog.show();
 
         User user = AppController.getInstance().getSessionHandler().getUser();//get user
-        if(!user.getName().isEmpty() && user.getYearOfBirth()!=0 && !user.getGender().isEmpty() && user.getHeight()!=0
-        &&user.getWeight()!=0 && user.getTargetWeight()!=0 && user.getActivityLevel()!=0)//if all the user personal information is filled
+        if (!user.getName().isEmpty() && user.getYearOfBirth() != 0 && !user.getGender().isEmpty() && user.getHeight() != 0
+                && user.getWeight() != 0 && user.getTargetWeight() != 0 && user.getActivityLevel() != 0)//if all the user personal information is filled
         {
             FirebaseFirestore database = FirebaseFirestore.getInstance();//create database
-            if(ConnectivityReceiver.isConnected())//if have wifi connection
+            if (ConnectivityReceiver.isConnected())//if have wifi connection
             {
                 Map<String, Object> userMap = new HashMap<>();//create hash map to store the user's data
-                userMap.put("email",user.getEmailAddress());
-                userMap.put("name",user.getName());
-                userMap.put("gender",user.getGender());
-                userMap.put("yearOfBirth",user.getYearOfBirth());
-                userMap.put("height",user.getHeight());
-                userMap.put("weight",user.getWeight());
-                userMap.put("startWeight",user.getWeight());
-                userMap.put("targetWeight",user.getTargetWeight());
-                userMap.put("activityLevel",user.getActivityLevel());
+                userMap.put("email", user.getEmailAddress());
+                userMap.put("name", user.getName());
+                userMap.put("gender", user.getGender());
+                userMap.put("yearOfBirth", user.getYearOfBirth());
+                userMap.put("height", user.getHeight());
+                userMap.put("weight", user.getWeight());
+                userMap.put("startWeight", user.getWeight());
+                userMap.put("targetWeight", user.getTargetWeight());
+                userMap.put("activityLevel", user.getActivityLevel());
+                userMap.put("dateCreated", new Date());
 
                 database.collection("Users").document(user.getUID()).set(userMap)//add user to database
                         .addOnSuccessListener(documentReference -> {//if success
@@ -148,15 +150,20 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
 
                             createErrorDialog(e.getMessage());
                         });
-            }
-            else{//have wifi connection
+
+                //get the date format
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");//date format example 11 Sep 2021
+                Map<String, Object> bodyWeightMap = new HashMap<>();//create hash map to store the user's data
+
+
+                //database.collection("BodyWeightRecords").document(user.getUID()).collection(dateFormat.format(new Date())).get("")
+            } else {//have wifi connection
                 if (_progressDialog.isShowing())//cancel dialog
                     _progressDialog.dismiss();
 
                 createErrorDialog("No internet connection! Please check your connection and try again.");
             }
-        }
-        else{//if one of the user personal information is missing
+        } else {//if one of the user personal information is missing
             //cancel dialog
             if (_progressDialog.isShowing())
                 _progressDialog.dismiss();
@@ -167,7 +174,7 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
 
     private void createErrorDialog(String message)//create error dialog
     {
-        SweetAlertDialog _errorDialog = new SweetAlertDialog(this,SweetAlertDialog.ERROR_TYPE);
+        SweetAlertDialog _errorDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
         _errorDialog.setTitleText(R.string.alert_title_error);
         _errorDialog.setContentText(message);
         _errorDialog.setConfirmButton(R.string.alert_ok, sweetAlertDialog -> sweetAlertDialog.dismiss());

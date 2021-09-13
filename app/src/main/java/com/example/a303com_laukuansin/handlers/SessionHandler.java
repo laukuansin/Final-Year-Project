@@ -93,6 +93,7 @@ public class SessionHandler {
         user.setWeight(documentSnapshot.getDouble("weight"));
         user.setTargetWeight(documentSnapshot.getDouble("targetWeight"));
         user.setYearOfBirth(documentSnapshot.getLong("yearOfBirth").intValue());
+        user.setDateCreateAccount(documentSnapshot.getDate("dateCreated"));
 
         setUser(user);
     }

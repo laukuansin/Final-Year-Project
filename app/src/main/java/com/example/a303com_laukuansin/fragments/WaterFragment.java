@@ -17,7 +17,7 @@ import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.ProgressAnimation;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
-import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.yangp.ypwaveview.YPWaveView;
 
@@ -40,9 +40,9 @@ public class WaterFragment extends BaseFragment {
     private YPWaveView _waveProgressView;
     private RetrieveWaterRecord _retrieveWaterRecord = null;
     private int currentGlassOfWater = 0;
-    private boolean hasRecord = false;
+    private String waterRecordID = "";
     private ImageView _decreaseButton;
-    private String WATER_DOCUMENT_PATH = "";
+    private String WATER_COLLECTION_PATH = "";
 
     public WaterFragment() {
         user = getSessionHandler().getUser();
@@ -95,8 +95,8 @@ public class WaterFragment extends BaseFragment {
             date = format.format(new Date());//get current date
         }
 
-        //water document path
-        WATER_DOCUMENT_PATH = String.format("WaterRecords/%1$s/%2$s/Water", user.getUID(), date);
+        //water collection path
+        WATER_COLLECTION_PATH = String.format("WaterRecords/%1$s/%2$s", user.getUID(), date);
 
         //when click decrease button
         _decreaseButton.setOnClickListener(clickView -> {
@@ -132,14 +132,14 @@ public class WaterFragment extends BaseFragment {
         //set progress text
         _waterProgressView.setText(String.format("%1$d of %2$d Glasses water consumed", currentGlassOfWater, user.getSuggestWaterIntakeInGlass()));
 
-        Map<String, Object> stepRecordMap = new HashMap<>();//create hash map to store the water record's data
-        stepRecordMap.put("glassOfWater", currentGlassOfWater);
-        if (hasRecord) {//if has record before, just update, otherwise add new record
-            database.document(WATER_DOCUMENT_PATH).update(stepRecordMap);
+        Map<String, Object> waterRecordMap = new HashMap<>();//create hash map to store the water record's data
+        waterRecordMap.put("glassOfWater", currentGlassOfWater);
+        CollectionReference collectionReference = database.collection(WATER_COLLECTION_PATH);
+        if (waterRecordID.isEmpty()) {//if no has record before, then add new record, otherwise update
+            waterRecordID = collectionReference.document().getId();
+            collectionReference.document(waterRecordID).set(waterRecordMap);
         } else {
-            database.document(WATER_DOCUMENT_PATH).set(stepRecordMap);
-            //after add record, then change to false
-            hasRecord = true;
+            collectionReference.document(waterRecordID).update(waterRecordMap);
         }
     }
 
@@ -169,16 +169,21 @@ public class WaterFragment extends BaseFragment {
         @Override
         protected Void doInBackground(Void... voids) {
             getActivity().runOnUiThread(() -> {
-                //get water document reference
-                DocumentReference waterDocumentRef = database.document(WATER_DOCUMENT_PATH);
-                waterDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
+                //get water collection reference
+                CollectionReference waterCollectionRef = database.collection(WATER_COLLECTION_PATH);
+                waterCollectionRef.get().addOnSuccessListener(documentSnapshot -> {
                     if(_progressDialog.isShowing())
                         _progressDialog.dismiss();
-                    //if has record
-                    if(documentSnapshot.exists())
+                    //if no record
+                    if(documentSnapshot.isEmpty())
                     {
-                        currentGlassOfWater = documentSnapshot.getLong("glassOfWater").intValue();
-                        hasRecord = true;
+                        currentGlassOfWater = 0;
+                        _decreaseButton.setEnabled(false);
+                        _decreaseButton.setAlpha(0.2f);
+                    }
+                    else{
+                        waterRecordID = documentSnapshot.getDocuments().get(0).getId();
+                        currentGlassOfWater = documentSnapshot.getDocuments().get(0).getLong("glassOfWater").intValue();
                         if(currentGlassOfWater<=0)//if the water drink is less than or equal to 0
                         {
                             _decreaseButton.setEnabled(false);
@@ -188,12 +193,6 @@ public class WaterFragment extends BaseFragment {
                             _decreaseButton.setEnabled(true);
                             _decreaseButton.setAlpha(1f);
                         }
-                    }
-                    else{
-                        currentGlassOfWater = 0;
-                        hasRecord = false;
-                        _decreaseButton.setEnabled(false);
-                        _decreaseButton.setAlpha(0.2f);
                     }
                     //start the animation
                     _waveProgressView.startAnimation();

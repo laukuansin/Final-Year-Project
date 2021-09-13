@@ -21,6 +21,8 @@ import com.example.a303com_laukuansin.domains.Exercise;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.example.a303com_laukuansin.utilities.ProgressAnimation;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -28,6 +30,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.w3c.dom.Text;
 
@@ -44,6 +47,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ExerciseFragment extends BaseFragment {
     private String date;
@@ -140,12 +144,20 @@ public class ExerciseFragment extends BaseFragment {
         private double totalCalories = 0;
         private double stepCalories = 0;
         private int stepWalked = 0;
+        private SweetAlertDialog _progressDialog;
 
         public RetrieveExerciseRecordAndStepData(String date, User user) {
             this.date = date;
             this.user = user;
             //initialize the exercise list
             _exerciseRecordList = new ArrayList<>();
+            _progressDialog = showProgressDialog("Loading...",getResources().getColor(R.color.yellow_900));
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            _progressDialog.show();
         }
 
         @Override
@@ -165,17 +177,9 @@ public class ExerciseFragment extends BaseFragment {
                 //collection path = ExerciseRecords/UID/Date
                 CollectionReference exerciseCollectionReference = database.collection(EXERCISE_COLLECTION_PATH);
                 //get the exercise record
-                exerciseCollectionReference.addSnapshotListener(getActivity(), (exerciseValue, exerciseError) -> {
-                    //if error appears
-                    if (exerciseError != null) {
-                        //show error with dialog
-                        ErrorAlert(exerciseError.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
-                        _retrieveExerciseRecordAndStep = null;
-                        return;
-                    }
-
+                exerciseCollectionReference.get().addOnSuccessListener(queryDocumentSnapshots -> {
                     //loop the document
-                    for (DocumentSnapshot document : exerciseValue.getDocuments()) {
+                    for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                         Exercise exercise = new Exercise();
                         Map<String, Object> documentMapData = document.getData();
                         Long duration = (Long) documentMapData.get("duration");
@@ -193,58 +197,69 @@ public class ExerciseFragment extends BaseFragment {
 
                         _exerciseRecordList.add(exercise);
                     }
+                }).addOnFailureListener(exerciseError -> {
+                    //show error with dialog
+                    ErrorAlert(exerciseError.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
+                    _retrieveExerciseRecordAndStep = null;
+                });
 
-                    //set step document path
-                    String STEP_DOCUMENT_PATH = String.format("StepRecords/%1$s/%2$s/Step", user.getUID(), date);
-                    //get the step record document reference
-                    //document path = StepRecords/UID/Date/Step
-                    DocumentReference stepDocumentReference = database.document(STEP_DOCUMENT_PATH);
-                    stepDocumentReference.addSnapshotListener((stepValue, stepError) -> {
-                        if (stepError != null)//if appear error
-                        {
-                            ErrorAlert(stepError.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
-                            _retrieveExerciseRecordAndStep = null;
-                            return;
-                        }
-                        if (stepValue.exists()) {
-                            stepWalked = stepValue.getLong("stepCount").intValue();
-                            _stepCountView.setText(String.format("%1$d steps", stepWalked));
-                            stepCalories = stepWalked * user.getCaloriesBurnedPerStepWalked();
-                            _stepCaloriesView.setText(String.format("%1$d Calories", (int) Math.round(stepCalories)));
-                        }
-                        totalCalories += stepCalories;
-                        //set progress bar
-                        _exerciseProgressBar.setMax((int) Math.round(user.getDailyCaloriesBurnt()));
-                        _exerciseProgressBar.clearAnimation();
-                        //create animation, from 0 animate to current value
-                        ProgressAnimation animation = new ProgressAnimation(_exerciseProgressBar, 0, (int) Math.round(totalCalories));
-                        animation.setDuration(1000);//set 2 milliseconds animation
-                        _exerciseProgressBar.setAnimation(animation);//start animation
+                //set step collection path
+                String STEP_COLLECTION_PATH = String.format("StepRecords/%1$s/%2$s", user.getUID(), date);
+                //get the step record collection reference
+                //collection path = StepRecords/UID/Date/StepRecordID
+                CollectionReference stepCollectionReference = database.collection(STEP_COLLECTION_PATH);
+                stepCollectionReference.get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    if(_progressDialog.isShowing())
+                        _progressDialog.dismiss();
+                    if(!queryDocumentSnapshots.isEmpty())
+                    {
+                        stepWalked = queryDocumentSnapshots.getDocuments().get(0).getLong("stepCount").intValue();
+                        _stepCountView.setText(String.format("%1$d steps", stepWalked));
+                        stepCalories = stepWalked * user.getCaloriesBurnedPerStepWalked();
+                        _stepCaloriesView.setText(String.format("%1$d Calories", (int) Math.round(stepCalories)));
+                    }
+
+                    totalCalories += stepCalories;
+                    //set progress bar
+                    _exerciseProgressBar.setMax((int) Math.round(user.getDailyCaloriesBurnt()));
+                    _exerciseProgressBar.clearAnimation();
+                    //create animation, from 0 animate to current value
+                    ProgressAnimation animation = new ProgressAnimation(_exerciseProgressBar, 0, (int) Math.round(totalCalories));
+                    animation.setDuration(1000);//set 2 milliseconds animation
+                    _exerciseProgressBar.setAnimation(animation);//start animation
 
 
-                        _exerciseProgressView.setText(String.format("%1$s of %2$s Calories Burnt", (int) Math.round(totalCalories), (int) Math.round(user.getDailyCaloriesBurnt())));
+                    _exerciseProgressView.setText(String.format("%1$s of %2$s Calories Burnt", (int) Math.round(totalCalories), (int) Math.round(user.getDailyCaloriesBurnt())));
 
-                        //if no exercise record and step walked today
-                        if (_exerciseRecordList.isEmpty() && stepWalked <= 0) {
-                            _emptyExerciseLayout.setVisibility(View.VISIBLE);
+                    //if no exercise record and step walked today
+                    if (_exerciseRecordList.isEmpty() && stepWalked <= 0) {
+                        _emptyExerciseLayout.setVisibility(View.VISIBLE);
+                        _exerciseRecyclerView.setVisibility(View.GONE);
+                        _stepLayout.setVisibility(View.GONE);
+                    } else {
+                        _emptyExerciseLayout.setVisibility(View.GONE);
+                        //when the exercise record list is empty;
+                        if (_exerciseRecordList.isEmpty()) {
                             _exerciseRecyclerView.setVisibility(View.GONE);
-                            _stepLayout.setVisibility(View.GONE);
-                        } else {
-                            _emptyExerciseLayout.setVisibility(View.GONE);
-                            //when the exercise record list is not empty;
-                            if (!_exerciseRecordList.isEmpty()) {
-                                _exerciseRecyclerView.setVisibility(View.VISIBLE);
-                                ExerciseRecordAdapter adapter = new ExerciseRecordAdapter(getContext(), _exerciseRecordList);
-                                _exerciseRecyclerView.setAdapter(adapter);
-                            }
-                            //when the step walk is high than 0
-                            if (stepWalked > 0) {
-                                _stepLayout.setVisibility(View.VISIBLE);
-                            }
                         }
-                    });
-
-
+                        else{
+                            _exerciseRecyclerView.setVisibility(View.VISIBLE);
+                            ExerciseRecordAdapter adapter = new ExerciseRecordAdapter(getContext(), _exerciseRecordList);
+                            _exerciseRecyclerView.setAdapter(adapter);
+                        }
+                        //when the step walk is high than 0
+                        if (stepWalked > 0) {
+                            _stepLayout.setVisibility(View.VISIBLE);
+                        }
+                        else{
+                            _stepLayout.setVisibility(View.GONE);
+                        }
+                    }
+                }).addOnFailureListener(stepError -> {
+                    if(_progressDialog.isShowing())
+                        _progressDialog.dismiss();
+                    ErrorAlert(stepError.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
+                    _retrieveExerciseRecordAndStep = null;
                 });
 
             });
