@@ -164,7 +164,7 @@ public class ExerciseFragment extends BaseFragment {
         protected Void doInBackground(Void... voids) {
             //date format
             DateFormat format = new SimpleDateFormat("dd MMM yyyy");
-            //if the date argument is not "Today"
+            //if the date argument is "Today"
             if (date.equals("Today")) {
                 date = format.format(new Date());//get current date
             }
@@ -172,12 +172,12 @@ public class ExerciseFragment extends BaseFragment {
             getActivity().runOnUiThread(() -> {
 
                 //set exercise collection path
-                String EXERCISE_COLLECTION_PATH = String.format("ExerciseRecords/%1$s/%2$s", user.getUID(), date);
+                String EXERCISE_COLLECTION_PATH = String.format("ExerciseRecords/%1$s/Records", user.getUID());
                 //get the Exercise record Collection reference
-                //collection path = ExerciseRecords/UID/Date
+                //collection path = ExerciseRecords/UID/Records
                 CollectionReference exerciseCollectionReference = database.collection(EXERCISE_COLLECTION_PATH);
                 //get the exercise record
-                exerciseCollectionReference.get().addOnSuccessListener(queryDocumentSnapshots -> {
+                exerciseCollectionReference.whereEqualTo("date",date).get().addOnSuccessListener(queryDocumentSnapshots -> {
                     //loop the document
                     for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
                         Exercise exercise = new Exercise();
@@ -185,6 +185,7 @@ public class ExerciseFragment extends BaseFragment {
                         Long duration = (Long) documentMapData.get("duration");
                         double caloriesBurnedPerKGPerMin = (double) documentMapData.get("caloriesPerKGPerMin");
                         exercise.setExerciseRecordID(document.getId());
+                        exercise.setDate(documentMapData.get("date").toString());
                         exercise.setExerciseID(documentMapData.get("exerciseID").toString());
                         exercise.setExerciseName(documentMapData.get("exerciseName").toString());
 
@@ -204,11 +205,11 @@ public class ExerciseFragment extends BaseFragment {
                 });
 
                 //set step collection path
-                String STEP_COLLECTION_PATH = String.format("StepRecords/%1$s/%2$s", user.getUID(), date);
+                String STEP_COLLECTION_PATH = String.format("StepRecords/%1$s/Records", user.getUID());
                 //get the step record collection reference
-                //collection path = StepRecords/UID/Date/StepRecordID
+                //collection path = StepRecords/UID/Records
                 CollectionReference stepCollectionReference = database.collection(STEP_COLLECTION_PATH);
-                stepCollectionReference.get().addOnSuccessListener(queryDocumentSnapshots -> {
+                stepCollectionReference.whereEqualTo("date",date).get().addOnSuccessListener(queryDocumentSnapshots -> {
                     if(_progressDialog.isShowing())
                         _progressDialog.dismiss();
                     if(!queryDocumentSnapshots.isEmpty())

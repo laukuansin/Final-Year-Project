@@ -213,17 +213,18 @@ public class ExerciseDetailFragment extends BaseFragment {
 
         //date format
         DateFormat format = new SimpleDateFormat("dd MMM yyyy");
-        //if the date argument is not "Today"
+        //if the date argument is "Today"
         if (date.equals("Today")) {
             date = format.format(new Date());//get current date
         }
-        //the collection path, example: ExerciseRecords/UID/Date
-        String COLLECTION_PATH = String.format("ExerciseRecords/%1$s/%2$s", getSessionHandler().getUser().getUID(), date);
+        //the collection path, example: ExerciseRecords/UID/Records
+        String COLLECTION_PATH = String.format("ExerciseRecords/%1$s/Records", getSessionHandler().getUser().getUID());
         //get exercise record reference
         CollectionReference exerciseRecordRef = database.collection(COLLECTION_PATH);
         //create exercise record class
         Map<String, Object> exerciseRecordMap = new HashMap<>();//create hash map to store the exercise record's data
         exerciseRecordMap.put("exerciseID", exerciseID);
+        exerciseRecordMap.put("date",date);
         exerciseRecordMap.put("exerciseName", exerciseName);
         exerciseRecordMap.put("caloriesPerKGPerMin", caloriesPerKGPerMinutes);
         exerciseRecordMap.put("duration", duration);
@@ -245,6 +246,7 @@ public class ExerciseDetailFragment extends BaseFragment {
             ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
         });
     }
+
     private void updateExercise()
     {
         int duration = 0;
@@ -267,6 +269,7 @@ public class ExerciseDetailFragment extends BaseFragment {
             updateExerciseRecordToDatabase(duration);
         }
     }
+
     private void deleteExercise(SweetAlertDialog sweetAlertDialog)
     {
         sweetAlertDialog.dismiss();
@@ -276,13 +279,13 @@ public class ExerciseDetailFragment extends BaseFragment {
 
         //date format
         DateFormat format = new SimpleDateFormat("dd MMM yyyy");
-        //if the date argument is not "Today"
+        //if the date argument is "Today"
         if(date.equals("Today"))
         {
             date = format.format(new Date());//get current date
         }
-        //the document path, example: ExerciseRecords/UID/Date/ExerciseRecordID
-        String DOCUMENT_PATH = String.format("ExerciseRecords/%1$s/%2$s/%3$s",getSessionHandler().getUser().getUID(),date,exerciseRecordID);
+        //the document path, example: ExerciseRecords/UID/Records/ExerciseRecordID
+        String DOCUMENT_PATH = String.format("ExerciseRecords/%1$s/Records/%2$s",getSessionHandler().getUser().getUID(),exerciseRecordID);
         //get exercise record document
         DocumentReference exerciseRecordRef = database.document(DOCUMENT_PATH);
         exerciseRecordRef.delete().addOnSuccessListener(unused -> {
@@ -297,6 +300,7 @@ public class ExerciseDetailFragment extends BaseFragment {
             Log.d("Error:",e.getMessage());
         });
     }
+
     private void updateExerciseRecordToDatabase(int duration)
     {
         //create progress dialog
@@ -305,13 +309,13 @@ public class ExerciseDetailFragment extends BaseFragment {
 
         //date format
         DateFormat format = new SimpleDateFormat("dd MMM yyyy");
-        //if the date argument is not "Today"
+        //if the date argument is "Today"
         if(date.equals("Today"))
         {
             date = format.format(new Date());//get current date
         }
-        //the document path, example: ExerciseRecords/UID/Date/ExerciseRecordID
-        String DOCUMENT_PATH = String.format("ExerciseRecords/%1$s/%2$s/%3$s",getSessionHandler().getUser().getUID(),date,exerciseRecordID);
+        //the document path, example: ExerciseRecords/UID/Records/ExerciseRecordID
+        String DOCUMENT_PATH = String.format("ExerciseRecords/%1$s/Records/%2$s",getSessionHandler().getUser().getUID(),exerciseRecordID);
         //get exercise record document
         DocumentReference exerciseRecordRef = database.document(DOCUMENT_PATH);
         //create exercise record class
@@ -332,8 +336,8 @@ public class ExerciseDetailFragment extends BaseFragment {
             //show error dialog
             ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
         });
-
     }
+
     private void setupToolbar(Toolbar toolbar) {
         //set support action bar
         ((ExerciseDetailActivity) getActivity()).setSupportActionBar(toolbar);
@@ -411,13 +415,13 @@ public class ExerciseDetailFragment extends BaseFragment {
     {
         //date format
         DateFormat format = new SimpleDateFormat("dd MMM yyyy");
-        //if the date argument is not "Today"
+        //if the date argument is "Today"
         if (date.equals("Today")) {
             date = format.format(new Date());//get current date
         }
-        String DOCUMENT_PATH = String.format("ExerciseRecords/%1$s/%2$s/%3$s", getSessionHandler().getUser().getUID(), date,exerciseRecordID);
+        String DOCUMENT_PATH = String.format("ExerciseRecords/%1$s/Records/%2$s", getSessionHandler().getUser().getUID(), exerciseRecordID);
         //get the Document reference
-        //document path = ExerciseRecords/UID/Date/ExerciseRecordID
+        //document path = ExerciseRecords/UID/Records/ExerciseRecordID
         DocumentReference documentReference = database.document(DOCUMENT_PATH);
         documentReference.get().addOnSuccessListener(documentSnapshot -> {
             //set the default quantity

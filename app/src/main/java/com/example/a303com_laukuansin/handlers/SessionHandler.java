@@ -8,6 +8,8 @@ import com.example.a303com_laukuansin.activities.MainActivity;
 import com.example.a303com_laukuansin.activities.HomeActivity;
 import com.example.a303com_laukuansin.activities.PersonalInformationActivity;
 import com.example.a303com_laukuansin.domains.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -17,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.gson.GsonBuilder;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 
@@ -48,12 +51,7 @@ public class SessionHandler {
         {
             FirebaseUser firebaseUser = auth.getCurrentUser();//get current user
             DocumentReference docRef = database.collection("Users").document(firebaseUser.getUid());//get users document
-            docRef.addSnapshotListener((documentSnapshot, error) -> {
-                if(error!=null)//if have error
-                {
-                    Log.d("Error:",error.getMessage());
-                    return;
-                }
+            docRef.get().addOnSuccessListener(documentSnapshot -> {
                 if(documentSnapshot.exists())//if user document is exists
                 {
                     loadUser(documentSnapshot,firebaseUser);
@@ -64,12 +62,17 @@ public class SessionHandler {
                     _context.startActivity(intent);
                 }
                 else{//else user does not exists
+                    User user = new User();
+                    user.setEmailAddress(firebaseUser.getEmail());
+                    user.setUID(firebaseUser.getUid());
+                    setUser(user);
+
                     Intent intent = new Intent(_context, PersonalInformationActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     _context.startActivity(intent);
                 }
-            });
+            }).addOnFailureListener(e -> Log.d("Error:",e.getMessage()));
         }
         else{//user never log in before
             Intent intent = new Intent(this._context, MainActivity.class);
@@ -93,7 +96,7 @@ public class SessionHandler {
         user.setWeight(documentSnapshot.getDouble("weight"));
         user.setTargetWeight(documentSnapshot.getDouble("targetWeight"));
         user.setYearOfBirth(documentSnapshot.getLong("yearOfBirth").intValue());
-        user.setDateCreateAccount(documentSnapshot.getDate("dateCreated"));
+        user.setDateCreated(documentSnapshot.getString("dateCreated"));
 
         setUser(user);
     }

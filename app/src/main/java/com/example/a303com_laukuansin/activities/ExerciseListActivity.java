@@ -98,7 +98,7 @@ public class ExerciseListActivity extends BaseActivity implements ExerciseListAd
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.deep_orange_900));// set status background dark green
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.deep_orange_900));// set status background dark orange
         }
         //set back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

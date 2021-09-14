@@ -1,32 +1,25 @@
 package com.example.a303com_laukuansin.activities;
 
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.example.a303com_laukuansin.R;
+import com.example.a303com_laukuansin.adapters.BodyWeightRecordAdapter;
 import com.example.a303com_laukuansin.cores.BaseActivity;
-import com.example.a303com_laukuansin.domains.Exercise;
-import com.example.a303com_laukuansin.fragments.ExerciseDetailFragment;
-import com.example.a303com_laukuansin.fragments.ExerciseListFragment;
+import com.example.a303com_laukuansin.domains.BodyWeight;
+import com.example.a303com_laukuansin.fragments.BodyWeightFragment;
+import com.example.a303com_laukuansin.fragments.WaterFragment;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-public class ExerciseDetailActivity extends BaseActivity {
+public class BodyWeightActivity extends BaseActivity implements BodyWeightRecordAdapter.OnActionListener {
     public static final String DATE_KEY = "date_key";
-    public static final String EXERCISE_ID_KEY = "exercise_id_key";
-    public static final String EXERCISE_RECORD_ID_KEY = "meal_record_id_key";
-    private String date;
-    private String exerciseID;
-    private String exerciseRecordID="";
     private Fragment _fragment;
+    private String date;
     @Override
     protected int ContentView() {
         return R.layout.activity_template;
@@ -76,6 +69,7 @@ public class ExerciseDetailActivity extends BaseActivity {
     protected boolean DisableActionMenu() {
         return true;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,21 +80,15 @@ public class ExerciseDetailActivity extends BaseActivity {
             {
                 date = bundle.getString(DATE_KEY);
             }
-            if(bundle.containsKey(EXERCISE_ID_KEY))
-            {
-                exerciseID = bundle.getString(EXERCISE_ID_KEY);
-            }
-            if(bundle.containsKey(EXERCISE_RECORD_ID_KEY))
-            {
-                exerciseRecordID = bundle.getString(EXERCISE_RECORD_ID_KEY);
-            }
         }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.deep_orange_900));// set status background dark orange
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.pink_900));// set status background dark pink
         }
+
         //set the default fragment
         if (savedInstanceState == null) {
-            _fragment = ExerciseDetailFragment.newInstance(date,exerciseID,exerciseRecordID);
+            _fragment = BodyWeightFragment.newInstance(date);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.frame_container, _fragment).commit();
         }
@@ -110,17 +98,12 @@ public class ExerciseDetailActivity extends BaseActivity {
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState,outPersistentState);
         outState.putString(DATE_KEY,date);
-        outState.putString(EXERCISE_ID_KEY,exerciseID);
-        outState.putString(EXERCISE_RECORD_ID_KEY,exerciseRecordID);
-
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        date = savedInstanceState.getString(DATE_KEY);
-        exerciseID = savedInstanceState.getString(EXERCISE_ID_KEY);
-        exerciseRecordID = savedInstanceState.getString(EXERCISE_RECORD_ID_KEY);
+        date=savedInstanceState.getString(DATE_KEY);
     }
 
     @Override
@@ -129,4 +112,8 @@ public class ExerciseDetailActivity extends BaseActivity {
         overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
     }
 
+    @Override
+    public void editBodyWeightRecord(BodyWeight bodyWeight) {
+        ((BodyWeightFragment)_fragment).editBodyWeightRecord(bodyWeight);
+    }
 }

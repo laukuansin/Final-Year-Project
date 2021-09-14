@@ -15,7 +15,7 @@ public class User implements Serializable {
     private double targetWeight=0;
     private double startWeight=0;
     private double activityLevel=0;
-    private Date dateCreated;
+    private String dateCreated;
 
     public User() {
     }
@@ -100,11 +100,11 @@ public class User implements Serializable {
         this.activityLevel = activityLevel;
     }
 
-    public Date getDateCreated() {
+    public String getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreateAccount(Date dateCreated) {
+    public void setDateCreated(String dateCreated) {
         this.dateCreated = dateCreated;
     }
 
@@ -155,6 +155,7 @@ public class User implements Serializable {
         else if(getStartWeight()<getTargetWeight()){//if user target is gain weight
             calories+=250;//calories increase 250
         }
+        //if user want to maintain weight, then does not need any extra + - calories
         //user started weight is same as the target weight
         return calories;
     }

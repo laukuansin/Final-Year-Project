@@ -125,8 +125,8 @@ public class SensorListener extends Service implements SensorEventListener {
     private void saveStepData() {
         //if the user is log in
         if (AppController.getInstance().getSessionHandler().getUser().getUID()!=null) {
-            String path = String.format("StepRecords/%1$s/%2$s", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate);
-            database.collection(path).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            String path = String.format("StepRecords/%1$s/Records", AppController.getInstance().getSessionHandler().getUser().getUID());
+            database.collection(path).whereEqualTo("date",currentDate).get().addOnSuccessListener(queryDocumentSnapshots -> {
                 if(queryDocumentSnapshots.isEmpty())
                 {
                     addStep();
@@ -145,8 +145,9 @@ public class SensorListener extends Service implements SensorEventListener {
         if (AppController.getInstance().getSessionHandler().getUser()!=null) {
             Map<String, Object> stepRecordMap = new HashMap<>();//create hash map to store the step record's data
             stepRecordMap.put("stepCount", currentStep);
-            String path = String.format("StepRecords/%1$s/%2$s", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate);
-            database.collection(path).document().set(stepRecordMap);
+            stepRecordMap.put("date",currentDate);
+            String path = String.format("StepRecords/%1$s/Records", AppController.getInstance().getSessionHandler().getUser().getUID());
+            database.collection(path).add(stepRecordMap);
         }
     }
 
@@ -154,7 +155,7 @@ public class SensorListener extends Service implements SensorEventListener {
         if (AppController.getInstance().getSessionHandler().getUser()!=null&&!stepRecordID.isEmpty()) {
             Map<String, Object> stepRecordMap = new HashMap<>();//create hash map to store the step record's data
             stepRecordMap.put("stepCount", currentStep);
-            String path = String.format("StepRecords/%1$s/%2$s/%3$s", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate,stepRecordID);
+            String path = String.format("StepRecords/%1$s/Records/%2$s", AppController.getInstance().getSessionHandler().getUser().getUID(),stepRecordID);
             database.document(path).update(stepRecordMap);
         }
     }
@@ -165,9 +166,9 @@ public class SensorListener extends Service implements SensorEventListener {
             //get today day
             currentDate = dateFormat.format(new Date());
             //get the path of database
-            String path = String.format("StepRecords/%1$s/%2$s", AppController.getInstance().getSessionHandler().getUser().getUID(), currentDate);
+            String path = String.format("StepRecords/%1$s/Records", AppController.getInstance().getSessionHandler().getUser().getUID());
             //get the today step data
-            database.collection(path).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            database.collection(path).whereEqualTo("date",currentDate).get().addOnSuccessListener(queryDocumentSnapshots -> {
                 if(queryDocumentSnapshots.isEmpty())
                 {
                     currentStep = 0;

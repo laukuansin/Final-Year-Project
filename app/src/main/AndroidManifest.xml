@@ -119,6 +119,12 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".activities.BodyWeightActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".activities.BodyWeightDetailActivity"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

@@ -90,13 +90,13 @@ public class WaterFragment extends BaseFragment {
 
         //date format
         DateFormat format = new SimpleDateFormat("dd MMM yyyy");
-        //if the date argument is not "Today"
+        //if the date argument is "Today"
         if (date.equals("Today")) {
             date = format.format(new Date());//get current date
         }
 
         //water collection path
-        WATER_COLLECTION_PATH = String.format("WaterRecords/%1$s/%2$s", user.getUID(), date);
+        WATER_COLLECTION_PATH = String.format("WaterRecords/%1$s/Records", user.getUID());
 
         //when click decrease button
         _decreaseButton.setOnClickListener(clickView -> {
@@ -136,6 +136,7 @@ public class WaterFragment extends BaseFragment {
         waterRecordMap.put("glassOfWater", currentGlassOfWater);
         CollectionReference collectionReference = database.collection(WATER_COLLECTION_PATH);
         if (waterRecordID.isEmpty()) {//if no has record before, then add new record, otherwise update
+            waterRecordMap.put("date",date);
             waterRecordID = collectionReference.document().getId();
             collectionReference.document(waterRecordID).set(waterRecordMap);
         } else {
@@ -171,7 +172,7 @@ public class WaterFragment extends BaseFragment {
             getActivity().runOnUiThread(() -> {
                 //get water collection reference
                 CollectionReference waterCollectionRef = database.collection(WATER_COLLECTION_PATH);
-                waterCollectionRef.get().addOnSuccessListener(documentSnapshot -> {
+                waterCollectionRef.whereEqualTo("date",date).get().addOnSuccessListener(documentSnapshot -> {
                     if(_progressDialog.isShowing())
                         _progressDialog.dismiss();
                     //if no record

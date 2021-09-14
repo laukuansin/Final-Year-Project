@@ -69,6 +69,7 @@ public class MealDetailFragment extends BaseFragment {
     private RetrieveBarcodeFoodDetail _getBarcodeFoodDetail = null;
     private FirebaseFirestore database;
     private Button _addButton,_deleteButton,_updateButton;
+    private DateFormat format = new SimpleDateFormat("dd MMM yyyy");
 
     public MealDetailFragment() {
     }
@@ -310,15 +311,13 @@ public class MealDetailFragment extends BaseFragment {
         SweetAlertDialog _progressDialog = showProgressDialog("Deleting...",getResources().getColor(R.color.green_A700));
         _progressDialog.show();
 
-        //date format
-        DateFormat format = new SimpleDateFormat("dd MMM yyyy");
-        //if the date argument is not "Today"
+        //if the date argument is "Today"
         if(date.equals("Today"))
         {
             date = format.format(new Date());//get current date
         }
-        //the document path, example: MealRecords/UID/Date/MealRecordID
-        String DOCUMENT_PATH = String.format("MealRecords/%1$s/%2$s/%3$s",getSessionHandler().getUser().getUID(),date,mealRecordID);
+        //the document path, example: MealRecords/UID/Records/MealRecordID
+        String DOCUMENT_PATH = String.format("MealRecords/%1$s/Records/%2$s",getSessionHandler().getUser().getUID(),mealRecordID);
         //get meal record document
         DocumentReference mealRecordRef = database.document(DOCUMENT_PATH);
         mealRecordRef.delete().addOnSuccessListener(unused -> {
@@ -341,19 +340,18 @@ public class MealDetailFragment extends BaseFragment {
         SweetAlertDialog _progressDialog = showProgressDialog("Adding...",getResources().getColor(R.color.green_A700));
         _progressDialog.show();
 
-        //date format
-        DateFormat format = new SimpleDateFormat("dd MMM yyyy");
-        //if the date argument is not "Today"
+        //if the date argument is "Today"
         if(date.equals("Today"))
         {
             date = format.format(new Date());//get current date
         }
-        //the collection path, example: MealRecords/UID/Date
-        String COLLECTION_PATH = String.format("MealRecords/%1$s/%2$s",getSessionHandler().getUser().getUID(),date);
+        //the collection path, example: MealRecords/UID/Records
+        String COLLECTION_PATH = String.format("MealRecords/%1$s/Records",getSessionHandler().getUser().getUID());
         //get meal record reference
         CollectionReference mealRecordRef = database.collection(COLLECTION_PATH);
         //create meal record class
         Map<String, Object> mealRecordMap = new HashMap<>();//create hash map to store the meal record's data
+        mealRecordMap.put("date",date);
         mealRecordMap.put("foodName",foodName);
         if(!foodID.isEmpty())
         {
@@ -386,7 +384,6 @@ public class MealDetailFragment extends BaseFragment {
             //show error dialog
             ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
         });
-
     }
 
     private void updateMealRecordToDatabase(String servingUnit, double quantity)
@@ -395,15 +392,13 @@ public class MealDetailFragment extends BaseFragment {
         SweetAlertDialog _progressDialog = showProgressDialog("Updating...",getResources().getColor(R.color.green_A700));
         _progressDialog.show();
 
-        //date format
-        DateFormat format = new SimpleDateFormat("dd MMM yyyy");
-        //if the date argument is not "Today"
+        //if the date argument is "Today"
         if(date.equals("Today"))
         {
             date = format.format(new Date());//get current date
         }
-        //the document path, example: MealRecords/UID/Date/MealRecordID
-        String DOCUMENT_PATH = String.format("MealRecords/%1$s/%2$s/%3$s",getSessionHandler().getUser().getUID(),date,mealRecordID);
+        //the document path, example: MealRecords/UID/Records/MealRecordID
+        String DOCUMENT_PATH = String.format("MealRecords/%1$s/Records/%2$s",getSessionHandler().getUser().getUID(),mealRecordID);
         //get meal record document
         DocumentReference mealRecordRef = database.document(DOCUMENT_PATH);
         //create meal record class
@@ -620,7 +615,6 @@ public class MealDetailFragment extends BaseFragment {
             _foodBrandView.setText(foodDetail.brandName);
         }
 
-
         //to get the multipliers of each nutrition, which mean 1 gram have x nutrition value
         caloriesMultipliers = foodDetail.calories / foodDetail.weightGrams;
         carbsMultipliers = foodDetail.carbohydrate / foodDetail.weightGrams;
@@ -706,15 +700,13 @@ public class MealDetailFragment extends BaseFragment {
 
     private void getFoodRecordDetailFromDatabase(String date)
     {
-        //date format
-        DateFormat format = new SimpleDateFormat("dd MMM yyyy");
-        //if the date argument is not "Today"
+        //if the date argument is "Today"
         if (date.equals("Today")) {
             date = format.format(new Date());//get current date
         }
-        String DOCUMENT_PATH = String.format("MealRecords/%1$s/%2$s/%3$s", getSessionHandler().getUser().getUID(), date,mealRecordID);
+        String DOCUMENT_PATH = String.format("MealRecords/%1$s/Records/%2$s", getSessionHandler().getUser().getUID(), mealRecordID);
         //get the Document reference
-        //document path = MealRecords/UID/Date/MealRecordID
+        //document path = MealRecords/UID/Record/MealRecordID
         DocumentReference documentReference = database.document(DOCUMENT_PATH);
         //get meal record detail
         documentReference.get().addOnSuccessListener((value) -> {

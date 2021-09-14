@@ -9,6 +9,7 @@ public class Exercise{
     private double caloriesBurnedPerKGPerMin;
     private double calories;
     private String exerciseIcon;
+    private String date;
 
     public Exercise() {
     }
@@ -67,5 +68,13 @@ public class Exercise{
 
     public void setExerciseIcon(String exerciseIcon) {
         this.exerciseIcon = exerciseIcon;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

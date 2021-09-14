@@ -16,7 +16,6 @@ import androidx.fragment.app.FragmentTransaction;
 
 public class WaterActivity extends BaseActivity {
     public static final String DATE_KEY = "date_key";
-    private Fragment _fragment;
     private String date;
 
     @Override
@@ -84,7 +83,7 @@ public class WaterActivity extends BaseActivity {
 
         //set the default fragment
         if (savedInstanceState == null) {
-            _fragment = WaterFragment.newInstance(date);
+            Fragment _fragment = WaterFragment.newInstance(date);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.frame_container, _fragment).commit();
         }
@@ -98,7 +97,7 @@ public class WaterActivity extends BaseActivity {
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.light_blue_900));// set status background dark orange
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.light_blue_900));// set status background dark blue
         }
         //set back button
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

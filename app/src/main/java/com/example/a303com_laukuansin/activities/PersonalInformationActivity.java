@@ -19,6 +19,9 @@ import com.example.a303com_laukuansin.fragments.PersonalInformation.FillNameFrag
 import com.example.a303com_laukuansin.fragments.PersonalInformation.FillTargetWeightFragment;
 import com.example.a303com_laukuansin.fragments.PersonalInformation.FillWeightFragment;
 import com.example.a303com_laukuansin.receivers.ConnectivityReceiver;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -26,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -121,6 +125,13 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
             FirebaseFirestore database = FirebaseFirestore.getInstance();//create database
             if (ConnectivityReceiver.isConnected())//if have wifi connection
             {
+                //get the date format
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");//date format example 11 Sep 2021
+                //user document path
+                String USER_DOCUMENT_PATH = String.format("Users/%1$s", user.getUID());
+                //body weight collection path
+                String BODY_WEIGHT_COLLECTION_PATH = String.format("BodyWeightRecords/%1$s/Records", user.getUID());
+
                 Map<String, Object> userMap = new HashMap<>();//create hash map to store the user's data
                 userMap.put("email", user.getEmailAddress());
                 userMap.put("name", user.getName());
@@ -128,35 +139,33 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
                 userMap.put("yearOfBirth", user.getYearOfBirth());
                 userMap.put("height", user.getHeight());
                 userMap.put("weight", user.getWeight());
-                userMap.put("startWeight", user.getWeight());
+                userMap.put("startWeight", user.getStartWeight());
                 userMap.put("targetWeight", user.getTargetWeight());
                 userMap.put("activityLevel", user.getActivityLevel());
-                userMap.put("dateCreated", new Date());
+                userMap.put("dateCreated", dateFormat.format(new Date()));
 
-                database.collection("Users").document(user.getUID()).set(userMap)//add user to database
-                        .addOnSuccessListener(documentReference -> {//if success
-                            if (_progressDialog.isShowing())//cancel dialog
-                                _progressDialog.dismiss();
+                Map<String, Object> bodyWeightMap = new HashMap<>();//create hash map to store the body weight's data
+                bodyWeightMap.put("bodyWeight", user.getStartWeight());
+                bodyWeightMap.put("date", dateFormat.format(new Date()));
 
-                            Intent intent = new Intent(this, HomeActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
+                //add initially body weight to database
+                database.collection(BODY_WEIGHT_COLLECTION_PATH).add(bodyWeightMap);
+                //add user to database
+                database.document(USER_DOCUMENT_PATH).set(userMap).addOnSuccessListener(documentReference -> {//if success
+                    if (_progressDialog.isShowing())//cancel dialog
+                        _progressDialog.dismiss();
 
-                        })
-                        .addOnFailureListener(e -> {//if failure
-                            if (_progressDialog.isShowing())//cancel dialog
-                                _progressDialog.dismiss();
+                    Intent intent = new Intent(PersonalInformationActivity.this, HomeActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
 
-                            createErrorDialog(e.getMessage());
-                        });
+                }).addOnFailureListener(e -> {//if failure
+                    if (_progressDialog.isShowing())//cancel dialog
+                        _progressDialog.dismiss();
 
-                //get the date format
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");//date format example 11 Sep 2021
-                Map<String, Object> bodyWeightMap = new HashMap<>();//create hash map to store the user's data
-
-
-                //database.collection("BodyWeightRecords").document(user.getUID()).collection(dateFormat.format(new Date())).get("")
+                    createErrorDialog(e.getMessage());
+                });
             } else {//have wifi connection
                 if (_progressDialog.isShowing())//cancel dialog
                     _progressDialog.dismiss();
