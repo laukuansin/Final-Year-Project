@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/upperLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/upperView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Record your weight"
+                android:textAlignment="center"
+                android:textSize="25dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bottomLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_arrow_right_pink" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="0.1"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+                <cn.carbswang.android.numberpickerview.library.NumberPickerView
+                    android:id="@+id/weightPicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:npv_ItemPaddingHorizontal="5dp"
+                    app:npv_ItemPaddingVertical="5dp"
+                    app:npv_MarginStartOfHint="10dp"
+                    app:npv_RespondChangeOnDetached="false"
+                    app:npv_ShowDivider="false"
+                    app:npv_ShownCount="5"
+                    app:npv_TextColorNormal="@color/grey_300"
+                    app:npv_TextColorSelected="@color/pink_A400"
+                    app:npv_TextSizeNormal="25dp"
+                    app:npv_TextSizeSelected="40dp"
+                    app:npv_WrapSelectorWheel="false" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:text="."
+                    android:textColor="@color/pink_A400"
+                    android:textSize="40dp"
+                    android:layout_height="wrap_content"/>
+                <cn.carbswang.android.numberpickerview.library.NumberPickerView
+                    android:id="@+id/weightDecimalPicker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:npv_ItemPaddingHorizontal="5dp"
+                    app:npv_ItemPaddingVertical="5dp"
+                    app:npv_MarginStartOfHint="10dp"
+                    app:npv_RespondChangeOnDetached="false"
+                    app:npv_ShowDivider="false"
+                    app:npv_ShownCount="5"
+                    app:npv_TextColorNormal="@color/grey_300"
+                    app:npv_TextColorSelected="@color/pink_A400"
+                    app:npv_TextSizeNormal="25dp"
+                    app:npv_TextSizeSelected="40dp"
+                    app:npv_WrapSelectorWheel="false" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:text="KG"
+                    android:id="@+id/units"
+                    android:textColor="@color/orange_700"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_arrow_left_pink" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/addButton"
+            android:text="Add"
+            android:visibility="gone"
+            android:textColor="@color/white_1000"
+            android:background="@drawable/border_pink_color_button"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_margin="5dp"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:text="update"
+            android:visibility="gone"
+            android:id="@+id/updateButton"
+            android:textColor="@color/white_1000"
+            android:layout_width="0dp"
+            android:layout_margin="5dp"
+            android:layout_weight="0.5"
+            android:background="@drawable/border_pink_color_button"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</LinearLayout>

@@ -155,7 +155,7 @@ public class LoginFragment extends BaseFragment {
         {
             _progressDialog.show();
             auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(task -> {//checked by authentication firebase
-                //if register success
+                //if login success
                 if(task.isSuccessful())
                 {
                     getSessionHandler().checkAuthorization();//check authorization, to determine which activity to go

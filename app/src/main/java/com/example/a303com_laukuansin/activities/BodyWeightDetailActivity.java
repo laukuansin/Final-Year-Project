@@ -1,35 +1,28 @@
 package com.example.a303com_laukuansin.activities;
 
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseActivity;
-import com.example.a303com_laukuansin.domains.Exercise;
+import com.example.a303com_laukuansin.fragments.BodyWeightDetailFragment;
 import com.example.a303com_laukuansin.fragments.ExerciseDetailFragment;
-import com.example.a303com_laukuansin.fragments.ExerciseListFragment;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-public class ExerciseDetailActivity extends BaseActivity {
+public class BodyWeightDetailActivity extends BaseActivity {
     public static final String DATE_KEY = "date_key";
-    public static final String EXERCISE_ID_KEY = "exercise_id_key";
-    public static final String EXERCISE_RECORD_ID_KEY = "meal_record_id_key";
+    public static final String BODY_WEIGHT_RECORD_ID_KEY = "body_weight_record_id_key";
     private String date;
-    private String exerciseID;
-    private String exerciseRecordID="";
+    private String bodyWeightRecordID="";
     private Fragment _fragment;
     @Override
     protected int ContentView() {
-        return R.layout.activity_template;
+        return R.layout.activity_template_toolbar;
     }
 
     @Override
@@ -76,6 +69,7 @@ public class ExerciseDetailActivity extends BaseActivity {
     protected boolean DisableActionMenu() {
         return true;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,32 +80,45 @@ public class ExerciseDetailActivity extends BaseActivity {
             {
                 date = bundle.getString(DATE_KEY);
             }
-            if(bundle.containsKey(EXERCISE_ID_KEY))
+            if(bundle.containsKey(BODY_WEIGHT_RECORD_ID_KEY))
             {
-                exerciseID = bundle.getString(EXERCISE_ID_KEY);
-            }
-            if(bundle.containsKey(EXERCISE_RECORD_ID_KEY))
-            {
-                exerciseRecordID = bundle.getString(EXERCISE_RECORD_ID_KEY);
+                bodyWeightRecordID = bundle.getString(BODY_WEIGHT_RECORD_ID_KEY);
             }
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.deep_orange_900));// set status background dark orange
-        }
+        //ste toolbar
+        setupToolbar();
+
         //set the default fragment
         if (savedInstanceState == null) {
-            _fragment = ExerciseDetailFragment.newInstance(date,exerciseID,exerciseRecordID);
+            _fragment = BodyWeightDetailFragment.newInstance(date,bodyWeightRecordID);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.frame_container, _fragment).commit();
         }
+    }
+
+    private void setupToolbar()
+    {
+        //handle toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.pink_900));// set status background dark pink
+        }
+        //set back button
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //set title
+        getSupportActionBar().setTitle(date);
+        //set background
+        getSupportActionBar().setBackgroundDrawable(getResources().getDrawable(R.color.pink_A400));
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState,outPersistentState);
         outState.putString(DATE_KEY,date);
-        outState.putString(EXERCISE_ID_KEY,exerciseID);
-        outState.putString(EXERCISE_RECORD_ID_KEY,exerciseRecordID);
+        outState.putString(BODY_WEIGHT_RECORD_ID_KEY,bodyWeightRecordID);
 
     }
 
@@ -119,8 +126,7 @@ public class ExerciseDetailActivity extends BaseActivity {
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         date = savedInstanceState.getString(DATE_KEY);
-        exerciseID = savedInstanceState.getString(EXERCISE_ID_KEY);
-        exerciseRecordID = savedInstanceState.getString(EXERCISE_RECORD_ID_KEY);
+        bodyWeightRecordID = savedInstanceState.getString(BODY_WEIGHT_RECORD_ID_KEY);
     }
 
     @Override

@@ -46,7 +46,6 @@ public class FillNameFragment extends BaseFragment {
 
 
         return view;
-
     }
 
     private void loadGenderFragment()//load gender fragment

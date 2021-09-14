@@ -14,7 +14,7 @@ public class Meal {
     private double quantity;
     private String servingUnit;
     private double foodWeightInGram;
-    private Date date;
+    private String date;
 
     public Meal() {
     }
@@ -91,11 +91,11 @@ public class Meal {
         this.foodBarcode = foodBarcode;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

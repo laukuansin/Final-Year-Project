@@ -63,18 +63,20 @@ public class FillTargetWeightFragment extends BaseFragment{
 
     private void initialization(View view)
     {
+        //bind view with id
         TextView _nextButton = view.findViewById(R.id.nextButton);
         TextView _backButton = view.findViewById(R.id.backButton);
         TextView _BMIView = view.findViewById(R.id.BMIView);
         TextView _idealRangeView = view.findViewById(R.id.idealWeightRangeView);
+        _weightPicker = view.findViewById(R.id.weightPicker);
+        _weightDecimalPicker = view.findViewById(R.id.weightDecimalPicker);
 
         _listener = (OnReturnTargetWeightListener) getContext();
 
         //setup the weight picker
-        setupWeightPicker(view);
-
+        setupWeightPicker();
         //setup the weight decimal picker
-        setupWeightDecimalPicker(view);
+        setupWeightDecimalPicker();
 
         _BMIView.append(String.valueOf(BMI));
         _idealRangeView.setText(String.format("%1$d-%2$d KG",minimumIdealWeight,maximumIdealWeight));
@@ -105,6 +107,7 @@ public class FillTargetWeightFragment extends BaseFragment{
         //set animation
         setAnimation(view);
     }
+
     private void createBottomDialog()
     {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(),R.style.BottomSheetDialogTheme);
@@ -155,9 +158,8 @@ public class FillTargetWeightFragment extends BaseFragment{
         bottomSheetDialog.show();
     }
 
-    private void setupWeightPicker(View view)
+    private void setupWeightPicker()
     {
-        _weightPicker = view.findViewById(R.id.weightPicker);
         displayedValueWeight = new String[271];//create display values for weight, the weight is limit between 30 KG until 300 KG
         for(int i=0;i<271;i++)
         {
@@ -180,9 +182,9 @@ public class FillTargetWeightFragment extends BaseFragment{
             _weightPicker.setValue((int)Math.floor(user.getTargetWeight()-30));//use Math.floor is because get the front number
         }
     }
-    private void setupWeightDecimalPicker(View view)//setup weight decimal picker
+
+    private void setupWeightDecimalPicker()//setup weight decimal picker
     {
-        _weightDecimalPicker = view.findViewById(R.id.weightDecimalPicker);
         displayedValueWeightDecimal = new String[10];//create display values for weight decimal, the weight is limit between 0 until 9
         for(int i=0;i<10;i++)
         {
@@ -204,6 +206,7 @@ public class FillTargetWeightFragment extends BaseFragment{
             _weightDecimalPicker.setValue(decimalNum);//set decimal value
         }
     }
+
     private void loadActivityLevelFragment()
     {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
@@ -222,6 +225,7 @@ public class FillTargetWeightFragment extends BaseFragment{
         _weightDecimalPicker.setAnimation(_slideUp);
         _units.setAnimation(_slideUp);
     }
+
     private void getCurrentTargetWeightPickerValueAndUpdateUser()
     {
         user = getSessionHandler().getUser();
@@ -232,6 +236,7 @@ public class FillTargetWeightFragment extends BaseFragment{
         user.setTargetWeight(frontNumber+(decimalNumber/10));//set weight
         getSessionHandler().setUser(user);//update user
     }
+
     public interface OnReturnTargetWeightListener
     {
         void backPressed();

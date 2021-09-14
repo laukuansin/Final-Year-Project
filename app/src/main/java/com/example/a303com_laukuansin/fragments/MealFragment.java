@@ -166,19 +166,19 @@ public class MealFragment extends BaseFragment {
         protected Void doInBackground(Void... voids) {
             //date format
             DateFormat format = new SimpleDateFormat("dd MMM yyyy");
-            //if the date argument is not "Today"
+            //if the date argument is "Today"
             if (date.equals("Today")) {
                 date = format.format(new Date());//get current date
             }
 
             //set collection path
-            String COLLECTION_PATH = String.format("MealRecords/%1$s/%2$s", user.getUID(), date);
+            String COLLECTION_PATH = String.format("MealRecords/%1$s/Records", user.getUID());
 
             //get the Collection reference
             //collection path = MealRecords/UID/Date
             CollectionReference collectionReference = database.collection(COLLECTION_PATH);
             //get the meal record
-            collectionReference.addSnapshotListener(getActivity(), (value, error) -> {
+            collectionReference.whereEqualTo("date",date).addSnapshotListener(getActivity(), (value, error) -> {
                 //if error appears
                 if (error != null) {
                     //show error with dialog
@@ -206,6 +206,7 @@ public class MealFragment extends BaseFragment {
                         {
                             meal.setFoodBarcode(documentMapData.get("foodBarcode").toString());
                         }
+                        meal.setDate(documentMapData.get("date").toString());
                         meal.setCalories((double) documentMapData.get("calories"));
                         meal.setMealName(documentMapData.get("foodName").toString());
                         meal.setQuantity((double) documentMapData.get("quantity"));

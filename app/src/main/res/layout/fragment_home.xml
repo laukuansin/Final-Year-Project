@@ -482,6 +482,7 @@
                 android:padding="20dp">
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/bodyWeightCardView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clipChildren="false"
@@ -530,7 +531,6 @@
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/black_1000"
                                 android:id="@+id/dailyBodyWeight"
-                                android:text="No record yet"
                                 android:textSize="16dp" />
                             <TextView
                                 android:layout_width="match_parent"

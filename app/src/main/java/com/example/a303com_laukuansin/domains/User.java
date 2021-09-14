@@ -2,6 +2,7 @@ package com.example.a303com_laukuansin.domains;
 
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.Date;
 
 public class User implements Serializable {
     private String emailAddress;
@@ -14,6 +15,7 @@ public class User implements Serializable {
     private double targetWeight=0;
     private double startWeight=0;
     private double activityLevel=0;
+    private String dateCreated;
 
     public User() {
     }
@@ -98,6 +100,14 @@ public class User implements Serializable {
         this.activityLevel = activityLevel;
     }
 
+    public String getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
     public double getBMI()
     {
         double BMI = getWeight()/Math.pow((double)getHeight()/100,2.0);//BMI = Weight(KG)/ (Height(M)^2)
@@ -145,6 +155,7 @@ public class User implements Serializable {
         else if(getStartWeight()<getTargetWeight()){//if user target is gain weight
             calories+=250;//calories increase 250
         }
+        //if user want to maintain weight, then does not need any extra + - calories
         //user started weight is same as the target weight
         return calories;
     }

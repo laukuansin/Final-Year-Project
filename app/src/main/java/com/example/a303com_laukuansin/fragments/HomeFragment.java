@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
+import com.example.a303com_laukuansin.activities.BodyWeightActivity;
 import com.example.a303com_laukuansin.activities.ExerciseActivity;
 import com.example.a303com_laukuansin.activities.MealActivity;
 import com.example.a303com_laukuansin.activities.WaterActivity;
@@ -29,6 +30,8 @@ import com.example.a303com_laukuansin.domains.MealType;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.example.a303com_laukuansin.utilities.ProgressAnimation;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.firestore.CollectionReference;
@@ -37,6 +40,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
@@ -59,16 +64,17 @@ import devs.mulham.horizontalcalendar.utils.HorizontalCalendarListener;
 import devs.mulham.horizontalcalendar.utils.HorizontalCalendarPredicate;
 
 public class HomeFragment extends BaseFragment{
-    private final User user;
+    private User user;
     private TextView _dateView;
     private SimpleDateFormat dateFormat;
     private RecyclerView _mealRecyclerView;
-    private TextView _dailyCaloriesEatenView, _dailyCaloriesBurntView, _dailyStepView, _dailyWaterView;
+    private TextView _dailyCaloriesEatenView, _dailyCaloriesBurntView, _dailyStepView, _dailyWaterView,_dailyBodyWeightView;
     private LinearProgressIndicator _dailyCaloriesEatenProgress, _dailyCaloriesBurntProgress,_dailyStepProgress,_dailyWaterProgress;
     private RetrieveDailyData _retrieveData = null;
     private FirebaseFirestore database;
     private int stepWalked = 0,glassOfWaterDrink = 0;
     private String realDate;
+    private TextView _goalView;
     private SyncDailyStepData _syncStepData = null;
 
     public HomeFragment() {
@@ -96,7 +102,8 @@ public class HomeFragment extends BaseFragment{
     @Override
     public void onResume() {
         super.onResume();
-        loadData(user);//load data
+        user = getSessionHandler().getUser();
+        loadData();//load data
     }
 
     private void initialization(View view) {
@@ -114,6 +121,7 @@ public class HomeFragment extends BaseFragment{
         MaterialCardView _mealCardView = view.findViewById(R.id.mealCardView);
         MaterialCardView _exerciseCardView = view.findViewById(R.id.exerciseCardView);
         MaterialCardView _waterCardView = view.findViewById(R.id.waterCardView);
+        MaterialCardView _bodyWeightCardView = view.findViewById(R.id.bodyWeightCardView);
         TextView _viewMoreMealButton = view.findViewById(R.id.viewMoreMealButton);
         _dateView = view.findViewById(R.id.date_view);
         ImageView arrow = view.findViewById(R.id.arrowView);
@@ -127,7 +135,8 @@ public class HomeFragment extends BaseFragment{
         _dailyStepProgress = view.findViewById(R.id.dailyStepProgress);
         _dailyWaterView = view.findViewById(R.id.dailyWater);
         _dailyWaterProgress = view.findViewById(R.id.dailyWaterProgress);
-        TextView _goalView = view.findViewById(R.id.goal);
+        _dailyBodyWeightView = view.findViewById(R.id.dailyBodyWeight);
+        _goalView = view.findViewById(R.id.goal);
         _mealRecyclerView = view.findViewById(R.id.mealRecyclerView);
         _mealRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         _mealRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -139,8 +148,6 @@ public class HomeFragment extends BaseFragment{
         setDate(Calendar.getInstance());
         //setup database
         database = FirebaseFirestore.getInstance();
-        //set target goal
-        _goalView.setText(String.format("Target goal: %1$s",user.getTargetGoal()));
         //click view more meal
         _viewMoreMealButton.setOnClickListener(v -> {
             TransitionManager.beginDelayedTransition(_containerLayout, new AutoTransition());//delay the transition
@@ -211,14 +218,26 @@ public class HomeFragment extends BaseFragment{
             }
         });
 
+        //when click body weight card view
+        _bodyWeightCardView.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                Intent intent = new Intent(getContext(), BodyWeightActivity.class);
+                intent.putExtra(BodyWeightActivity.DATE_KEY,_dateView.getText().toString());
+                startActivity(intent);
+                //add animation sliding to next activity
+                getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
+            }
+        });
+
         //set first name of user
         _welcomeView.setText(String.format("Hi %1$s!", user.getName().split(" ")[0]));
     }
 
-    private void loadData(User user) {
+    private void loadData() {
         if (_retrieveData == null)//if retrieve data class is null, by default will null
         {
-            _retrieveData = new RetrieveDailyData(user);
+            _retrieveData = new RetrieveDailyData();
             _retrieveData.execute();
         }
     }
@@ -259,7 +278,7 @@ public class HomeFragment extends BaseFragment{
             @Override
             public void onDateSelected(Calendar date, int position) {
                 setDate(date);//set date
-                loadData(user);//load data
+                loadData();//load data
             }
         });
     }
@@ -314,10 +333,8 @@ public class HomeFragment extends BaseFragment{
     }
 
     private class RetrieveDailyData extends AsyncTask<Void, Void, Void> {
-        private User user;
 
-        public RetrieveDailyData(User user) {
-            this.user = user;
+        public RetrieveDailyData() {
         }
 
         @Override
@@ -329,6 +346,8 @@ public class HomeFragment extends BaseFragment{
                 loadStepAndExerciseData(true);
                 //load water data
                 loadWaterData();
+                //load body weight data
+                loadBodyWeightData();
                 _retrieveData = null;
             });
             return null;
@@ -338,11 +357,11 @@ public class HomeFragment extends BaseFragment{
     private void loadMealData()
     {
         //meal collection path
-        String MEAL_COLLECTION_PATH = String.format("MealRecords/%1$s/%2$s", user.getUID(),realDate);
+        String MEAL_COLLECTION_PATH = String.format("MealRecords/%1$s/Records", user.getUID());
 
         //get meal collection reference
         CollectionReference mealCollectionRef = database.collection(MEAL_COLLECTION_PATH);
-        mealCollectionRef.addSnapshotListener((value, error) -> {
+        mealCollectionRef.whereEqualTo("date",realDate).addSnapshotListener((value, error) -> {
             if(error!=null)//if appear error
             {
                 ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
@@ -405,11 +424,11 @@ public class HomeFragment extends BaseFragment{
     private void loadExerciseData()
     {
         //exercise collection path
-        String EXERCISE_COLLECTION_PATH = String.format("ExerciseRecords/%1$s/%2$s", user.getUID(),realDate);
+        String EXERCISE_COLLECTION_PATH = String.format("ExerciseRecords/%1$s/Records", user.getUID());
 
         //get exercise collection reference
         CollectionReference exerciseCollectionRef = database.collection(EXERCISE_COLLECTION_PATH);
-        exerciseCollectionRef.addSnapshotListener((value, error) -> {
+        exerciseCollectionRef.whereEqualTo("date",realDate).addSnapshotListener((value, error) -> {
             if(error!=null)//if appear error
             {
                 ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
@@ -446,20 +465,20 @@ public class HomeFragment extends BaseFragment{
 
         //initialize the step count
         stepWalked = 0;
-        //step document path
-        String STEP_DOCUMENT_PATH = String.format("StepRecords/%1$s/%2$s/Step", user.getUID(),realDate);
-        //get step document reference
-        DocumentReference stepDocumentRef = database.document(STEP_DOCUMENT_PATH);
-        stepDocumentRef.get().addOnSuccessListener(documentSnapshot -> {
+        //step collection path
+        String STEP_COLLECTION_PATH = String.format("StepRecords/%1$s/Records", user.getUID());
+        //get step collection reference
+        CollectionReference stepCollectionRef = database.collection(STEP_COLLECTION_PATH);
+        stepCollectionRef.whereEqualTo("date",realDate).get().addOnSuccessListener(queryDocumentSnapshots -> {
             if(showDialog)
             {
                 if(_progressDialog.isShowing())
                     _progressDialog.dismiss();
             }
-            //if have the step count
-            if(documentSnapshot.exists())
+            //if has record
+            if(!queryDocumentSnapshots.isEmpty())
             {
-                stepWalked = documentSnapshot.getLong("stepCount").intValue();
+                stepWalked = queryDocumentSnapshots.getDocuments().get(0).getLong("stepCount").intValue();
             }
             //set text for daily step walked
             _dailyStepView.setText(String.format("%1$d of %2$d Steps Walked",stepWalked,user.getSuggestStepWalk()));
@@ -468,7 +487,6 @@ public class HomeFragment extends BaseFragment{
 
             //load exercise data
             loadExerciseData();
-
         }).addOnFailureListener(e -> ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show());
 
     }
@@ -477,19 +495,14 @@ public class HomeFragment extends BaseFragment{
     {
         //initialize water drink to 0
         glassOfWaterDrink = 0;
-        //water document path
-        String WATER_DOCUMENT_PATH = String.format("WaterRecords/%1$s/%2$s/Water", user.getUID(),realDate);
-        //get water document reference
-        DocumentReference waterDocumentRef = database.document(WATER_DOCUMENT_PATH);
-        waterDocumentRef.addSnapshotListener((value, error) -> {
-            if(error!=null)//if appear error
+        //water collection path
+        String WATER_COLLECTION_PATH = String.format("WaterRecords/%1$s/Records", user.getUID());
+        //get water collection reference
+        CollectionReference waterCollectionRef = database.collection(WATER_COLLECTION_PATH);
+        waterCollectionRef.whereEqualTo("date",realDate).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if(!queryDocumentSnapshots.isEmpty())
             {
-                ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
-                return;
-            }
-            if(value.exists())
-            {
-                glassOfWaterDrink = value.getLong("glassOfWater").intValue();
+                glassOfWaterDrink = queryDocumentSnapshots.getDocuments().get(0).getLong("glassOfWater").intValue();
             }
             //set text for daily water consumed
             _dailyWaterView.setText(String.format("%1$d of %2$d Glasses water consumed", glassOfWaterDrink, user.getSuggestWaterIntakeInGlass()));
@@ -497,6 +510,33 @@ public class HomeFragment extends BaseFragment{
             //setup progress bar and animation for water
             setupProgressAndAnimation(_dailyWaterProgress, glassOfWaterDrink, user.getSuggestWaterIntakeInGlass());
 
+        }).addOnFailureListener(e -> ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show());
+
+    }
+
+    private void loadBodyWeightData()
+    {
+        //body weight collection path
+        String BODY_WEIGHT_COLLECTION_PATH = String.format("BodyWeightRecords/%1$s/Records", user.getUID());
+        //get body weight collection reference
+        CollectionReference bodyWeightCollectionRef = database.collection(BODY_WEIGHT_COLLECTION_PATH);
+        bodyWeightCollectionRef.whereEqualTo("date",realDate).addSnapshotListener((value, error) -> {
+            if(error!=null)
+            {
+                ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
+                return;
+            }
+
+            if(value.isEmpty())
+            {
+                _dailyBodyWeightView.setText("No Record yet");
+            }
+            else{
+                double bodyWeight = value.getDocuments().get(0).getDouble("bodyWeight");
+                _dailyBodyWeightView.setText(String.format("Body Weight: %.1f kg",bodyWeight));
+            }
+            //set target goal
+            _goalView.setText(String.format("Target goal: %1$s",user.getTargetGoal()));
         });
     }
 
