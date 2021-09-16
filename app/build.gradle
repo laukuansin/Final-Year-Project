@@ -104,5 +104,6 @@ dependencies {
     //wave progress view
     implementation 'com.yangping:ypwaveview:1.0.3'
 
-
+    //graph
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 }

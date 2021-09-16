@@ -156,10 +156,18 @@ public class MealFragment extends BaseFragment {
         private String date;
         private User user;
         private double totalCalories = 0, breakfastCalories = 0, lunchCalories = 0, dinnerCalories = 0, snackCalories = 0;
+        private SweetAlertDialog _progressDialog;
 
         public RetrieveMealRecord(String date, User user) {
             this.date = date;
             this.user = user;
+            _progressDialog = showProgressDialog("Loading...", getResources().getColor(R.color.green_A700));
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            _progressDialog.show();
         }
 
         @Override
@@ -178,102 +186,100 @@ public class MealFragment extends BaseFragment {
             //collection path = MealRecords/UID/Date
             CollectionReference collectionReference = database.collection(COLLECTION_PATH);
             //get the meal record
-            collectionReference.whereEqualTo("date",date).addSnapshotListener(getActivity(), (value, error) -> {
-                //if error appears
-                if (error != null) {
-                    //show error with dialog
-                    ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
-                    _retrieveMealRecord = null;
-                    return;
-                }
-                getActivity().runOnUiThread(() -> {
-                    //initialize the meal list
-                    List<Meal> _breakfastRecordList = new ArrayList<>();
-                    List<Meal> _lunchMealRecordList = new ArrayList<>();
-                    List<Meal> _dinnerMealRecordList = new ArrayList<>();
-                    List<Meal> _snackMealRecordList = new ArrayList<>();
+            collectionReference.whereEqualTo("date", date).get().addOnSuccessListener(queryDocumentSnapshots -> getActivity().runOnUiThread(() -> {
+                if (_progressDialog.isShowing())
+                    _progressDialog.dismiss();
 
-                    //loop the document
-                    for (DocumentSnapshot document : value.getDocuments()) {
-                        Meal meal = new Meal();
-                        Map<String, Object> documentMapData = document.getData();
-                        meal.setMealRecordID(document.getId());
-                        if(documentMapData.get("foodID")!=null)
-                        {
-                            meal.setNixItemID(documentMapData.get("foodID").toString());
-                        }
-                        if(documentMapData.get("foodBarcode")!=null)
-                        {
-                            meal.setFoodBarcode(documentMapData.get("foodBarcode").toString());
-                        }
-                        meal.setDate(documentMapData.get("date").toString());
-                        meal.setCalories((double) documentMapData.get("calories"));
-                        meal.setMealName(documentMapData.get("foodName").toString());
-                        meal.setQuantity((double) documentMapData.get("quantity"));
-                        meal.setMealType(documentMapData.get("mealType").toString());
-                        meal.setServingUnit(documentMapData.get("servingUnit").toString());
-                        meal.setFoodWeightInGram((double) documentMapData.get("foodWeight"));
+                //initialize the meal list
+                List<Meal> _breakfastRecordList = new ArrayList<>();
+                List<Meal> _lunchMealRecordList = new ArrayList<>();
+                List<Meal> _dinnerMealRecordList = new ArrayList<>();
+                List<Meal> _snackMealRecordList = new ArrayList<>();
 
-                        //switch case see the meal type
-                        switch (meal.getMealType()) {
-                            case "Breakfast": {
-                                _breakfastRecordList.add(meal);
-                                breakfastCalories += meal.getCalories();
-                                break;
-                            }
-                            case "Lunch": {
-                                _lunchMealRecordList.add(meal);
-                                lunchCalories += meal.getCalories();
-                                break;
-                            }
-                            case "Dinner": {
-                                _dinnerMealRecordList.add(meal);
-                                dinnerCalories += meal.getCalories();
-                                break;
-                            }
-                            case "Snack": {
-                                _snackMealRecordList.add(meal);
-                                snackCalories += meal.getCalories();
-                                break;
-                            }
-                            default: {
-                                Log.d("Error:", "Unknown class");
-                                break;
-                            }
+                //loop the document
+                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                    Meal meal = new Meal();
+                    Map<String, Object> documentMapData = document.getData();
+                    meal.setMealRecordID(document.getId());
+                    if (documentMapData.get("foodID") != null) {
+                        meal.setNixItemID(documentMapData.get("foodID").toString());
+                    }
+                    if (documentMapData.get("foodBarcode") != null) {
+                        meal.setFoodBarcode(documentMapData.get("foodBarcode").toString());
+                    }
+                    meal.setDate(documentMapData.get("date").toString());
+                    meal.setCalories((double) documentMapData.get("calories"));
+                    meal.setMealName(documentMapData.get("foodName").toString());
+                    meal.setQuantity((double) documentMapData.get("quantity"));
+                    meal.setMealType(documentMapData.get("mealType").toString());
+                    meal.setServingUnit(documentMapData.get("servingUnit").toString());
+                    meal.setFoodWeightInGram((double) documentMapData.get("foodWeight"));
+
+                    //switch case see the meal type
+                    switch (meal.getMealType()) {
+                        case "Breakfast": {
+                            _breakfastRecordList.add(meal);
+                            breakfastCalories += meal.getCalories();
+                            break;
+                        }
+                        case "Lunch": {
+                            _lunchMealRecordList.add(meal);
+                            lunchCalories += meal.getCalories();
+                            break;
+                        }
+                        case "Dinner": {
+                            _dinnerMealRecordList.add(meal);
+                            dinnerCalories += meal.getCalories();
+                            break;
+                        }
+                        case "Snack": {
+                            _snackMealRecordList.add(meal);
+                            snackCalories += meal.getCalories();
+                            break;
+                        }
+                        default: {
+                            Log.d("Error:", "Unknown class");
+                            break;
                         }
                     }
-                    //get total calories
-                    totalCalories = breakfastCalories + lunchCalories + dinnerCalories + snackCalories;
+                }
+                //get total calories
+                totalCalories = breakfastCalories + lunchCalories + dinnerCalories + snackCalories;
 
-                    //set progress bar
-                    _mealProgressBar.setMax((int) Math.round(user.getDailyCaloriesEaten()));
-                    _mealProgressBar.clearAnimation();
+                //set progress bar
+                _mealProgressBar.setMax((int) Math.round(user.getDailyCaloriesEaten()));
+                _mealProgressBar.clearAnimation();
 
-                    //create animation, from 0 animate to current value
-                    ProgressAnimation animation = new ProgressAnimation(_mealProgressBar, 0, (int) Math.round(totalCalories));
-                    animation.setDuration(1000);//set 2 milliseconds animation
-                    _mealProgressBar.setAnimation(animation);//start animation
+                //create animation, from 0 animate to current value
+                ProgressAnimation animation = new ProgressAnimation(_mealProgressBar, 0, (int) Math.round(totalCalories));
+                animation.setDuration(1000);//set 2 milliseconds animation
+                _mealProgressBar.setAnimation(animation);//start animation
 
 
-                    _mealProgressView.setText(String.format("%1$s of %2$s Calories Eaten", (int) Math.round(totalCalories), (int) Math.round(user.getDailyCaloriesEaten())));
-                    _breakfastProgressView.setText(String.format("%1$s/%2$s Calories", (int) Math.round(breakfastCalories), (int) Math.round(user.getSuggestBreakfastCalorieEaten())));
-                    _lunchProgressView.setText(String.format("%1$s/%2$s Calories", (int) Math.round(lunchCalories), (int) Math.round(user.getSuggestLunchCalorieEaten())));
-                    _dinnerProgressView.setText(String.format("%1$s/%2$s Calories", (int) Math.round(dinnerCalories), (int) Math.round(user.getSuggestDinnerCalorieEaten())));
-                    _snackProgressView.setText(String.format("%1$s/%2$s Calories", (int) Math.round(snackCalories), (int) Math.round(user.getSuggestSnackCalorieEaten())));
+                _mealProgressView.setText(String.format("%1$s of %2$s Calories Eaten", (int) Math.round(totalCalories), (int) Math.round(user.getDailyCaloriesEaten())));
+                _breakfastProgressView.setText(String.format("%1$s/%2$s Calories", (int) Math.round(breakfastCalories), (int) Math.round(user.getSuggestBreakfastCalorieEaten())));
+                _lunchProgressView.setText(String.format("%1$s/%2$s Calories", (int) Math.round(lunchCalories), (int) Math.round(user.getSuggestLunchCalorieEaten())));
+                _dinnerProgressView.setText(String.format("%1$s/%2$s Calories", (int) Math.round(dinnerCalories), (int) Math.round(user.getSuggestDinnerCalorieEaten())));
+                _snackProgressView.setText(String.format("%1$s/%2$s Calories", (int) Math.round(snackCalories), (int) Math.round(user.getSuggestSnackCalorieEaten())));
 
-                    //show recyclerview
-                    _breakfastRecyclerView.setVisibility(View.VISIBLE);
-                    _lunchRecyclerView.setVisibility(View.VISIBLE);
-                    _dinnerRecyclerView.setVisibility(View.VISIBLE);
-                    _snackRecyclerView.setVisibility(View.VISIBLE);
+                //show recyclerview
+                _breakfastRecyclerView.setVisibility(View.VISIBLE);
+                _lunchRecyclerView.setVisibility(View.VISIBLE);
+                _dinnerRecyclerView.setVisibility(View.VISIBLE);
+                _snackRecyclerView.setVisibility(View.VISIBLE);
 
-                    //setup the adapter for each recyclerview
-                    setupAdapter(_breakfastRecordList, _breakfastRecyclerView);
-                    setupAdapter(_lunchMealRecordList, _lunchRecyclerView);
-                    setupAdapter(_dinnerMealRecordList, _dinnerRecyclerView);
-                    setupAdapter(_snackMealRecordList, _snackRecyclerView);
+                //setup the adapter for each recyclerview
+                setupAdapter(_breakfastRecordList, _breakfastRecyclerView);
+                setupAdapter(_lunchMealRecordList, _lunchRecyclerView);
+                setupAdapter(_dinnerMealRecordList, _dinnerRecyclerView);
+                setupAdapter(_snackMealRecordList, _snackRecyclerView);
 
-                });
+            })).addOnFailureListener(e -> {
+                if (_progressDialog.isShowing())
+                    _progressDialog.dismiss();
+                //show error with dialog
+                ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
+                _retrieveMealRecord = null;
             });
 
             _retrieveMealRecord = null;
@@ -320,21 +326,18 @@ public class MealFragment extends BaseFragment {
         });
     }
 
-    public void editMealRecord(Meal meal)
-    {
+    public void editMealRecord(Meal meal) {
         Intent intent = new Intent(getContext(), MealDetailActivity.class);
         intent.putExtra(MealDetailActivity.DATE_KEY, date);
         intent.putExtra(MealDetailActivity.MEAL_TYPE_KEY, meal.getMealType());
-        if(!meal.getNixItemID().isEmpty())
-        {
-            intent.putExtra(MealDetailActivity.FOOD_ID_KEY,meal.getNixItemID());
+        if (!meal.getNixItemID().isEmpty()) {
+            intent.putExtra(MealDetailActivity.FOOD_ID_KEY, meal.getNixItemID());
         }
-        if(!meal.getFoodBarcode().isEmpty())
-        {
-            intent.putExtra(MealDetailActivity.FOOD_BARCODE_KEY,meal.getFoodBarcode());
+        if (!meal.getFoodBarcode().isEmpty()) {
+            intent.putExtra(MealDetailActivity.FOOD_BARCODE_KEY, meal.getFoodBarcode());
         }
-        intent.putExtra(MealDetailActivity.MEAL_RECORD_ID_KEY,meal.getMealRecordID());
-        intent.putExtra(MealDetailActivity.FOOD_NAME_KEY,meal.getMealName());
+        intent.putExtra(MealDetailActivity.MEAL_RECORD_ID_KEY, meal.getMealRecordID());
+        intent.putExtra(MealDetailActivity.FOOD_NAME_KEY, meal.getMealName());
         startActivity(intent);
         getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
     }
