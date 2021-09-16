@@ -20,10 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/white"
-            android:contentInsetStart="0dp"
-            android:contentInsetLeft="0dp"
-            android:contentInsetEnd="0dp"
-            android:contentInsetRight="0dp"
+            
             app:contentInsetEnd="0dp"
             app:contentInsetLeft="0dp"
             app:contentInsetRight="0dp"
@@ -131,7 +128,41 @@
 
                 </com.google.android.material.card.MaterialCardView>
             </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:padding="15dp"
+                android:layout_height="wrap_content">
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    app:cardCornerRadius="5dp"
+                    app:cardElevation="5dp"
+                    app:strokeColor="@color/grey_200"
+                    app:strokeWidth="1dp"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:orientation="vertical"
+                        android:padding="10dp"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:textAlignment="center"
+                            android:text="Statistic of Body Weight"
+                            android:textSize="18sp"
+                            android:layout_marginTop="10dp"
+                            android:textColor="@color/black_1000"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/bodyWeightLineChart"
+                            android:layout_width="match_parent"
+                            android:layout_height="400dp"/>
+                    </LinearLayout>
 
+                </com.google.android.material.card.MaterialCardView>
+            </RelativeLayout>
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>

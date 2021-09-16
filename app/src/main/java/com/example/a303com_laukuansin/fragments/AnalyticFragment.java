@@ -20,6 +20,7 @@ import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.DateXAxisValueFormatter;
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LimitLine;
@@ -28,6 +29,9 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.utils.Utils;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -57,8 +61,10 @@ public class AnalyticFragment extends BaseFragment {
     private FirebaseFirestore database;
     private RetrieveCaloriesEaten _retrieveCaloriesEaten = null;
     private RetrieveCaloriesBurned _retrieveCaloriesBurned = null;
+    private RetrieveBodyWeight _retrieveBodyWeight = null;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");
     private BarChart caloriesEatenBarChart, caloriesBurnedBarChart;
+    private LineChart bodyWeightLineChart;
 
     public AnalyticFragment() {
         user = getSessionHandler().getUser();
@@ -83,7 +89,8 @@ public class AnalyticFragment extends BaseFragment {
         loadCaloriesEatenData(user, caloriesEatenBarChart);
         //load calories burned
         loadCaloriesBurnedData(user, caloriesBurnedBarChart);
-
+        //load body weight
+        loadBodyWeightData(user,bodyWeightLineChart);
         return view;
     }
 
@@ -91,6 +98,7 @@ public class AnalyticFragment extends BaseFragment {
         //bind view with id
         caloriesEatenBarChart = view.findViewById(R.id.caloriesEatenBarChart);
         caloriesBurnedBarChart = view.findViewById(R.id.caloriesBurnedBarChart);
+        bodyWeightLineChart = view.findViewById(R.id.bodyWeightLineChart);
 
         //initialize database
         database = FirebaseFirestore.getInstance();
@@ -107,6 +115,13 @@ public class AnalyticFragment extends BaseFragment {
         if (_retrieveCaloriesBurned == null) {
             _retrieveCaloriesBurned = new RetrieveCaloriesBurned(user, barChart);
             _retrieveCaloriesBurned.execute();
+        }
+    }
+
+    private void loadBodyWeightData(User user, LineChart lineChart) {
+        if (_retrieveBodyWeight == null) {
+            _retrieveBodyWeight = new RetrieveBodyWeight(user, lineChart);
+            _retrieveBodyWeight.execute();
         }
     }
 
@@ -322,15 +337,87 @@ public class AnalyticFragment extends BaseFragment {
                     data.setBarWidth(0.5f);
                     //set data into bar chart
                     barChart.setData(data);
-                   
+
                     setupBarChartXAxis(dateList, barChart);
                     setupBarChartYAxis(barChart, R.color.yellow_900, user.getDailyCaloriesBurnt());
-                    setupBarChart(barEntries.size(), barChart);
+                    setupBarChart(count, barChart);
 
                 }).addOnFailureListener(e -> {
                     ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
                     _retrieveCaloriesBurned = null;
                 });
+            }).addOnFailureListener(e -> {
+                if (_progressDialog.isShowing())
+                    _progressDialog.dismiss();
+
+                ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
+                _retrieveCaloriesBurned = null;
+            });
+
+            _retrieveCaloriesBurned = null;
+            return null;
+        }
+    }
+
+    private class RetrieveBodyWeight extends AsyncTask<Void, Void, Void> {
+        private User user;
+        private SweetAlertDialog _progressDialog;
+        private LineChart lineChart;
+
+        public RetrieveBodyWeight(User user, LineChart lineChart) {
+            this.user = user;
+            this.lineChart = lineChart;
+            _progressDialog = showProgressDialog("Loading...", getResources().getColor(R.color.colorPrimary));
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            _progressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            //body weight collection path
+            String BODY_WEIGHT_COLLECTION_PATH = String.format("BodyWeightRecords/%1$s/Records", user.getUID());
+            //get body weight collection reference
+            CollectionReference bodyWeightCollectionRef = database.collection(BODY_WEIGHT_COLLECTION_PATH);
+            //sort the body weight by date
+            bodyWeightCollectionRef.orderBy("date").get().addOnSuccessListener(exerciseSnapshots -> {
+                if (_progressDialog.isShowing())
+                    _progressDialog.dismiss();
+
+                //entries is the list to input the line chart data
+                List<Entry> entries = new ArrayList<>();
+                //date list to display the x-axis date
+                List<String> dateList = new ArrayList<>();
+                //for the index purpose, the entry is required
+                int count = 0;
+                for (DocumentSnapshot documentSnapshot : exerciseSnapshots.getDocuments()) {
+                    Map<String, Object> documentMapData = documentSnapshot.getData();
+                    double bodyWeight = (double) documentMapData.get("bodyWeight");
+                    String date = documentMapData.get("date").toString();
+
+                    entries.add(new Entry(count++, (float) bodyWeight));
+                    dateList.add(date);
+                }
+
+                //set the LineDataSet and the label of the line chart
+                LineDataSet lineDataSet = new LineDataSet(entries, "Body Weight");
+                //change the line chart color
+                lineDataSet.setColor(getResources().getColor(R.color.pink_A400));
+                //change the label text size of the line chart
+                lineDataSet.setValueTextSize(10f);
+                //change the circle color
+                lineDataSet.setCircleColor(getResources().getColor(R.color.pink_A400));
+                //set the LineData
+                LineData data = new LineData(lineDataSet);
+                //set data into line chart
+                lineChart.setData(data);
+
+                setupLineChartXAxis(dateList,lineChart);
+                setupLineChartYAxis(lineChart,R.color.pink_A400,user.getTargetWeight());
+                setupLineChart(count,lineChart);
             }).addOnFailureListener(e -> {
                 if (_progressDialog.isShowing())
                     _progressDialog.dismiss();
@@ -354,7 +441,7 @@ public class AnalyticFragment extends BaseFragment {
         //change the text position to bottom
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         //rotate the label angle
-        xAxis.setLabelRotationAngle(-45);
+        xAxis.setLabelRotationAngle(-90);
         //set the granularity is when the user zoom the bar chart, it will only display one value
         xAxis.setGranularity(1);
         //add the new custom value formatter is to change the x-axis label to date, by default it is only can display number
@@ -373,6 +460,7 @@ public class AnalyticFragment extends BaseFragment {
         limitLine.enableDashedLine(10f, 10f, 0f);
         //set the line color
         limitLine.setLineColor(getResources().getColor(color));
+
 
         //get the bar chart y-axis
         YAxis yAxis = barChart.getAxisLeft();
@@ -413,6 +501,78 @@ public class AnalyticFragment extends BaseFragment {
 
         //update the bar chart
         barChart.notifyDataSetChanged();
+    }
+
+    private void setupLineChartXAxis(List<String> dateList,LineChart lineChart)
+    {
+        //get the line chart x-axis
+        XAxis xAxis = lineChart.getXAxis();
+        //remove the x-axis grid line
+        xAxis.setDrawGridLines(false);
+        //set the text size
+        xAxis.setTextSize(10f);
+        //change the text position to bottom
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        //rotate the label angle
+        xAxis.setLabelRotationAngle(-90);
+        //set the granularity is when the user zoom the bar chart, it will only display one value
+        xAxis.setGranularity(1);
+        //add the new custom value formatter is to change the x-axis label to date, by default it is only can display number
+        xAxis.setValueFormatter(new DateXAxisValueFormatter(dateList));
+    }
+
+    private void setupLineChartYAxis(LineChart lineChart, int color, double goalValue)
+    {
+        //limit line is to add a horizontal straight in the line chart
+        //set up the limit and label as "Goal"
+        LimitLine limitLine = new LimitLine(Math.round(goalValue), "Goal");
+        //set the line width
+        limitLine.setLineWidth(1f);
+        //set the text size
+        limitLine.setTextSize(10f);
+        //enable the line into dashed
+        limitLine.enableDashedLine(10f, 10f, 0f);
+        //set the line color
+        limitLine.setLineColor(getResources().getColor(color));
+
+        //get the line chart y-axis
+        YAxis yAxis = lineChart.getAxisLeft();
+        //also remove the y-axis grid line
+        yAxis.setDrawGridLines(false);
+        //remove all previous limit lines
+        yAxis.removeAllLimitLines();
+        //set the axis minimum which mean the minimum of label value is 0
+        yAxis.setAxisMinimum(0f);
+        //add the limit line
+        yAxis.addLimitLine(limitLine);
+    }
+
+    private void setupLineChart(int size, LineChart lineChart)
+    {
+        //remove the description
+        lineChart.setDescription(null);
+        //remove the grid background
+        lineChart.setDrawGridBackground(false);
+        //disable double tap to zoom
+        lineChart.setDoubleTapToZoomEnabled(false);
+        //enable the drag x
+        lineChart.setDragXEnabled(true);
+        //remove the label of y-axis on right
+        lineChart.getAxisRight().setDrawLabels(false);
+        //set the visible of line chart as maximum 7
+        lineChart.setVisibleXRangeMaximum(7);
+        //move the current view to latest
+        lineChart.moveViewToX(size);
+
+        //get the line chart's legend
+        Legend legend = lineChart.getLegend();
+        //change the text size
+        legend.setTextSize(14f);
+        //not allow the legend is inside the line chart
+        legend.setDrawInside(false);
+
+        //update the line chart
+        lineChart.notifyDataSetChanged();
     }
 
 }
