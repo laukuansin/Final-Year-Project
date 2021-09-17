@@ -85,8 +85,8 @@ public class LoginFragment extends BaseFragment {
         _loginButton.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                //check input
-                checkInput();
+                //check input and login
+                checkInputAndLogin();
             }
         });
 
@@ -125,7 +125,7 @@ public class LoginFragment extends BaseFragment {
         _signUpView.setHighlightColor(Color.TRANSPARENT);
     }
 
-    private void checkInput()
+    private void checkInputAndLogin()
     {
         String email = _inputEmail.getEditText().getText().toString().trim();//get email
         boolean check = true;

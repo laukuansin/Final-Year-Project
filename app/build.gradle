@@ -106,4 +106,8 @@ dependencies {
 
     //graph
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+    //circle image view
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
 }

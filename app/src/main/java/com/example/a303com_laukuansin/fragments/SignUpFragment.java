@@ -61,7 +61,7 @@ public class SignUpFragment extends BaseFragment {
         return view;
     }
 
-    private void checkInput()
+    private void checkInputAndSignUp()
     {
         String email = _inputEmail.getEditText().getText().toString().trim();//get the email
         boolean check = true;
@@ -159,7 +159,7 @@ public class SignUpFragment extends BaseFragment {
         _signUpButton.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                checkInput();
+                checkInputAndSignUp();
             }
         });
 

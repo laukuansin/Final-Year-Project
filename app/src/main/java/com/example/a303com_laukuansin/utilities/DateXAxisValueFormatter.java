@@ -15,9 +15,13 @@ public class DateXAxisValueFormatter extends IndexAxisValueFormatter {
     }
     @Override
     public String getFormattedValue(float value) {
-//        Date date =new Date((long)value);
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-//        return dateFormat.format(date);
-        return String.valueOf(dateList.get((int)value));
+        if(value>=0&&value<dateList.size())
+        {
+            return String.valueOf(dateList.get((int)value));
+        }
+        else{
+             return "";
+        }
+
     }
 }

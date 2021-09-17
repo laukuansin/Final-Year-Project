@@ -21,6 +21,7 @@ import com.example.a303com_laukuansin.activities.CropImageActivity;
 import com.example.a303com_laukuansin.activities.TrackWithImageActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.FoodClass;
+import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.responses.FoodClassifyResponse;
 import com.example.a303com_laukuansin.utilities.ApiClient;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
@@ -52,6 +53,7 @@ import static android.app.Activity.RESULT_OK;
 public class TrackWithImageFragment extends BaseFragment {
     private String date;
     private String mealType;
+    private final User user;
     private ImageView _imageView;
     private static final int CAMERA_PERMISSION_CODE = 101;
     private static final int GALLERY_PERMISSION_CODE = 102;
@@ -68,6 +70,7 @@ public class TrackWithImageFragment extends BaseFragment {
 
 
     public TrackWithImageFragment() {
+        user = getSessionHandler().getUser();
     }
 
     public static TrackWithImageFragment newInstance(String date, String mealType) {
@@ -114,7 +117,7 @@ public class TrackWithImageFragment extends BaseFragment {
 
         //setup storage
         storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference("images");
+        storageReference = storage.getReference("images/"+user.getUID());
 
         //when click camera
         _cameraButton.setOnClickListener(new OnSingleClickListener() {

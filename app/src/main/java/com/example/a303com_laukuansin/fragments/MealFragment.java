@@ -66,7 +66,6 @@ public class MealFragment extends BaseFragment {
         user = getSessionHandler().getUser();
     }
 
-
     public static MealFragment newInstance(String date) {
         MealFragment fragment = new MealFragment();
         Bundle args = new Bundle();

@@ -193,23 +193,27 @@ public class AnalyticFragment extends BaseFragment {
                     barEntries.add(new BarEntry(count++, (float) totalCaloriesPerDay));
                     dateList.add(dateString);
                 }
-                //set the BarDataSet and the label of the bar chart
-                BarDataSet barDataSet = new BarDataSet(barEntries, "Calories Eaten");
-                //change the bar chart color
-                barDataSet.setColor(getResources().getColor(R.color.green_A700));
-                //change the label text size of the bar chart
-                barDataSet.setValueTextSize(10f);
+                //if it has data only proceed
+                if(!dateList.isEmpty()&&!barEntries.isEmpty())
+                {
+                    //set the BarDataSet and the label of the bar chart
+                    BarDataSet barDataSet = new BarDataSet(barEntries, "Calories Eaten");
+                    //change the bar chart color
+                    barDataSet.setColor(getResources().getColor(R.color.green_A700));
+                    //change the label text size of the bar chart
+                    barDataSet.setValueTextSize(10f);
 
-                //set the BarData
-                BarData data = new BarData(barDataSet);
-                //set each bar width
-                data.setBarWidth(0.5f);
-                //set data into bar chart
-                barChart.setData(data);
+                    //set the BarData
+                    BarData data = new BarData(barDataSet);
+                    //set each bar width
+                    data.setBarWidth(0.5f);
+                    //set data into bar chart
+                    barChart.setData(data);
 
-                setupBarChartXAxis(dateList, barChart);
-                setupBarChartYAxis(barChart, R.color.green_A700, user.getDailyCaloriesEaten());
-                setupBarChart(barEntries.size(), barChart);
+                    setupBarChartXAxis(dateList, barChart);
+                    setupBarChartYAxis(barChart, R.color.green_A700, user.getDailyCaloriesEaten());
+                    setupBarChart(barEntries.size(), barChart);
+                }
             }).addOnFailureListener(e -> {
                 if (_progressDialog.isShowing())
                     _progressDialog.dismiss();
@@ -324,23 +328,27 @@ public class AnalyticFragment extends BaseFragment {
                         barEntries.add(new BarEntry(count++, (float) totalCaloriesPerDay));
                         dateList.add(dateString);
                     }
-                    //set the BarDataSet and the label of the bar chart
-                    BarDataSet barDataSet = new BarDataSet(barEntries, "Calories Burned");
-                    //change the bar chart color
-                    barDataSet.setColor(getResources().getColor(R.color.yellow_900));
-                    //change the label text size of the bar chart
-                    barDataSet.setValueTextSize(10f);
+                    //if it has data only proceed
+                    if(!barEntries.isEmpty()&&!dateList.isEmpty())
+                    {
+                        //set the BarDataSet and the label of the bar chart
+                        BarDataSet barDataSet = new BarDataSet(barEntries, "Calories Burned");
+                        //change the bar chart color
+                        barDataSet.setColor(getResources().getColor(R.color.yellow_900));
+                        //change the label text size of the bar chart
+                        barDataSet.setValueTextSize(10f);
 
-                    //set the BarData
-                    BarData data = new BarData(barDataSet);
-                    //set each bar width
-                    data.setBarWidth(0.5f);
-                    //set data into bar chart
-                    barChart.setData(data);
+                        //set the BarData
+                        BarData data = new BarData(barDataSet);
+                        //set each bar width
+                        data.setBarWidth(0.5f);
+                        //set data into bar chart
+                        barChart.setData(data);
 
-                    setupBarChartXAxis(dateList, barChart);
-                    setupBarChartYAxis(barChart, R.color.yellow_900, user.getDailyCaloriesBurnt());
-                    setupBarChart(count, barChart);
+                        setupBarChartXAxis(dateList, barChart);
+                        setupBarChartYAxis(barChart, R.color.yellow_900, user.getDailyCaloriesBurnt());
+                        setupBarChart(count, barChart);
+                    }
 
                 }).addOnFailureListener(e -> {
                     ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
@@ -401,23 +409,27 @@ public class AnalyticFragment extends BaseFragment {
                     entries.add(new Entry(count++, (float) bodyWeight));
                     dateList.add(date);
                 }
+                //if it has data only proceed
+                if(!entries.isEmpty()&&!dateList.isEmpty())
+                {
+                    //set the LineDataSet and the label of the line chart
+                    LineDataSet lineDataSet = new LineDataSet(entries, "Body Weight");
+                    //change the line chart color
+                    lineDataSet.setColor(getResources().getColor(R.color.pink_A400));
+                    //change the label text size of the line chart
+                    lineDataSet.setValueTextSize(10f);
+                    //change the circle color
+                    lineDataSet.setCircleColor(getResources().getColor(R.color.pink_A400));
+                    //set the LineData
+                    LineData data = new LineData(lineDataSet);
+                    //set data into line chart
+                    lineChart.setData(data);
 
-                //set the LineDataSet and the label of the line chart
-                LineDataSet lineDataSet = new LineDataSet(entries, "Body Weight");
-                //change the line chart color
-                lineDataSet.setColor(getResources().getColor(R.color.pink_A400));
-                //change the label text size of the line chart
-                lineDataSet.setValueTextSize(10f);
-                //change the circle color
-                lineDataSet.setCircleColor(getResources().getColor(R.color.pink_A400));
-                //set the LineData
-                LineData data = new LineData(lineDataSet);
-                //set data into line chart
-                lineChart.setData(data);
+                    setupLineChartXAxis(dateList,lineChart);
+                    setupLineChartYAxis(lineChart,R.color.pink_A400,user.getTargetWeight());
+                    setupLineChart(count,lineChart);
+                }
 
-                setupLineChartXAxis(dateList,lineChart);
-                setupLineChartYAxis(lineChart,R.color.pink_A400,user.getTargetWeight());
-                setupLineChart(count,lineChart);
             }).addOnFailureListener(e -> {
                 if (_progressDialog.isShowing())
                     _progressDialog.dismiss();
