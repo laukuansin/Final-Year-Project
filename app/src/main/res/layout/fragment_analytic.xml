@@ -20,7 +20,6 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/white"
-            
             app:contentInsetEnd="0dp"
             app:contentInsetLeft="0dp"
             app:contentInsetRight="0dp"
@@ -31,14 +30,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="horizontal">
+
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="50dp"
+                    android:layout_weight="0.1"
                     android:maxLines="1"
                     android:text="Analytic"
+                    android:textAlignment="center"
                     android:textColor="@color/black_1000"
                     android:textSize="18dp" />
+
+                <ImageView
+                    android:id="@+id/achievement"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginRight="20dp"
+                    android:src="@drawable/ic_achievement" />
+
             </LinearLayout>
 
         </androidx.appcompat.widget.Toolbar>
@@ -46,11 +57,11 @@
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:theme="@style/MaterialTheme"
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:overScrollMode="ifContentScrolls"
+        android:theme="@style/MaterialTheme"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -58,107 +69,122 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:orientation="vertical"
+                android:layout_height="wrap_content"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:padding="15dp"
-                android:layout_height="wrap_content">
+                android:orientation="vertical"
+                android:padding="15dp">
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     app:cardCornerRadius="5dp"
                     app:cardElevation="5dp"
                     app:strokeColor="@color/grey_200"
-                    app:strokeWidth="1dp"
-                    android:layout_height="wrap_content">
+                    app:strokeWidth="1dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="10dp"
-                        android:layout_height="wrap_content">
+                        android:padding="10dp">
+
                         <TextView
-                            android:textAlignment="center"
-                            android:text="Statistic of Calories Eaten"
-                            android:textSize="18sp"
-                            android:layout_marginTop="10dp"
-                            android:textColor="@color/black_1000"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Statistic of Calories Eaten"
+                            android:textAlignment="center"
+                            android:textColor="@color/black_1000"
+                            android:textSize="18sp" />
+
                         <com.github.mikephil.charting.charts.BarChart
                             android:id="@+id/caloriesEatenBarChart"
                             android:layout_width="match_parent"
-                            android:layout_height="400dp"/>
+                            android:layout_height="400dp" />
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
             </RelativeLayout>
+
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:orientation="vertical"
+                android:layout_height="wrap_content"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:padding="15dp"
-                android:layout_height="wrap_content">
+                android:orientation="vertical"
+                android:padding="15dp">
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     app:cardCornerRadius="5dp"
                     app:cardElevation="5dp"
                     app:strokeColor="@color/grey_200"
-                    app:strokeWidth="1dp"
-                    android:layout_height="wrap_content">
+                    app:strokeWidth="1dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="10dp"
-                        android:layout_height="wrap_content">
+                        android:padding="10dp">
+
                         <TextView
-                            android:textAlignment="center"
-                            android:text="Statistic of Calories Burned"
-                            android:textSize="18sp"
-                            android:layout_marginTop="10dp"
-                            android:textColor="@color/black_1000"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Statistic of Calories Burned"
+                            android:textAlignment="center"
+                            android:textColor="@color/black_1000"
+                            android:textSize="18sp" />
+
                         <com.github.mikephil.charting.charts.BarChart
                             android:id="@+id/caloriesBurnedBarChart"
                             android:layout_width="match_parent"
-                            android:layout_height="400dp"/>
+                            android:layout_height="400dp" />
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
             </RelativeLayout>
+
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:orientation="vertical"
+                android:layout_height="wrap_content"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:padding="15dp"
-                android:layout_height="wrap_content">
+                android:orientation="vertical"
+                android:padding="15dp">
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     app:cardCornerRadius="5dp"
                     app:cardElevation="5dp"
                     app:strokeColor="@color/grey_200"
-                    app:strokeWidth="1dp"
-                    android:layout_height="wrap_content">
+                    app:strokeWidth="1dp">
+
                     <LinearLayout
                         android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="10dp"
-                        android:layout_height="wrap_content">
+                        android:padding="10dp">
+
                         <TextView
-                            android:textAlignment="center"
-                            android:text="Statistic of Body Weight"
-                            android:textSize="18sp"
-                            android:layout_marginTop="10dp"
-                            android:textColor="@color/black_1000"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Statistic of Body Weight"
+                            android:textAlignment="center"
+                            android:textColor="@color/black_1000"
+                            android:textSize="18sp" />
+
                         <com.github.mikephil.charting.charts.LineChart
                             android:id="@+id/bodyWeightLineChart"
                             android:layout_width="match_parent"
-                            android:layout_height="400dp"/>
+                            android:layout_height="400dp" />
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>

@@ -38,4 +38,7 @@
         <item name="android:textColorSecondary">@color/white</item>
     </style>
 
+    <style name="RoundedCornersDialog" parent="@style/Theme.MaterialComponents.Dialog">
+        <item name="dialogCornerRadius">10dp</item>
+    </style>
 </resources>

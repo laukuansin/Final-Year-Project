@@ -52,12 +52,7 @@ public class MealActivity extends BaseActivity implements MealRecordAdapter.OnAc
     }
 
     @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
+    protected void AttemptHelp() {
 
     }
 

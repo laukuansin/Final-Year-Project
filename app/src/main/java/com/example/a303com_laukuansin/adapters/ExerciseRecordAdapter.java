@@ -32,7 +32,7 @@ public class ExerciseRecordAdapter extends RecyclerView.Adapter<ExerciseRecordAd
     }
     @NonNull
     @Override
-    public ExerciseRecordAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v= LayoutInflater.from(_context).inflate(R.layout.item_exercise_record,parent,false);
         return new ViewHolder(v);
     }

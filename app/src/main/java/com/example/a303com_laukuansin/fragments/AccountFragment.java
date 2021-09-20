@@ -8,9 +8,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.activities.ChangePasswordActivity;
+import com.example.a303com_laukuansin.activities.EditPersonalInformationActivity;
 import com.example.a303com_laukuansin.activities.MainActivity;
 import com.example.a303com_laukuansin.activities.MealActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
@@ -21,12 +24,14 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AccountFragment extends BaseFragment{
     private User user;
+    private TextView _nameView,_emailView;
+    private CircleImageView _profileImageView;
 
     public AccountFragment() {
-        user = getSessionHandler().getUser();
     }
 
     public static AccountFragment newInstance()
@@ -48,6 +53,15 @@ public class AccountFragment extends BaseFragment{
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        user = getSessionHandler().getUser();
+        _nameView.setText(user.getName());
+        _emailView.setText(user.getEmailAddress());
+        Glide.with(getContext()).load(user.getProfileImage()).placeholder(R.drawable.ic_profile_picture).into(_profileImageView);
+    }
+
     private void initialization(View view)
     {
         //bind view with id
@@ -57,12 +71,19 @@ public class AccountFragment extends BaseFragment{
         LinearLayout _changePasswordLayout = view.findViewById(R.id.changePasswordLayout);
         LinearLayout _privacyPolicyLayout = view.findViewById(R.id.privacyLayout);
         LinearLayout _termsConditionLayout = view.findViewById(R.id.termsConditionLayout);
+        _nameView = view.findViewById(R.id.name);
+        _emailView = view.findViewById(R.id.email);
+        _profileImageView = view.findViewById(R.id.profileImage);
+
 
         //when click personal information
         _personalInformationLayout.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-
+                Intent intent = new Intent(getContext(), EditPersonalInformationActivity.class);
+                startActivity(intent);
+                //add animation sliding to next activity
+                getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
             }
         });
 
@@ -128,4 +149,6 @@ public class AccountFragment extends BaseFragment{
             }
         });
     }
+
+
 }

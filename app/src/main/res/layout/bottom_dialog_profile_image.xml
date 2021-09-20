@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <View
+        android:layout_width="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bottom_dialog_indicator"
+        android:layout_height="4dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Change profile image"
+            android:textColor="@color/black_1000"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+       <LinearLayout
+           android:id="@+id/cameraLayout"
+           android:layout_width="match_parent"
+           android:layout_marginTop="20dp"
+           android:padding="15dp"
+           android:orientation="horizontal"
+           android:gravity="center"
+           android:layout_height="wrap_content">
+           <ImageView
+               android:src="@drawable/ic_camera_black"
+               android:layout_width="24dp"
+               android:layout_height="24dp"/>
+           <TextView
+               android:text="Take a picture from camera"
+               android:layout_width="match_parent"
+               android:layout_marginLeft="20dp"
+               android:textColor="@color/black_1000"
+               android:layout_height="wrap_content"/>
+       </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/galleryLayout"
+            android:layout_width="match_parent"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:padding="15dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/ic_image_black"
+                android:layout_width="24dp"
+                android:layout_height="24dp"/>
+            <TextView
+                android:text="Upload from gallery"
+                android:layout_width="match_parent"
+                android:layout_marginLeft="20dp"
+                android:textColor="@color/black_1000"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -84,6 +84,8 @@ public class SensorListener extends Service implements SensorEventListener {
                 currentStep += thisStepCount - previousStepCount;
                 previousStepCount = thisStepCount;
             }
+            //update the notification
+            setStepBuilder();
             //save the step data
             saveStepData();
         } else if (stepSensor == 1) {//else the step sensor is step detector
@@ -91,6 +93,8 @@ public class SensorListener extends Service implements SensorEventListener {
             if ((double) sensorEvent.values[0] == 1.0) {
                 //then only add one step to the current step
                 currentStep++;
+                //update the notification
+                setStepBuilder();
                 saveStepData();
                 //save the step data
             }
@@ -136,8 +140,6 @@ public class SensorListener extends Service implements SensorEventListener {
                     updateStep();
                 }
             });
-            //update the notification
-            setStepBuilder();
         }
     }
 
@@ -223,6 +225,8 @@ public class SensorListener extends Service implements SensorEventListener {
                     case Intent.ACTION_CLOSE_SYSTEM_DIALOGS:
                     case Intent.ACTION_SHUTDOWN: {
                         saveStepData();
+                        //update the notification
+                        setStepBuilder();
                         break;
                     }
 
@@ -230,6 +234,8 @@ public class SensorListener extends Service implements SensorEventListener {
                     case Intent.ACTION_TIME_CHANGED:
                     case Intent.ACTION_TIME_TICK: {
                         saveStepData();
+                        //update the notification
+                        setStepBuilder();
                         isNewDay();
                         break;
                     }

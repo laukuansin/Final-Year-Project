@@ -39,8 +39,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
     protected abstract void AttemptDelete();
     protected abstract void AttemptSearch();
     protected abstract void AttemptAdd();
-    protected abstract void AttemptFilter();
-    protected abstract void AttemptRefresh();
+    protected abstract void AttemptHelp();
     protected abstract @MenuRes
     int MenuResource();
     protected abstract boolean DisableActionMenu();
@@ -141,11 +140,8 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
             case R.id.action_search:
                 AttemptSearch();
                 return true;
-            case R.id.action_filter:
-                AttemptFilter();
-                return true;
-            case R.id.action_refresh:
-                AttemptRefresh();
+            case R.id.action_help:
+                AttemptHelp();
                 return true;
             case android.R.id.home:
                 onBackPressed();

@@ -14,11 +14,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.DateXAxisValueFormatter;
+import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
@@ -99,9 +103,16 @@ public class AnalyticFragment extends BaseFragment {
         caloriesEatenBarChart = view.findViewById(R.id.caloriesEatenBarChart);
         caloriesBurnedBarChart = view.findViewById(R.id.caloriesBurnedBarChart);
         bodyWeightLineChart = view.findViewById(R.id.bodyWeightLineChart);
+        ImageView _achievementButton = view.findViewById(R.id.achievement);
 
         //initialize database
         database = FirebaseFirestore.getInstance();
+
+        _achievementButton.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+            }
+        });
     }
 
     private void loadCaloriesEatenData(User user, BarChart barChart) {

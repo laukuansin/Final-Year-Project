@@ -213,6 +213,10 @@ public class MealFragment extends BaseFragment {
                     meal.setMealType(documentMapData.get("mealType").toString());
                     meal.setServingUnit(documentMapData.get("servingUnit").toString());
                     meal.setFoodWeightInGram((double) documentMapData.get("foodWeight"));
+                    if(documentMapData.get("foodImageURL")!=null)
+                    {
+                        meal.setFoodImageURL(documentMapData.get("foodImageURL").toString());
+                    }
 
                     //switch case see the meal type
                     switch (meal.getMealType()) {
@@ -334,6 +338,9 @@ public class MealFragment extends BaseFragment {
         }
         if (!meal.getFoodBarcode().isEmpty()) {
             intent.putExtra(MealDetailActivity.FOOD_BARCODE_KEY, meal.getFoodBarcode());
+        }
+        if (!meal.getFoodImageURL().isEmpty()) {
+            intent.putExtra(MealDetailActivity.FOOD_IMAGE_URL_KEY, meal.getFoodImageURL());
         }
         intent.putExtra(MealDetailActivity.MEAL_RECORD_ID_KEY, meal.getMealRecordID());
         intent.putExtra(MealDetailActivity.FOOD_NAME_KEY, meal.getMealName());

@@ -16,6 +16,7 @@ public class User implements Serializable {
     private double startWeight=0;
     private double activityLevel=0;
     private String dateCreated;
+    private String profileImage = "";
 
     public User() {
     }
@@ -106,6 +107,14 @@ public class User implements Serializable {
 
     public void setDateCreated(String dateCreated) {
         this.dateCreated = dateCreated;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
     public double getBMI()

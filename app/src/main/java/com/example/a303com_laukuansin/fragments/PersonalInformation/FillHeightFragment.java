@@ -74,7 +74,7 @@ public class FillHeightFragment extends BaseFragment{
     private void setupHeightPicker(View view)
     {
         _heightPicker = view.findViewById(R.id.heightPicker);
-        displayedValue = new String[171];//create display values
+        displayedValue = new String[171];//create display values, the height is limit between 100-270
         for(int i=0;i<171;i++)
         {
             displayedValue[i] = String.valueOf(i+100);//assign value into string array

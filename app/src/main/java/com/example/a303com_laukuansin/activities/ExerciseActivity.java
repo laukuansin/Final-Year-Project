@@ -51,12 +51,7 @@ public class ExerciseActivity extends BaseActivity implements ExerciseRecordAdap
     }
 
     @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
+    protected void AttemptHelp() {
 
     }
 

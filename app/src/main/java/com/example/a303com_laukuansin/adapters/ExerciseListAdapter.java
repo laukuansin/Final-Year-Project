@@ -36,7 +36,7 @@ public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapte
     }
     @NonNull
     @Override
-    public ExerciseListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v= LayoutInflater.from(_context).inflate(R.layout.item_exercise,parent,false);
         return new ViewHolder(v);
     }

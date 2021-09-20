@@ -1,5 +1,6 @@
 package com.example.a303com_laukuansin.activities;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -8,7 +9,6 @@ import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseActivity;
 import com.example.a303com_laukuansin.fragments.MealDetailFragment;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -21,12 +21,14 @@ public class MealDetailActivity extends BaseActivity {
     public static final String FOOD_ID_KEY = "food_id_key";
     public static final String FOOD_BARCODE_KEY = "food_barcode_key";
     public static final String MEAL_RECORD_ID_KEY = "meal_record_id_key";
+    public static final String FOOD_IMAGE_URL_KEY = "food_image_url_key";
     private String mealType;
     private String date;
     private String foodName = "";
     private String foodID = "";
     private String foodBarcode = "";
     private String mealRecordID = "";
+    private String foodImageURL = "";
 
     @Override
     protected int ContentView() {
@@ -59,24 +61,23 @@ public class MealDetailActivity extends BaseActivity {
     }
 
     @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
-
+    protected void AttemptHelp() {
+        Intent intent = new Intent(this, ServingUnitHelpActivity.class);
+        startActivity(intent);
+        //add animation sliding to next activity
+        overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
     }
 
     @Override
     protected int MenuResource() {
-        return 0;
+        return R.menu.help_only;
     }
 
     @Override
     protected boolean DisableActionMenu() {
-        return true;
+        return false;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,13 +107,17 @@ public class MealDetailActivity extends BaseActivity {
             {
                 foodBarcode = bundle.getString(FOOD_BARCODE_KEY);
             }
+            if(bundle.containsKey(FOOD_IMAGE_URL_KEY))
+            {
+                foodImageURL = bundle.getString(FOOD_IMAGE_URL_KEY);
+            }
         }
 
         setToolbar();
 
         //set the default fragment
         if (savedInstanceState == null) {
-            Fragment _fragment = MealDetailFragment.newInstance(date, mealType,foodName,foodID,mealRecordID,foodBarcode);
+            Fragment _fragment = MealDetailFragment.newInstance(date, mealType,foodName,foodID,mealRecordID,foodBarcode,foodImageURL);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.frame_container, _fragment).commit();
         }
@@ -142,6 +147,7 @@ public class MealDetailActivity extends BaseActivity {
         outState.putString(FOOD_ID_KEY, foodID);
         outState.putString(MEAL_RECORD_ID_KEY, mealRecordID);
         outState.putString(FOOD_BARCODE_KEY, foodBarcode);
+        outState.putString(FOOD_IMAGE_URL_KEY, foodImageURL);
     }
 
     @Override
@@ -153,6 +159,7 @@ public class MealDetailActivity extends BaseActivity {
         foodID = savedInstanceState.getString(FOOD_ID_KEY);
         mealRecordID = savedInstanceState.getString(MEAL_RECORD_ID_KEY);
         foodBarcode = savedInstanceState.getString(FOOD_BARCODE_KEY);
+        foodImageURL = savedInstanceState.getString(FOOD_IMAGE_URL_KEY);
     }
 
     @Override

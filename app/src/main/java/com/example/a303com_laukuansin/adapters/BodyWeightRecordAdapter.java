@@ -34,7 +34,7 @@ public class BodyWeightRecordAdapter extends RecyclerView.Adapter<BodyWeightReco
 
     @NonNull
     @Override
-    public BodyWeightRecordAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v= LayoutInflater.from(_context).inflate(R.layout.item_body_weight_record,parent,false);
         return new ViewHolder(v);
     }

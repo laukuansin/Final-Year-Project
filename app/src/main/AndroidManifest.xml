@@ -130,6 +130,15 @@
             android:windowSoftInputMode="adjustResize"
             android:label="Change Password">
         </activity>
+        <activity android:name=".activities.ServingUnitHelpActivity"
+            android:screenOrientation="portrait"
+            android:label="Serving Unit Help">
+        </activity>
+        <activity android:name=".activities.EditPersonalInformationActivity"
+            android:screenOrientation="portrait"
+            android:label="Personal Information"
+            android:windowSoftInputMode="adjustResize">
+        </activity>
     </application>
 
 </manifest>

@@ -58,7 +58,7 @@ public class FillActivityLevelFragment extends BaseFragment{
 
         if(user.getActivityLevel()!=0)//if the activity is not 0 means user choose activity level before
         {
-            setActivityLevel(user.getActivityLevel());//set actvitiy level
+            setActivityLevel(user.getActivityLevel());//set activity level
         }
 
         //when back button is clicked action

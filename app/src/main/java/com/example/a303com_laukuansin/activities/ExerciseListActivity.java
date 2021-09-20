@@ -51,12 +51,7 @@ public class ExerciseListActivity extends BaseActivity implements ExerciseListAd
     }
 
     @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
+    protected void AttemptHelp() {
 
     }
 

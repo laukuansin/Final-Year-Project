@@ -65,12 +65,7 @@ public class CropImageActivity extends BaseActivity {
     }
 
     @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
+    protected void AttemptHelp() {
 
     }
 

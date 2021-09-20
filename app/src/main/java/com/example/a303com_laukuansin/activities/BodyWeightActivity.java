@@ -51,12 +51,7 @@ public class BodyWeightActivity extends BaseActivity implements BodyWeightRecord
     }
 
     @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
+    protected void AttemptHelp() {
 
     }
 
