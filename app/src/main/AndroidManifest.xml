@@ -13,9 +13,10 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
-<!--    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>-->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.BODY_SENSORS"/>
+    <uses-permission android:name="android.permission.SET_ALARM"/>
 
 
     <application
@@ -48,6 +49,11 @@
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
             </intent-filter>
         </service>
+        <receiver android:name=".broadcastReceiver.ReminderService">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".activities.SplashScreenActivity"
@@ -138,6 +144,11 @@
             android:screenOrientation="portrait"
             android:label="Personal Information"
             android:windowSoftInputMode="adjustResize">
+        </activity>
+        <activity android:name=".activities.ReminderActivity"
+            android:screenOrientation="portrait"
+            android:label="Reminders"
+            >
         </activity>
     </application>
 

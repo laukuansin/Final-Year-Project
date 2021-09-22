@@ -419,7 +419,7 @@ public class ExerciseDetailFragment extends BaseFragment {
         if (date.equals("Today")) {
             date = format.format(new Date());//get current date
         }
-        String DOCUMENT_PATH = String.format("ExerciseRecords/%1$s/Records/%2$s", getSessionHandler().getUser().getUID(), exerciseRecordID);
+        String DOCUMENT_PATH = String.format("ExerciseRecords/%1$s/Records/%2$s", user.getUID(), exerciseRecordID);
         //get the Document reference
         //document path = ExerciseRecords/UID/Records/ExerciseRecordID
         DocumentReference documentReference = database.document(DOCUMENT_PATH);

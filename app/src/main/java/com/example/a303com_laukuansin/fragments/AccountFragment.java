@@ -1,5 +1,8 @@
 package com.example.a303com_laukuansin.fragments;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,11 +19,14 @@ import com.example.a303com_laukuansin.activities.ChangePasswordActivity;
 import com.example.a303com_laukuansin.activities.EditPersonalInformationActivity;
 import com.example.a303com_laukuansin.activities.MainActivity;
 import com.example.a303com_laukuansin.activities.MealActivity;
+import com.example.a303com_laukuansin.activities.ReminderActivity;
+import com.example.a303com_laukuansin.broadcastReceiver.ReminderService;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.pedometer.SensorListener;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.squareup.picasso.Picasso;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,7 +65,10 @@ public class AccountFragment extends BaseFragment{
         user = getSessionHandler().getUser();
         _nameView.setText(user.getName());
         _emailView.setText(user.getEmailAddress());
-        Glide.with(getContext()).load(user.getProfileImage()).placeholder(R.drawable.ic_profile_picture).into(_profileImageView);
+        //set profile image
+        if (!user.getProfileImage().isEmpty()) {
+            Picasso.get().load(user.getProfileImage()).placeholder(R.drawable.ic_profile_picture).into(_profileImageView);
+        }
     }
 
     private void initialization(View view)
@@ -91,7 +100,10 @@ public class AccountFragment extends BaseFragment{
         _reminderLayout.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-
+                Intent intent = new Intent(getContext(), ReminderActivity.class);
+                startActivity(intent);
+                //add animation sliding to next activity
+                getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
             }
         });
 
@@ -136,6 +148,8 @@ public class AccountFragment extends BaseFragment{
             public void onSingleClick(View v) {
                 //stop the step service
                 getActivity().stopService(new Intent(getContext(), SensorListener.class));
+                //remove all reminder has set
+                removeAllReminder();
                 FirebaseAuth auth=FirebaseAuth.getInstance();
                 //redirect to main activity
                 Intent intent = new Intent(getContext(), MainActivity.class);
@@ -150,5 +164,18 @@ public class AccountFragment extends BaseFragment{
         });
     }
 
-
+    private void removeAllReminder()
+    {
+        //get the alarm service
+        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        //loop from 2 to 7 because the alarm id is 2-7
+        for(int i=2;i<=7;i++)
+        {
+            Intent myIntent = new Intent(getContext(), ReminderService.class);
+            //get the pending intent
+            PendingIntent pendingIntent = PendingIntent. getBroadcast ( getContext(), i , myIntent , PendingIntent.FLAG_UPDATE_CURRENT);
+            //cancel the alarm
+            alarmManager.cancel(pendingIntent);
+        }
+    }
 }

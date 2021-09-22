@@ -72,7 +72,7 @@ public class SessionHandler {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     _context.startActivity(intent);
                 }
-            }).addOnFailureListener(e -> Log.d("Error:",e.getMessage()));
+            }).addOnFailureListener(e -> Log.d("Error",e.getMessage()));
         }
         else{//user never log in before
             Intent intent = new Intent(this._context, MainActivity.class);
@@ -97,6 +97,7 @@ public class SessionHandler {
         user.setTargetWeight(documentSnapshot.getDouble("targetWeight"));
         user.setYearOfBirth(documentSnapshot.getLong("yearOfBirth").intValue());
         user.setDateCreated(documentSnapshot.getString("dateCreated"));
+        user.setProfileImage(documentSnapshot.getString("profileImage"));
 
         setUser(user);
     }

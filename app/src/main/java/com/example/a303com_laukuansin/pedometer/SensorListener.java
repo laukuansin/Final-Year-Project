@@ -17,6 +17,7 @@ import android.os.IBinder;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.AppController;
+import com.example.a303com_laukuansin.utilities.ConstantData;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -30,8 +31,6 @@ import java.util.Map;
 import androidx.annotation.Nullable;
 
 public class SensorListener extends Service implements SensorEventListener {
-    private final String CHANNEL_ID = "100";//channel id
-    private final String CHANNEL_NAME = "StepService";// channel name
     private final int NOTIFY_ID = 1;//notification id
     private String stepRecordID = "";//step record id
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy");//date format example 11 Sep 2021
@@ -109,14 +108,14 @@ public class SensorListener extends Service implements SensorEventListener {
 
         //for android 8.0
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder = new Notification.Builder(this, CHANNEL_ID);
+            builder = new Notification.Builder(this, ConstantData.CHANNEL_ID);
             //setup the notification channel
-            NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_MIN);
+            NotificationChannel notificationChannel = new NotificationChannel(ConstantData.CHANNEL_ID, ConstantData.CHANNEL_NAME, NotificationManager.IMPORTANCE_MIN);
             notificationChannel.enableLights(false);//disable the light
             notificationChannel.setShowBadge(false);//disable to show the icon in status bar
             notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);// no show the notification on a secure lockscreen
             notificationManager.createNotificationChannel(notificationChannel);
-            builder.setChannelId(CHANNEL_ID);
+            builder.setChannelId(ConstantData.CHANNEL_ID);
         } else {
             builder = new Notification.Builder(this);
         }

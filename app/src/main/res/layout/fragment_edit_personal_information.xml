@@ -269,8 +269,10 @@
                     android:hint="Current Weight"
                     app:errorEnabled="true"
                     app:boxBackgroundColor="@color/grey_50"
+                    app:suffixText="kg"
                     android:id="@+id/currentWeightLayout"
                     android:focusableInTouchMode="true"
+                    app:helperText="The range of weight must in between 30.0 to 300.9 kg"
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextCurrentWeight"
@@ -296,9 +298,11 @@
                     android:layout_marginLeft="20dp"
                     android:hint="Target Weight"
                     app:errorEnabled="true"
+                    app:suffixText="kg"
                     app:boxBackgroundColor="@color/grey_50"
                     android:id="@+id/targetWeightLayout"
                     android:focusableInTouchMode="true"
+                    app:helperText="The range of weight must in between 30.0 to 300.9 kg"
                     style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/editTextTargetWeight"

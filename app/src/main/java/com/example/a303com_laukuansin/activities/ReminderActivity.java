@@ -6,13 +6,14 @@ import android.os.Bundle;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseActivity;
 import com.example.a303com_laukuansin.fragments.EditPersonalInformationFragment;
+import com.example.a303com_laukuansin.fragments.ReminderFragment;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-public class EditPersonalInformationActivity extends BaseActivity {
+public class ReminderActivity extends BaseActivity {
     @Override
     protected int ContentView() {
         return R.layout.activity_template_toolbar;
@@ -66,7 +67,7 @@ public class EditPersonalInformationActivity extends BaseActivity {
 
         //set the default fragment
         if (savedInstanceState == null) {
-            Fragment _fragment = EditPersonalInformationFragment.newInstance();
+            Fragment _fragment = ReminderFragment.newInstance();
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.frame_container, _fragment).commit();
         }
