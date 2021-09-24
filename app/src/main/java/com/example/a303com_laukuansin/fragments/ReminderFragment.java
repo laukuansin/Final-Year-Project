@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -475,8 +476,6 @@ public class ReminderFragment extends BaseFragment {
             //set context
             builder.setContentText(String.format("Friendly reminder to log your %1$s", typeReminder));
         }
-        PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,new Intent(getContext(), HomeActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(contentIntent);
         builder.setSmallIcon(R.drawable.logo_no_til);
         builder.setAutoCancel(true);
         builder.setPriority(Notification.PRIORITY_MAX);
@@ -493,10 +492,10 @@ public class ReminderFragment extends BaseFragment {
         calendar.setTimeInMillis(System.currentTimeMillis());
         //need reset time zone to prevent time lag
         calendar.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-        //set the hour when to reminder
-        calendar.set(Calendar.HOUR_OF_DAY, reminder.getTime().get(Calendar.HOUR_OF_DAY));
         //set the minute when to reminder
         calendar.set(Calendar.MINUTE, reminder.getTime().get(Calendar.MINUTE));
+        //set the hour when to reminder
+        calendar.set(Calendar.HOUR_OF_DAY, reminder.getTime().get(Calendar.HOUR_OF_DAY));
         //set second to 0
         calendar.set(Calendar.SECOND, 0);
         //set millisecond to 0
@@ -520,7 +519,7 @@ public class ReminderFragment extends BaseFragment {
         //remove previous alarm
         alarmManager.cancel(pendingIntent);
         //set new repeating alarm
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
     private void removeNotification(int notificationID) {

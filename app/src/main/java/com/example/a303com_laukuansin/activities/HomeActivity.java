@@ -146,10 +146,10 @@ public class HomeActivity extends BaseActivity {
         calendar.setTimeInMillis(System.currentTimeMillis());
         //need reset time zone to prevent time lag
         calendar.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-        //set the hour when to reminder
-        calendar.set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY));
         //set the minute when to reminder
         calendar.set(Calendar.MINUTE,time.get(Calendar.MINUTE));
+        //set the hour when to reminder
+        calendar.set(Calendar.HOUR_OF_DAY, time.get(Calendar.HOUR_OF_DAY));
         //set second to 0
         calendar.set(Calendar.SECOND, 0);
         //set millisecond to 0

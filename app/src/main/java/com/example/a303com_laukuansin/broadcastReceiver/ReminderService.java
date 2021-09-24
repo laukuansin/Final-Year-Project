@@ -17,7 +17,7 @@ public class ReminderService extends BroadcastReceiver {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context. NOTIFICATION_SERVICE ) ;
         Notification notification = intent.getParcelableExtra( NOTIFICATION ) ;
         if (android.os.Build.VERSION. SDK_INT >= android.os.Build.VERSION_CODES. O ) {
-            NotificationChannel notificationChannel = new NotificationChannel(ConstantData.CHANNEL_ID, ConstantData.CHANNEL_NAME , NotificationManager. IMPORTANCE_MIN ) ;
+            NotificationChannel notificationChannel = new NotificationChannel(ConstantData.CHANNEL_ID, ConstantData.CHANNEL_NAME , NotificationManager.IMPORTANCE_HIGH ) ;
             assert notificationManager != null;
             notificationManager.createNotificationChannel(notificationChannel) ;
         }

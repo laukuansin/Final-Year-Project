@@ -51,7 +51,7 @@
         </service>
         <receiver android:name=".broadcastReceiver.ReminderService">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
@@ -147,8 +147,11 @@
         </activity>
         <activity android:name=".activities.ReminderActivity"
             android:screenOrientation="portrait"
-            android:label="Reminders"
-            >
+            android:label="Reminders">
+        </activity>
+        <activity android:name=".activities.AchievementActivity"
+            android:screenOrientation="portrait"
+            android:label="Achievement">
         </activity>
     </application>
 

@@ -28,11 +28,14 @@
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_add.xml" value="0.2203125" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_add_green.xml" value="0.2203125" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_ahcievement.xml" value="0.2203125" />
+        <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_average_color.xml" value="0.2203125" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_barcode.xml" value="0.2203125" />
+        <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_email.xml" value="0.2203125" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_email_sent.xml" value="0.2203125" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_footsteps_silhouette_variant.xml" value="0.2203125" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_home.xml" value="0.16111111111111112" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_image_holder.xml" value="0.2101851851851852" />
+        <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_mail_color.xml" value="0.2203125" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_meal.xml" value="0.2203125" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_password.xml" value="0.18425925925925926" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/drawable/ic_profile_picture.xml" value="0.1814814814814815" />
@@ -60,6 +63,7 @@
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/layout/dialog_activity_level.xml" value="0.22" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/layout/dialog_image.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/layout/fragment_account.xml" value="0.33" />
+        <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/layout/fragment_achievement.xml" value="0.25" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/layout/fragment_analytic.xml" value="0.494949494949495" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/layout/fragment_body_weight.xml" value="0.18" />
         <entry key="..\:/Users/Acer/Documents/GitHub/Final-Year-Project/app/src/main/res/layout/fragment_body_weight_detail.xml" value="0.23098201936376211" />

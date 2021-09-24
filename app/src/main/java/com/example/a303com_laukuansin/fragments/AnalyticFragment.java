@@ -1,6 +1,7 @@
 package com.example.a303com_laukuansin.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -19,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
+import com.example.a303com_laukuansin.activities.AchievementActivity;
+import com.example.a303com_laukuansin.activities.ChangePasswordActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.DateXAxisValueFormatter;
@@ -111,6 +114,10 @@ public class AnalyticFragment extends BaseFragment {
         _achievementButton.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
+                Intent intent = new Intent(getContext(), AchievementActivity.class);
+                startActivity(intent);
+                //add animation sliding to next activity
+                getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
             }
         });
     }
