@@ -18,6 +18,7 @@ import androidx.fragment.app.FragmentTransaction;
 public class LoginSignUpActivity extends AppCompatActivity{
     private FrameLayout _frameLayout;
     private int type;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,8 +27,6 @@ public class LoginSignUpActivity extends AppCompatActivity{
         //initialize
         initialization();
     }
-
-
 
     private void initialization()
     {
@@ -60,6 +59,7 @@ public class LoginSignUpActivity extends AppCompatActivity{
             Toast.makeText(this, "Error occurs: Cannot received previous activity data", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void receivedData()//received data
     {
         Intent intent = getIntent();
@@ -75,7 +75,7 @@ public class LoginSignUpActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.frameLayout);
-        //check the fragment is ForgotPasswordFragment
+        //check the fragment is ForgotPasswordFragment or success email fragment
         if(fragment instanceof ForgotPasswordFragment||fragment instanceof SuccessEmailFragment)
         {
             getSupportFragmentManager().popBackStack();

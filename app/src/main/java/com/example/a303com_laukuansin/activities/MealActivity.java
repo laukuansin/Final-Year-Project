@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 
 import com.example.a303com_laukuansin.R;
-import com.example.a303com_laukuansin.adapters.MealAdapter;
 import com.example.a303com_laukuansin.adapters.MealRecordAdapter;
 import com.example.a303com_laukuansin.cores.BaseActivity;
 import com.example.a303com_laukuansin.domains.Meal;
@@ -52,12 +51,7 @@ public class MealActivity extends BaseActivity implements MealRecordAdapter.OnAc
     }
 
     @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
+    protected void AttemptHelp() {
 
     }
 

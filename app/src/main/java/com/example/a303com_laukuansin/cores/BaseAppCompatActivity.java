@@ -7,7 +7,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -39,8 +38,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
     protected abstract void AttemptDelete();
     protected abstract void AttemptSearch();
     protected abstract void AttemptAdd();
-    protected abstract void AttemptFilter();
-    protected abstract void AttemptRefresh();
+    protected abstract void AttemptHelp();
     protected abstract @MenuRes
     int MenuResource();
     protected abstract boolean DisableActionMenu();
@@ -49,9 +47,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
     private void checkConnection() {
         boolean isConnected = ConnectivityReceiver.isConnected();
         showSnack(isConnected);
-    }
-    protected boolean isConnected(){//return got wifi connection or not
-        return ConnectivityReceiver.isConnected();
     }
 
     @Override
@@ -63,6 +58,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
 
         setContentView(ContentView());
     }
+
     // Showing the status in Snackbar
     private void showSnack(boolean isConnected) {
         FrameLayout contentContainer = (FrameLayout) findViewById(R.id.frame_container);
@@ -90,6 +86,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
             }
         }
     }
+
     /**
      * Callback will be triggered when there is change in
      * network connection
@@ -98,6 +95,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
     public void onNetworkConnectionChanged(boolean isConnected) {
         showSnack(isConnected);
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -141,11 +139,8 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
             case R.id.action_search:
                 AttemptSearch();
                 return true;
-            case R.id.action_filter:
-                AttemptFilter();
-                return true;
-            case R.id.action_refresh:
-                AttemptRefresh();
+            case R.id.action_help:
+                AttemptHelp();
                 return true;
             case android.R.id.home:
                 onBackPressed();
@@ -154,6 +149,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
                 return super.onOptionsItemSelected(item);
         }
     }
+
     protected void hideSoftKeyboard(){
         if (getCurrentFocus() != null && getCurrentFocus().getWindowToken() != null){
             InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);

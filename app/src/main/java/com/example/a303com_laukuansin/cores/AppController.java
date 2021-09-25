@@ -19,7 +19,6 @@ public class AppController extends MultiDexApplication {
         return _instance;
     }
 
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -38,6 +37,7 @@ public class AppController extends MultiDexApplication {
             // Ignore
         }
     }
+
     //set wifi connection listener
     public void setConnectivityListener(ConnectivityReceiver.ConnectivityReceiverListener listener) {
         ConnectivityReceiver.connectivityReceiverListener = listener;

@@ -1,27 +1,21 @@
 package com.example.a303com_laukuansin.fragments;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
+import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.example.a303com_laukuansin.R;
+import com.example.a303com_laukuansin.activities.AchievementActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.DateXAxisValueFormatter;
+import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
@@ -32,16 +26,9 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
-import com.github.mikephil.charting.utils.Utils;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -99,9 +86,21 @@ public class AnalyticFragment extends BaseFragment {
         caloriesEatenBarChart = view.findViewById(R.id.caloriesEatenBarChart);
         caloriesBurnedBarChart = view.findViewById(R.id.caloriesBurnedBarChart);
         bodyWeightLineChart = view.findViewById(R.id.bodyWeightLineChart);
+        ImageView _achievementButton = view.findViewById(R.id.achievement);
 
         //initialize database
         database = FirebaseFirestore.getInstance();
+
+        //when click achievement button
+        _achievementButton.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                Intent intent = new Intent(getContext(), AchievementActivity.class);
+                startActivity(intent);
+                //add animation sliding to next activity
+                getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
+            }
+        });
     }
 
     private void loadCaloriesEatenData(User user, BarChart barChart) {
@@ -193,23 +192,27 @@ public class AnalyticFragment extends BaseFragment {
                     barEntries.add(new BarEntry(count++, (float) totalCaloriesPerDay));
                     dateList.add(dateString);
                 }
-                //set the BarDataSet and the label of the bar chart
-                BarDataSet barDataSet = new BarDataSet(barEntries, "Calories Eaten");
-                //change the bar chart color
-                barDataSet.setColor(getResources().getColor(R.color.green_A700));
-                //change the label text size of the bar chart
-                barDataSet.setValueTextSize(10f);
+                //if it has data only proceed
+                if(!dateList.isEmpty()&&!barEntries.isEmpty())
+                {
+                    //set the BarDataSet and the label of the bar chart
+                    BarDataSet barDataSet = new BarDataSet(barEntries, "Calories Eaten");
+                    //change the bar chart color
+                    barDataSet.setColor(getResources().getColor(R.color.green_A700));
+                    //change the label text size of the bar chart
+                    barDataSet.setValueTextSize(10f);
 
-                //set the BarData
-                BarData data = new BarData(barDataSet);
-                //set each bar width
-                data.setBarWidth(0.5f);
-                //set data into bar chart
-                barChart.setData(data);
+                    //set the BarData
+                    BarData data = new BarData(barDataSet);
+                    //set each bar width
+                    data.setBarWidth(0.5f);
+                    //set data into bar chart
+                    barChart.setData(data);
 
-                setupBarChartXAxis(dateList, barChart);
-                setupBarChartYAxis(barChart, R.color.green_A700, user.getDailyCaloriesEaten());
-                setupBarChart(barEntries.size(), barChart);
+                    setupBarChartXAxis(dateList, barChart);
+                    setupBarChartYAxis(barChart, R.color.green_A700, user.getDailyCaloriesEaten());
+                    setupBarChart(barEntries.size(), barChart);
+                }
             }).addOnFailureListener(e -> {
                 if (_progressDialog.isShowing())
                     _progressDialog.dismiss();
@@ -324,23 +327,27 @@ public class AnalyticFragment extends BaseFragment {
                         barEntries.add(new BarEntry(count++, (float) totalCaloriesPerDay));
                         dateList.add(dateString);
                     }
-                    //set the BarDataSet and the label of the bar chart
-                    BarDataSet barDataSet = new BarDataSet(barEntries, "Calories Burned");
-                    //change the bar chart color
-                    barDataSet.setColor(getResources().getColor(R.color.yellow_900));
-                    //change the label text size of the bar chart
-                    barDataSet.setValueTextSize(10f);
+                    //if it has data only proceed
+                    if(!barEntries.isEmpty()&&!dateList.isEmpty())
+                    {
+                        //set the BarDataSet and the label of the bar chart
+                        BarDataSet barDataSet = new BarDataSet(barEntries, "Calories Burned");
+                        //change the bar chart color
+                        barDataSet.setColor(getResources().getColor(R.color.yellow_900));
+                        //change the label text size of the bar chart
+                        barDataSet.setValueTextSize(10f);
 
-                    //set the BarData
-                    BarData data = new BarData(barDataSet);
-                    //set each bar width
-                    data.setBarWidth(0.5f);
-                    //set data into bar chart
-                    barChart.setData(data);
+                        //set the BarData
+                        BarData data = new BarData(barDataSet);
+                        //set each bar width
+                        data.setBarWidth(0.5f);
+                        //set data into bar chart
+                        barChart.setData(data);
 
-                    setupBarChartXAxis(dateList, barChart);
-                    setupBarChartYAxis(barChart, R.color.yellow_900, user.getDailyCaloriesBurnt());
-                    setupBarChart(count, barChart);
+                        setupBarChartXAxis(dateList, barChart);
+                        setupBarChartYAxis(barChart, R.color.yellow_900, user.getDailyCaloriesBurnt());
+                        setupBarChart(count, barChart);
+                    }
 
                 }).addOnFailureListener(e -> {
                     ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
@@ -401,23 +408,27 @@ public class AnalyticFragment extends BaseFragment {
                     entries.add(new Entry(count++, (float) bodyWeight));
                     dateList.add(date);
                 }
+                //if it has data only proceed
+                if(!entries.isEmpty()&&!dateList.isEmpty())
+                {
+                    //set the LineDataSet and the label of the line chart
+                    LineDataSet lineDataSet = new LineDataSet(entries, "Body Weight");
+                    //change the line chart color
+                    lineDataSet.setColor(getResources().getColor(R.color.pink_A400));
+                    //change the label text size of the line chart
+                    lineDataSet.setValueTextSize(10f);
+                    //change the circle color
+                    lineDataSet.setCircleColor(getResources().getColor(R.color.pink_A400));
+                    //set the LineData
+                    LineData data = new LineData(lineDataSet);
+                    //set data into line chart
+                    lineChart.setData(data);
 
-                //set the LineDataSet and the label of the line chart
-                LineDataSet lineDataSet = new LineDataSet(entries, "Body Weight");
-                //change the line chart color
-                lineDataSet.setColor(getResources().getColor(R.color.pink_A400));
-                //change the label text size of the line chart
-                lineDataSet.setValueTextSize(10f);
-                //change the circle color
-                lineDataSet.setCircleColor(getResources().getColor(R.color.pink_A400));
-                //set the LineData
-                LineData data = new LineData(lineDataSet);
-                //set data into line chart
-                lineChart.setData(data);
+                    setupLineChartXAxis(dateList,lineChart);
+                    setupLineChartYAxis(lineChart,R.color.pink_A400,user.getTargetWeight());
+                    setupLineChart(count,lineChart);
+                }
 
-                setupLineChartXAxis(dateList,lineChart);
-                setupLineChartYAxis(lineChart,R.color.pink_A400,user.getTargetWeight());
-                setupLineChart(count,lineChart);
             }).addOnFailureListener(e -> {
                 if (_progressDialog.isShowing())
                     _progressDialog.dismiss();

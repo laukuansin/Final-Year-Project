@@ -9,9 +9,7 @@ import com.example.a303com_laukuansin.adapters.BodyWeightRecordAdapter;
 import com.example.a303com_laukuansin.cores.BaseActivity;
 import com.example.a303com_laukuansin.domains.BodyWeight;
 import com.example.a303com_laukuansin.fragments.BodyWeightFragment;
-import com.example.a303com_laukuansin.fragments.WaterFragment;
 
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -20,6 +18,7 @@ public class BodyWeightActivity extends BaseActivity implements BodyWeightRecord
     public static final String DATE_KEY = "date_key";
     private Fragment _fragment;
     private String date;
+
     @Override
     protected int ContentView() {
         return R.layout.activity_template;
@@ -51,12 +50,7 @@ public class BodyWeightActivity extends BaseActivity implements BodyWeightRecord
     }
 
     @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
+    protected void AttemptHelp() {
 
     }
 

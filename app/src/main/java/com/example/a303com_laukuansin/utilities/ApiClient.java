@@ -20,7 +20,6 @@ public class ApiClient {
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient okHttpClient=new OkHttpClient.Builder().addInterceptor(httpLoggingInterceptor).addInterceptor(interceptor).build();
 
-
         Retrofit retrofit=new Retrofit.Builder()
                 .baseUrl(url)
                 .client(okHttpClient)
@@ -28,11 +27,13 @@ public class ApiClient {
                 .build();
         return retrofit;
     }
+
     public static NutritionixService getNutritionixService()
     {
         NutritionixService nutritionixService = getRetrofit("https://trackapi.nutritionix.com/v2/",new NutritionixInterceptor()).create(NutritionixService.class);
         return nutritionixService;
     }
+
     public static IBMWatsonService getIBMWatsonService()
     {
         IBMWatsonService watsonService = getRetrofit("https://api.us-south.visual-recognition.watson.cloud.ibm.com/instances/d65e1c77-e0f9-4c45-a934-e7b8bab12676/v3/", new IBMWatsonInterceptor()).create(IBMWatsonService.class);

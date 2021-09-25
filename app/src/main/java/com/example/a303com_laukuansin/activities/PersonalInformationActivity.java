@@ -19,9 +19,6 @@ import com.example.a303com_laukuansin.fragments.PersonalInformation.FillNameFrag
 import com.example.a303com_laukuansin.fragments.PersonalInformation.FillTargetWeightFragment;
 import com.example.a303com_laukuansin.fragments.PersonalInformation.FillWeightFragment;
 import com.example.a303com_laukuansin.receivers.ConnectivityReceiver;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -29,7 +26,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -143,6 +139,7 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
                 userMap.put("targetWeight", user.getTargetWeight());
                 userMap.put("activityLevel", user.getActivityLevel());
                 userMap.put("dateCreated", dateFormat.format(new Date()));
+                user.setDateCreated(dateFormat.format(new Date()));
 
                 Map<String, Object> bodyWeightMap = new HashMap<>();//create hash map to store the body weight's data
                 bodyWeightMap.put("bodyWeight", user.getStartWeight());
@@ -156,6 +153,7 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
                         _progressDialog.dismiss();
 
                     Intent intent = new Intent(PersonalInformationActivity.this, HomeActivity.class);
+                    //remove all previous activity and task
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -189,6 +187,5 @@ public class PersonalInformationActivity extends AppCompatActivity implements Fi
         _errorDialog.setConfirmButton(R.string.alert_ok, sweetAlertDialog -> sweetAlertDialog.dismiss());
         _errorDialog.show();
     }
-
 
 }

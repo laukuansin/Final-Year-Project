@@ -34,9 +34,10 @@ public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapte
             throw new RuntimeException(_context.toString() + " must implement OnActionListener");
         }
     }
+
     @NonNull
     @Override
-    public ExerciseListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v= LayoutInflater.from(_context).inflate(R.layout.item_exercise,parent,false);
         return new ViewHolder(v);
     }
@@ -71,6 +72,7 @@ public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapte
             _itemBlock = itemView.findViewById(R.id.item_block);
         }
     }
+
     public interface OnActionListener{
         void selectExercise(Exercise exercise);
     }

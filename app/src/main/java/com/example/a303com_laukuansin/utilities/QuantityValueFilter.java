@@ -1,26 +1,23 @@
 package com.example.a303com_laukuansin.utilities;
 
 import android.text.InputFilter;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.method.DigitsKeyListener;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+/*
+The input filter for the quantity
+*/
 public class QuantityValueFilter implements InputFilter {
-
     private final String DOT = ".";
 
     private int mMaxIntegerDigitsLength;
     private int mMaxDigitsAfterLength;
-    private double mMax;
+    private double mMax,mMin;
 
-
-    public QuantityValueFilter(int maxDigitsBeforeDot, int maxDigitsAfterDot, double maxValue) {
+    public QuantityValueFilter(int maxDigitsBeforeDot, int maxDigitsAfterDot, double maxValue,double minValue) {
         mMaxIntegerDigitsLength = maxDigitsBeforeDot;
         mMaxDigitsAfterLength = maxDigitsAfterDot;
         mMax = maxValue;
+        mMin = minValue;
     }
 
     @Override
@@ -41,9 +38,8 @@ public class QuantityValueFilter implements InputFilter {
         }
     }
 
-
     private CharSequence checkMaxValueRule(double enteredValue, String onlyDigitsText) {
-        if (enteredValue > mMax) {
+        if (enteredValue<mMin||enteredValue > mMax) {
             return "";
         } else {
             return handleInputRules(onlyDigitsText);

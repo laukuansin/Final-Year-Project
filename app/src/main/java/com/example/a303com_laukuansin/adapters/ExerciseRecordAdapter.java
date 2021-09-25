@@ -21,7 +21,6 @@ public class ExerciseRecordAdapter extends RecyclerView.Adapter<ExerciseRecordAd
     private final List<Exercise> _exerciseRecordList;
     private OnActionListener _listener;
 
-
     public ExerciseRecordAdapter(Context _context, List<Exercise> _exerciseRecordList) {
         this._context = _context;
         this._exerciseRecordList = _exerciseRecordList;
@@ -30,9 +29,10 @@ public class ExerciseRecordAdapter extends RecyclerView.Adapter<ExerciseRecordAd
             _listener = (OnActionListener)_context;
         }
     }
+
     @NonNull
     @Override
-    public ExerciseRecordAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v= LayoutInflater.from(_context).inflate(R.layout.item_exercise_record,parent,false);
         return new ViewHolder(v);
     }

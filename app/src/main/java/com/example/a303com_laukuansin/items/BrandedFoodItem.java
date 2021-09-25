@@ -5,7 +5,6 @@ import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.domains.BrandedFood;
-import com.example.a303com_laukuansin.domains.CommonFood;
 import com.mikepenz.fastadapter.items.AbstractItem;
 
 import java.util.List;
@@ -29,6 +28,7 @@ public class BrandedFoodItem extends AbstractItem<BrandedFoodItem,BrandedFoodIte
         _brandedFood = brandedFood;
         return this;
     }
+
     @NonNull
     @Override
     public ViewHolder getViewHolder(View v) {

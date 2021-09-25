@@ -56,7 +56,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MealDetailFragment extends BaseFragment {
-    private String date,mealType,foodName,foodID,mealRecordID,foodBarcode;
+    private String date,mealType,foodName,foodID,mealRecordID,foodBarcode,foodImageURL;
     private double calories, proteins, carbs, fiber, fats, grams;
     private double caloriesMultipliers, proteinsMultipliers, carbsMultipliers, fiberMultipliers, fatsMultipliers;
     private TextView _foodNameView, _foodBrandView, _caloriesView, _proteinsView, _carbohydratesView, _fatsView, _fiberView;
@@ -69,12 +69,12 @@ public class MealDetailFragment extends BaseFragment {
     private RetrieveBarcodeFoodDetail _getBarcodeFoodDetail = null;
     private FirebaseFirestore database;
     private Button _addButton,_deleteButton,_updateButton;
-    private DateFormat format = new SimpleDateFormat("dd MMM yyyy");
+    private final DateFormat format = new SimpleDateFormat("dd MMM yyyy");
 
     public MealDetailFragment() {
     }
 
-    public static MealDetailFragment newInstance(String date, String mealType, String foodName, String foodID,String mealRecordID,String foodBarcode) {
+    public static MealDetailFragment newInstance(String date, String mealType, String foodName, String foodID,String mealRecordID,String foodBarcode,String foodImageURL) {
         MealDetailFragment fragment = new MealDetailFragment();
         Bundle args = new Bundle();
         args.putString(MealDetailActivity.DATE_KEY, date);
@@ -83,6 +83,7 @@ public class MealDetailFragment extends BaseFragment {
         args.putString(MealDetailActivity.FOOD_NAME_KEY, foodName);
         args.putString(MealDetailActivity.MEAL_RECORD_ID_KEY, mealRecordID);
         args.putString(MealDetailActivity.FOOD_BARCODE_KEY, foodBarcode);
+        args.putString(MealDetailActivity.FOOD_IMAGE_URL_KEY, foodImageURL);
         fragment.setArguments(args);
         return fragment;
     }
@@ -109,8 +110,11 @@ public class MealDetailFragment extends BaseFragment {
             if (getArguments().containsKey(MealDetailActivity.FOOD_BARCODE_KEY)) {
                 foodBarcode = getArguments().getString(MealDetailActivity.FOOD_BARCODE_KEY, "");
             }
+            if (getArguments().containsKey(MealDetailActivity.FOOD_IMAGE_URL_KEY)) {
+                foodImageURL = getArguments().getString(MealDetailActivity.FOOD_IMAGE_URL_KEY, "");
+            }
         }
-        setHasOptionsMenu(false);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -162,7 +166,7 @@ public class MealDetailFragment extends BaseFragment {
         servingUnitMap = new HashMap<>();
 
         //set quantity input filter, max digit before dot is 4, max digit after dot is 1, and max value is 5000
-        _quantityEditText.setFilters(new InputFilter[]{new QuantityValueFilter(4, 1, 5000)});
+        _quantityEditText.setFilters(new InputFilter[]{new QuantityValueFilter(4, 1, 5000,0)});
         //add the text changed listener
         _quantityEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -277,6 +281,7 @@ public class MealDetailFragment extends BaseFragment {
             addMealRecordToDatabase(servingUnit,quantity);
         }
     }
+
     private void updateMeal()
     {
         String servingUnit = _autoCompleteServing.getText().toString();
@@ -304,6 +309,7 @@ public class MealDetailFragment extends BaseFragment {
             updateMealRecordToDatabase(servingUnit,quantity);
         }
     }
+
     private void deleteMeal(SweetAlertDialog sweetAlertDialog)
     {
         sweetAlertDialog.dismiss();
@@ -333,7 +339,6 @@ public class MealDetailFragment extends BaseFragment {
         });
     }
 
-
     private void addMealRecordToDatabase(String servingUnit, double quantity)
     {
         //create progress dialog
@@ -360,6 +365,10 @@ public class MealDetailFragment extends BaseFragment {
         if(!foodBarcode.isEmpty())
         {
             mealRecordMap.put("foodBarcode",foodBarcode);
+        }
+        if(!foodImageURL.isEmpty())
+        {
+            mealRecordMap.put("foodImageURL",foodImageURL);
         }
         mealRecordMap.put("quantity",quantity);
         mealRecordMap.put("servingUnit",servingUnit);
@@ -422,7 +431,6 @@ public class MealDetailFragment extends BaseFragment {
             //show error dialog
             ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
         });
-
     }
 
     private class RetrieveCommonFoodDetail extends AsyncTask<Void, Void, Void> {
@@ -529,7 +537,6 @@ public class MealDetailFragment extends BaseFragment {
                         snackbar.show();
                     }
                 }
-
                 @Override
                 public void onFailure(Call<MealDetailResponse> call, Throwable t) {
                     if (_progressDialog.isShowing())
@@ -648,15 +655,14 @@ public class MealDetailFragment extends BaseFragment {
             _updateButton.setVisibility(View.VISIBLE);
             _deleteButton.setVisibility(View.VISIBLE);
 
-            getFoodRecordDetailFromDatabase(date);
+            getFoodRecordDetailFromDatabase();
         }
-
 
         //get food image detail
         FoodPhoto foodPhoto = foodDetail.photo;
         //set image with URL
         Glide.with(getContext())
-                .load(foodPhoto.thumb)
+                .load(foodImageURL.isEmpty()?foodPhoto.thumb:foodImageURL)
                 .centerInside()
                 .placeholder(R.drawable.ic_image_holder)
                 .into(_foodImage);
@@ -668,7 +674,7 @@ public class MealDetailFragment extends BaseFragment {
                 new StfalconImageViewer.Builder<>(getContext(), new String[]{foodPhoto.highres},
                         (imageView, image) ->
                                 Glide.with(getContext())
-                                        .load(image==null?foodPhoto.thumb:image)
+                                        .load(foodImageURL.isEmpty()?image==null?foodPhoto.thumb:image:foodImageURL)
                                         .centerInside()
                                         .placeholder(R.drawable.ic_image_holder)
                                         .into(imageView))
@@ -682,6 +688,9 @@ public class MealDetailFragment extends BaseFragment {
         //set the string list of the serving unit, the purpose is to display at drop down, because drop down required string array or list
         List<String> servingUnitList = new ArrayList<>();
 
+        //add default serving unit to list
+        servingUnitList.add(foodDetail.servingUnit);
+        //add default serving unit to hash map
         servingUnitMap.put(foodDetail.servingUnit, foodDetail.weightGrams/foodDetail.quantity);
         if(foodDetail.measures!=null&&foodDetail.measures.length>0) {
             for (Measure measure : foodDetail.measures) {
@@ -698,12 +707,8 @@ public class MealDetailFragment extends BaseFragment {
         setNutritionView();
     }
 
-    private void getFoodRecordDetailFromDatabase(String date)
+    private void getFoodRecordDetailFromDatabase()
     {
-        //if the date argument is "Today"
-        if (date.equals("Today")) {
-            date = format.format(new Date());//get current date
-        }
         String DOCUMENT_PATH = String.format("MealRecords/%1$s/Records/%2$s", getSessionHandler().getUser().getUID(), mealRecordID);
         //get the Document reference
         //document path = MealRecords/UID/Record/MealRecordID

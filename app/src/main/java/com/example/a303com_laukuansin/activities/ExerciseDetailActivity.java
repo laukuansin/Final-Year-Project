@@ -1,20 +1,14 @@
 package com.example.a303com_laukuansin.activities;
 
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseActivity;
-import com.example.a303com_laukuansin.domains.Exercise;
-import com.example.a303com_laukuansin.fragments.ExerciseDetailFragment;
-import com.example.a303com_laukuansin.fragments.ExerciseListFragment;
 
-import androidx.appcompat.widget.Toolbar;
+import com.example.a303com_laukuansin.fragments.ExerciseDetailFragment;
+
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -25,8 +19,8 @@ public class ExerciseDetailActivity extends BaseActivity {
     public static final String EXERCISE_RECORD_ID_KEY = "meal_record_id_key";
     private String date;
     private String exerciseID;
-    private String exerciseRecordID="";
-    private Fragment _fragment;
+    private String exerciseRecordID = "";
+
     @Override
     protected int ContentView() {
         return R.layout.activity_template;
@@ -58,12 +52,7 @@ public class ExerciseDetailActivity extends BaseActivity {
     }
 
     @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
+    protected void AttemptHelp() {
 
     }
 
@@ -76,22 +65,20 @@ public class ExerciseDetailActivity extends BaseActivity {
     protected boolean DisableActionMenu() {
         return true;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Bundle bundle = getIntent().getExtras();
-        if(bundle!=null){
-            if(bundle.containsKey(DATE_KEY))
-            {
+        if (bundle != null) {
+            if (bundle.containsKey(DATE_KEY)) {
                 date = bundle.getString(DATE_KEY);
             }
-            if(bundle.containsKey(EXERCISE_ID_KEY))
-            {
+            if (bundle.containsKey(EXERCISE_ID_KEY)) {
                 exerciseID = bundle.getString(EXERCISE_ID_KEY);
             }
-            if(bundle.containsKey(EXERCISE_RECORD_ID_KEY))
-            {
+            if (bundle.containsKey(EXERCISE_RECORD_ID_KEY)) {
                 exerciseRecordID = bundle.getString(EXERCISE_RECORD_ID_KEY);
             }
         }
@@ -100,7 +87,7 @@ public class ExerciseDetailActivity extends BaseActivity {
         }
         //set the default fragment
         if (savedInstanceState == null) {
-            _fragment = ExerciseDetailFragment.newInstance(date,exerciseID,exerciseRecordID);
+            Fragment _fragment = ExerciseDetailFragment.newInstance(date, exerciseID, exerciseRecordID);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.frame_container, _fragment).commit();
         }
@@ -108,11 +95,10 @@ public class ExerciseDetailActivity extends BaseActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState,outPersistentState);
-        outState.putString(DATE_KEY,date);
-        outState.putString(EXERCISE_ID_KEY,exerciseID);
-        outState.putString(EXERCISE_RECORD_ID_KEY,exerciseRecordID);
-
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putString(DATE_KEY, date);
+        outState.putString(EXERCISE_ID_KEY, exerciseID);
+        outState.putString(EXERCISE_RECORD_ID_KEY, exerciseRecordID);
     }
 
     @Override
@@ -126,7 +112,6 @@ public class ExerciseDetailActivity extends BaseActivity {
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
-
 }

@@ -15,6 +15,7 @@ public class Meal {
     private String servingUnit;
     private double foodWeightInGram;
     private String date;
+    private String foodImageURL="";
 
     public Meal() {
     }
@@ -113,5 +114,13 @@ public class Meal {
 
     public void setFoodWeightInGram(double foodWeightInGram) {
         this.foodWeightInGram = foodWeightInGram;
+    }
+
+    public String getFoodImageURL() {
+        return foodImageURL;
+    }
+
+    public void setFoodImageURL(String foodImageURL) {
+        this.foodImageURL = foodImageURL;
     }
 }

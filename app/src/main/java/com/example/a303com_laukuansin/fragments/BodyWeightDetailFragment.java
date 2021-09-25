@@ -1,9 +1,7 @@
 package com.example.a303com_laukuansin.fragments;
 
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,22 +12,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
-import com.example.a303com_laukuansin.activities.BodyWeightActivity;
 import com.example.a303com_laukuansin.activities.BodyWeightDetailActivity;
-import com.example.a303com_laukuansin.activities.MealActivity;
-import com.example.a303com_laukuansin.activities.WaterActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -159,7 +149,6 @@ public class BodyWeightDetailFragment extends BaseFragment {
         _weightDecimalPicker.setDisplayedValues(displayedValueWeightDecimal);//set string array into number picker view
         _weightDecimalPicker.setMinValue(0);
         _weightDecimalPicker.setMaxValue(9);
-
     }
 
     private class RetrieveBodyWeightDetail extends AsyncTask<Void, Void, Void> {

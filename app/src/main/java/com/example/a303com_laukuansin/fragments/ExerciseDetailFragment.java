@@ -3,10 +3,8 @@ package com.example.a303com_laukuansin.fragments;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
 import android.util.Log;
@@ -25,14 +23,10 @@ import com.example.a303com_laukuansin.activities.ExerciseDetailActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
-import com.example.a303com_laukuansin.utilities.QuantityValueFilter;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
@@ -58,7 +52,7 @@ public class ExerciseDetailFragment extends BaseFragment {
     private Button _addButton, _deleteButton, _updateButton;
     private TextView _exerciseName, _caloriesBurned;
     private TextInputLayout _inputDuration;
-    private double caloriesPerKGPerMinutes, caloriesBurned;
+    private double caloriesPerKGPerMinutes;
 
     public ExerciseDetailFragment() {
         user = getSessionHandler().getUser();
@@ -180,7 +174,7 @@ public class ExerciseDetailFragment extends BaseFragment {
     }
 
     private void calculateCalories(String duration) {
-        caloriesBurned = Integer.parseInt(duration) * caloriesPerKGPerMinutes * user.getWeight();
+        double caloriesBurned = Integer.parseInt(duration) * caloriesPerKGPerMinutes * user.getWeight();
         _caloriesBurned.setText(String.format("Calories Burned: %1$d", (int) Math.round(caloriesBurned)));
     }
 
@@ -419,7 +413,7 @@ public class ExerciseDetailFragment extends BaseFragment {
         if (date.equals("Today")) {
             date = format.format(new Date());//get current date
         }
-        String DOCUMENT_PATH = String.format("ExerciseRecords/%1$s/Records/%2$s", getSessionHandler().getUser().getUID(), exerciseRecordID);
+        String DOCUMENT_PATH = String.format("ExerciseRecords/%1$s/Records/%2$s", user.getUID(), exerciseRecordID);
         //get the Document reference
         //document path = ExerciseRecords/UID/Records/ExerciseRecordID
         DocumentReference documentReference = database.document(DOCUMENT_PATH);

@@ -30,18 +30,11 @@ import com.example.a303com_laukuansin.domains.MealType;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.example.a303com_laukuansin.utilities.ProgressAnimation;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;

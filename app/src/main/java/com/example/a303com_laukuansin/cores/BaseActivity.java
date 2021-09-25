@@ -6,20 +6,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.example.a303com_laukuansin.R;
-
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 public abstract class BaseActivity extends BaseAppCompatActivity {
     private static final int PERMISSION_CODE = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Handle Toolbar
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
     }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);

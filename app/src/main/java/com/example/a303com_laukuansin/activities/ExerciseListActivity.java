@@ -8,7 +8,6 @@ import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.adapters.ExerciseListAdapter;
 import com.example.a303com_laukuansin.cores.BaseActivity;
 import com.example.a303com_laukuansin.domains.Exercise;
-import com.example.a303com_laukuansin.fragments.ExerciseFragment;
 import com.example.a303com_laukuansin.fragments.ExerciseListFragment;
 
 import androidx.appcompat.widget.Toolbar;
@@ -20,6 +19,7 @@ public class ExerciseListActivity extends BaseActivity implements ExerciseListAd
     public static final String DATE_KEY = "date_key";
     private String date;
     private Fragment _fragment;
+
     @Override
     protected int ContentView() {
         return R.layout.activity_template_toolbar;
@@ -51,12 +51,7 @@ public class ExerciseListActivity extends BaseActivity implements ExerciseListAd
     }
 
     @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
+    protected void AttemptHelp() {
 
     }
 
@@ -69,6 +64,7 @@ public class ExerciseListActivity extends BaseActivity implements ExerciseListAd
     protected boolean DisableActionMenu() {
         return true;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

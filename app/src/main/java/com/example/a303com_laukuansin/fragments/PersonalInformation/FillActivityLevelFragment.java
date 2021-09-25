@@ -17,48 +17,50 @@ import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class FillActivityLevelFragment extends BaseFragment{
+public class FillActivityLevelFragment extends BaseFragment {
     private User user;
     private OnReturnActivityListener _listener;
-    private LinearLayout _sedentaryLayout,_lightlyLayout,_moderatelyLayout,_veryActiveLayout;
+    private LinearLayout _sedentaryLayout, _lightlyLayout, _moderatelyLayout, _veryActiveLayout;
     private double activityLevel = 0;
     private TextView _doneButton;
 
     public FillActivityLevelFragment() {
         user = getSessionHandler().getUser();//get the user from preferences
     }
-    public static FillActivityLevelFragment newInstance()
-    {
+
+    public static FillActivityLevelFragment newInstance() {
         return new FillActivityLevelFragment();
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(false);
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_fill_activity_level, container, false);
+        View view = inflater.inflate(R.layout.fragment_fill_activity_level, container, false);
 
         //initialize
         initialization(view);
-
         return view;
     }
-    private void initialization(View view)
-    {
+
+    private void initialization(View view) {
+        //bind view with id
         _doneButton = view.findViewById(R.id.doneButton);
         TextView _backButton = view.findViewById(R.id.backButton);
         _listener = (OnReturnActivityListener) getContext();
         _sedentaryLayout = view.findViewById(R.id.sedentaryLayout);
         _lightlyLayout = view.findViewById(R.id.lightlyLayout);
         _moderatelyLayout = view.findViewById(R.id.moderatelyLayout);
-        _veryActiveLayout =view.findViewById(R.id.veryActiveLayout);
+        _veryActiveLayout = view.findViewById(R.id.veryActiveLayout);
 
-        if(user.getActivityLevel()!=0)//if the activity is not 0 means user choose activity level before
+        if (user.getActivityLevel() != 0)//if the activity is not 0 means user choose activity level before
         {
-            setActivityLevel(user.getActivityLevel());//set actvitiy level
+            setActivityLevel(user.getActivityLevel());//set activity level
         }
 
         //when back button is clicked action
@@ -78,7 +80,6 @@ public class FillActivityLevelFragment extends BaseFragment{
         });
         //set animation
         setAnimation(view);
-
 
         //when user is choose sedentary
         _sedentaryLayout.setOnClickListener(v -> {
@@ -101,8 +102,7 @@ public class FillActivityLevelFragment extends BaseFragment{
         });
     }
 
-    private void setActivityLevel(double level)
-    {
+    private void setActivityLevel(double level) {
         this.activityLevel = level;//set level
 
         //update activity level
@@ -115,19 +115,16 @@ public class FillActivityLevelFragment extends BaseFragment{
         _veryActiveLayout.setBackground(getResources().getDrawable(R.drawable.border_grey_rectangle_shadow_layout));
 
         //once user click which layout, only update the background
-        if(activityLevel==1.2)//if click sedentary
+        if (activityLevel == 1.2)//if click sedentary
         {
             _sedentaryLayout.setBackground(getResources().getDrawable(R.drawable.border_primary_color_rectangle_shadow_layout));
-        }
-        else if(activityLevel==1.375)//if click lightly active
+        } else if (activityLevel == 1.375)//if click lightly active
         {
             _lightlyLayout.setBackground(getResources().getDrawable(R.drawable.border_primary_color_rectangle_shadow_layout));
-        }
-        else if(activityLevel==1.55)//if click moderately active
+        } else if (activityLevel == 1.55)//if click moderately active
         {
             _moderatelyLayout.setBackground(getResources().getDrawable(R.drawable.border_primary_color_rectangle_shadow_layout));
-        }
-        else if(activityLevel==1.725)//if click very active
+        } else if (activityLevel == 1.725)//if click very active
         {
             _veryActiveLayout.setBackground(getResources().getDrawable(R.drawable.border_primary_color_rectangle_shadow_layout));
         }
@@ -144,17 +141,16 @@ public class FillActivityLevelFragment extends BaseFragment{
         getSessionHandler().setUser(user);
     }
 
-    private void setAnimation(View view)
-    {
+    private void setAnimation(View view) {
         LinearLayout _bottomLayout = view.findViewById(R.id.bottomLayout);
-        Animation _slideUp = AnimationUtils.loadAnimation(getContext(),R.anim.bottom_animation_shorter);//bottom to up
+        Animation _slideUp = AnimationUtils.loadAnimation(getContext(), R.anim.bottom_animation_shorter);//bottom to up
 
         _bottomLayout.setAnimation(_slideUp);
     }
 
-    public interface OnReturnActivityListener
-    {
+    public interface OnReturnActivityListener {
         void backPressed();
+
         void completed();
     }
 }

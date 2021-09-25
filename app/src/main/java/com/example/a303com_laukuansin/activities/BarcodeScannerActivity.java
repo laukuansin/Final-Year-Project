@@ -43,12 +43,7 @@ public class BarcodeScannerActivity extends BaseActivity{
     }
 
     @Override
-    protected void AttemptFilter() {
-
-    }
-
-    @Override
-    protected void AttemptRefresh() {
+    protected void AttemptHelp() {
 
     }
 
@@ -61,21 +56,20 @@ public class BarcodeScannerActivity extends BaseActivity{
     protected boolean DisableActionMenu() {
         return true;
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setToolbar();
+        setupToolbar();
 
         DecoratedBarcodeView _barcodeScannerView = (DecoratedBarcodeView)findViewById(R.id.zxing_barcode_scanner);
         _capture = new CaptureManager(this, _barcodeScannerView);
         _capture.initializeFromIntent(getIntent(), savedInstanceState);
         _capture.decode();
-
-
     }
 
-    private void setToolbar()
+    private void setupToolbar()
     {
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -84,7 +78,6 @@ public class BarcodeScannerActivity extends BaseActivity{
             getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.green_700));// set status background dark green
         }
     }
-
 
     @Override
     protected void onResume() {

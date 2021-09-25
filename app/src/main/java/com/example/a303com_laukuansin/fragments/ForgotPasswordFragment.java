@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
@@ -19,20 +20,20 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ForgotPasswordFragment extends BaseFragment {
     private TextInputLayout _inputEmail;
-    public ForgotPasswordFragment()
-    {
+
+    public ForgotPasswordFragment() {
 
     }
-    public static ForgotPasswordFragment newInstance()
-    {
+
+    public static ForgotPasswordFragment newInstance() {
         return new ForgotPasswordFragment();
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(false);
     }
-
 
     @Nullable
     @Override
@@ -45,8 +46,7 @@ public class ForgotPasswordFragment extends BaseFragment {
         return view;
     }
 
-    private void initialization(View view)
-    {
+    private void initialization(View view) {
         _inputEmail = view.findViewById(R.id.emailLayout);
         Button _submitButton = view.findViewById(R.id.submitButton);
 
@@ -59,27 +59,24 @@ public class ForgotPasswordFragment extends BaseFragment {
         });
     }
 
-    private void checkInput()
-    {
+    private void checkInput() {
         String email = _inputEmail.getEditText().getText().toString().trim();//get email
         boolean check = true;
-        if(email.isEmpty())//if email is empty
+        if (email.isEmpty())//if email is empty
         {
             _inputEmail.setError("Email address cannot be empty!");
             check = false;
-        }
-        else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())//email did not match format
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches())//email did not match format
         {
             _inputEmail.setError("Invalid Email address format!");
             check = false;
-        }
-        else{//else no error occur
+        } else {//else no error occur
             _inputEmail.setError(null);
         }
-        if(check)//no error occurs
+        if (check)//no error occurs
         {
             //progress dialog
-            SweetAlertDialog _progressDialog = showProgressDialog("Sending reset password email.",getResources().getColor(R.color.colorPrimary));
+            SweetAlertDialog _progressDialog = showProgressDialog("Sending reset password email.", getResources().getColor(R.color.colorPrimary));
             _progressDialog.show();
             //firebase instance
             FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -87,15 +84,14 @@ public class ForgotPasswordFragment extends BaseFragment {
                 if (_progressDialog.isShowing())
                     _progressDialog.dismiss();
                 //if success
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     getActivity().getSupportFragmentManager().popBackStack();
                     FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.frameLayout,SuccessEmailFragment.newInstance());
+                    fragmentTransaction.replace(R.id.frameLayout, SuccessEmailFragment.newInstance());
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
-                }
-                else{
-                    ErrorAlert(task.getException().getMessage(), (sweetAlertDialog) -> sweetAlertDialog.cancel(),true).show();
+                } else {
+                    ErrorAlert(task.getException().getMessage(), (sweetAlertDialog) -> sweetAlertDialog.cancel(), true).show();
                 }
             });
         }

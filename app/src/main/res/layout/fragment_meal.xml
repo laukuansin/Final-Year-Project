@@ -91,6 +91,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/breakfastRecyclerView"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
@@ -149,6 +150,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lunchRecyclerView"
                 android:layout_width="match_parent"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:nestedScrollingEnabled="false" />
@@ -207,6 +209,7 @@
                 android:id="@+id/dinnerRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:layout_marginBottom="5dp"
                 android:nestedScrollingEnabled="false" />
         </LinearLayout>
@@ -264,6 +267,7 @@
                 android:id="@+id/snackRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:layout_marginBottom="5dp"
                 android:nestedScrollingEnabled="false" />
         </LinearLayout>

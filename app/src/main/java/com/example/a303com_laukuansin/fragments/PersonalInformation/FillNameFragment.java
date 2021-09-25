@@ -27,24 +27,24 @@ public class FillNameFragment extends BaseFragment {
     public FillNameFragment() {
         user = getSessionHandler().getUser();//get the user from preferences
     }
-    public static FillNameFragment newInstance()
-    {
+
+    public static FillNameFragment newInstance() {
         return new FillNameFragment();
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(false);
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_fill_name, container, false);
+        View view = inflater.inflate(R.layout.fragment_fill_name, container, false);
 
         //initialize
         initialization(view);
-
-
         return view;
     }
 
@@ -52,21 +52,21 @@ public class FillNameFragment extends BaseFragment {
     {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,R.anim.slide_in_left, R.anim.slide_out_right);//set animation
-        fragmentTransaction.replace(R.id.frameLayout,FillGenderFragment.newInstance());
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);//set animation
+        fragmentTransaction.replace(R.id.frameLayout, FillGenderFragment.newInstance());
         fragmentTransaction.commit();
     }
 
-    private void initialization(View view)
-    {
+    private void initialization(View view) {
+        //bind view with id
         _inputName = view.findViewById(R.id.nameLayout);
         TextInputEditText _inputEditName = view.findViewById(R.id.editTextName);
         TextView _nextButton = view.findViewById(R.id.nextButton);
 
         //initial listener
-        _listener = (OnReturnNameListener)getContext();
+        _listener = (OnReturnNameListener) getContext();
 
-        if(user.getName()!=null)//if the user name is no empty
+        if (user.getName() != null)//if the user name is no empty
         {
             _inputEditName.setText(getSessionHandler().getUser().getName());//display the user name
 
@@ -83,12 +83,11 @@ public class FillNameFragment extends BaseFragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.toString().trim().isEmpty())//if the name is empty
+                if (charSequence.toString().trim().isEmpty())//if the name is empty
                 {
                     _nextButton.setEnabled(false);
                     _nextButton.setAlpha(0.3f);
-                }
-                else{//else not empty
+                } else {//else not empty
                     _nextButton.setAlpha(1f);
                     _nextButton.setEnabled(true);
                 }
@@ -114,10 +113,7 @@ public class FillNameFragment extends BaseFragment {
         });
     }
 
-    public interface OnReturnNameListener
-    {
+    public interface OnReturnNameListener {
         void nextStep();
     }
-
-
 }

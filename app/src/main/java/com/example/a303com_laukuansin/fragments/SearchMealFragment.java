@@ -166,8 +166,8 @@ public class SearchMealFragment extends BaseFragment {
                 getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
-
     }
+
     private void checkBarcode(String barcode)
     {
         if(_checkBarcode==null)
@@ -253,6 +253,7 @@ public class SearchMealFragment extends BaseFragment {
             }
         }
     }
+
     private String convertUPCE_To_UPCA(String barcode)
     {
         switch (barcode.charAt(6)) {
@@ -539,5 +540,4 @@ public class SearchMealFragment extends BaseFragment {
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
     }
-
 }

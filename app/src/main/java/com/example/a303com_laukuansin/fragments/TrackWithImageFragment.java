@@ -18,13 +18,18 @@ import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.activities.CropImageActivity;
+import com.example.a303com_laukuansin.activities.MealDetailActivity;
 import com.example.a303com_laukuansin.activities.TrackWithImageActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.FoodClass;
+import com.example.a303com_laukuansin.domains.User;
+import com.example.a303com_laukuansin.requests.MealDetailRequest;
 import com.example.a303com_laukuansin.responses.FoodClassifyResponse;
+import com.example.a303com_laukuansin.responses.MealDetailResponse;
 import com.example.a303com_laukuansin.utilities.ApiClient;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Callback;
@@ -36,7 +41,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -52,6 +59,7 @@ import static android.app.Activity.RESULT_OK;
 public class TrackWithImageFragment extends BaseFragment {
     private String date;
     private String mealType;
+    private final User user;
     private ImageView _imageView;
     private static final int CAMERA_PERMISSION_CODE = 101;
     private static final int GALLERY_PERMISSION_CODE = 102;
@@ -64,10 +72,11 @@ public class TrackWithImageFragment extends BaseFragment {
     private RecogniseFoodByImage _recogniseFoodImage = null;
     private StorageReference storageReference;
     private FirebaseStorage storage;
+    private FirebaseFirestore database;
     private File imageFile;
 
-
     public TrackWithImageFragment() {
+        user = getSessionHandler().getUser();
     }
 
     public static TrackWithImageFragment newInstance(String date, String mealType) {
@@ -110,11 +119,13 @@ public class TrackWithImageFragment extends BaseFragment {
         _imageView = view.findViewById(R.id.imageView);
 
         //set progress dialog
-        _progressDialog = showProgressDialog("",getResources().getColor(R.color.green_A700));
+        _progressDialog = showProgressDialog("", getResources().getColor(R.color.green_A700));
 
+        //initialize database
+        database = FirebaseFirestore.getInstance();
         //setup storage
         storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference("images");
+        storageReference = storage.getReference("images/" + user.getUID());
 
         //when click camera
         _cameraButton.setOnClickListener(new OnSingleClickListener() {
@@ -245,8 +256,6 @@ public class TrackWithImageFragment extends BaseFragment {
                             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
-
-
                 } else {
                     removeImageFileSaved();
                 }
@@ -318,7 +327,7 @@ public class TrackWithImageFragment extends BaseFragment {
 
     public void recognitionImage() {
         if (imageUri == null) {
-            ErrorAlert("Please select or capture food image before start the detection", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
+            ErrorAlert("Please select or capture food image before start the detection", sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
         } else {
             uploadImage(imageFile);
         }
@@ -331,6 +340,7 @@ public class TrackWithImageFragment extends BaseFragment {
 
     private class UploadImageToStorage extends AsyncTask<Void, Void, Void> {
         private File imageFile;
+
         public UploadImageToStorage(File imageFile) {
             this.imageFile = imageFile;
         }
@@ -358,7 +368,7 @@ public class TrackWithImageFragment extends BaseFragment {
             }).addOnFailureListener(e -> {
                 if (_progressDialog.isShowing())
                     _progressDialog.dismiss();
-                ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
+                ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
             });
             _uploadImage = null;
             return null;
@@ -401,56 +411,107 @@ public class TrackWithImageFragment extends BaseFragment {
                         _progressDialog.dismiss();
                     if (response.isSuccessful()) {
                         getActivity().runOnUiThread(() -> {
+                            //if response not empty
                             if (response.body().foodImages[0].foodClassifiers[0].foodClasses != null) {
+                                //get the result
                                 FoodClass[] foodClasses = response.body().foodImages[0].foodClassifiers[0].foodClasses;
                                 List<FoodClass> _foodClassList = new ArrayList<>();
+                                //to check the image is food
                                 boolean checkIsFood = true;
+                                //loop the result
                                 for (FoodClass foodClass : foodClasses) {
+                                    //if appear the non-food result, direct break and set the boolean to false
                                     if (foodClass.Class.equals("non-food")) {
                                         checkIsFood = false;
                                         break;
-                                    } else if (foodClass.Class.equals("food")) {
+                                    } else if (foodClass.Class.equals("food") || foodClass.Class.equals("meal") || foodClass.Class.equals("lunch")) {
+                                        //else if the result is "food","meal","lunch", then continue, because it is meaningless to get it
                                         continue;
                                     }
+                                    //then add the result into list
                                     _foodClassList.add(foodClass);
                                 }
+                                //if the boolean is food, then check the food is in database or not
                                 if (checkIsFood) {
-
+                                    checkFoodIsExistsInFoodDatabase(_foodClassList.get(0), imagePath);
                                 } else {
+                                    //if not food, remove the image file saved
                                     removeImageFileSaved();
+                                    //remove the image already save in the storage
                                     StorageReference removeImageReference = storage.getReferenceFromUrl(imagePath);
-                                    removeImageReference.delete().addOnFailureListener(e -> {
-                                        if (_progressDialog.isShowing())
-                                            _progressDialog.dismiss();
-                                        ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
-                                    });
+                                    removeImageReference.delete();
                                     if (_progressDialog.isShowing())
                                         _progressDialog.dismiss();
+                                    //proof out the error alert
                                     ErrorAlert("After recognise the image, the image is non food", sweetAlertDialog -> {
                                         sweetAlertDialog.dismiss();
                                         getActivity().finish();
-                                    },false).show();
+                                    }, false).show();
                                 }
-                            }
-                            else{
-                                ErrorAlert("There is same input error. Please try again later", sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
-
+                            } else {
+                                ErrorAlert("There is same input error. Please try again later", sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
                             }
                         });
                     } else {
-                        ErrorAlert(response.message(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
+                        ErrorAlert(response.message(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
                     }
                 }
-
                 @Override
                 public void onFailure(Call<FoodClassifyResponse> call, Throwable t) {
                     if (_progressDialog.isShowing())
                         _progressDialog.dismiss();
-                    ErrorAlert(t.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
+                    ErrorAlert(t.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
                 }
             });
             _recogniseFoodImage = null;
             return null;
         }
+    }
+
+    private void checkFoodIsExistsInFoodDatabase(FoodClass foodClass, String imagePath) {
+        _progressDialog.setContentText("Checking Food database...");
+        _progressDialog.show();
+
+        //to check the food is exists in the food database or not
+        MealDetailRequest _request = new MealDetailRequest(foodClass.Class);
+        Call<MealDetailResponse> callCommonFoodDetailAPI = ApiClient.getNutritionixService().getCommonFoodDetail(_request);
+        callCommonFoodDetailAPI.enqueue(new retrofit2.Callback<MealDetailResponse>() {
+            @Override
+            public void onResponse(Call<MealDetailResponse> call, Response<MealDetailResponse> response) {
+                if (_progressDialog.isShowing())
+                    _progressDialog.dismiss();
+                //if exists in food database
+                if (response.isSuccessful()) {
+                    if (response.body().foodDetail != null) {
+                        Intent intent = new Intent(getContext(), MealDetailActivity.class);
+                        intent.putExtra(MealDetailActivity.DATE_KEY, date);
+                        intent.putExtra(MealDetailActivity.MEAL_TYPE_KEY, mealType);
+                        intent.putExtra(MealDetailActivity.FOOD_NAME_KEY, foodClass.Class);
+                        intent.putExtra(MealDetailActivity.FOOD_IMAGE_URL_KEY, imagePath);
+                        startActivity(intent);
+                        getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                        getActivity().finish();
+                    }
+                } else {
+                    //if food no exists in food database
+                    ErrorAlert(String.format("The food image you send is %1$s that currently not exists in the food database.", foodClass.Class), sweetAlertDialog -> {
+                        //upload the no exists food to database
+                        //create meal record class
+                        Map<String, Object> foodSubmitMap = new HashMap<>();//create hash map to store the food submit data
+                        foodSubmitMap.put("imageUrl", imagePath);
+                        foodSubmitMap.put("foodName", foodClass.Class);
+                        database.collection("FoodSubmitList").add(foodSubmitMap);
+                        sweetAlertDialog.dismiss();
+                        getActivity().finish();
+                    }, false).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<MealDetailResponse> call, Throwable t) {
+                if (_progressDialog.isShowing())
+                    _progressDialog.dismiss();
+                ErrorAlert(t.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
+            }
+        });
     }
 }

@@ -34,13 +34,14 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class SignUpFragment extends BaseFragment {
     private CheckBox _checkBox;
-    private TextInputLayout _inputEmail,_inputPassword;
-    private TextView _termPolicy,_loginView;
+    private TextInputLayout _inputEmail, _inputPassword;
+    private TextView _termPolicy, _loginView;
     private Button _signUpButton;
+
     public SignUpFragment() {
     }
-    public static SignUpFragment newInstance()
-    {
+
+    public static SignUpFragment newInstance() {
         return new SignUpFragment();
     }
 
@@ -54,55 +55,47 @@ public class SignUpFragment extends BaseFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sign_up, container, false);
-
         //initialize
         initialization(view);
-
         return view;
     }
 
-    private void checkInput()
-    {
+    private void checkInputAndSignUp() {
         String email = _inputEmail.getEditText().getText().toString().trim();//get the email
         boolean check = true;
-        if(email.isEmpty())//if email is empty
+        if (email.isEmpty())//if email is empty
         {
             _inputEmail.setError("Email address cannot be empty!");
             check = false;
-        }
-        else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())//if email is invalid format
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches())//if email is invalid format
         {
             _inputEmail.setError("Invalid Email address format!");
             check = false;
-        }
-        else{//else no error
+        } else {//else no error
             _inputEmail.setError(null);
         }
         String password = _inputPassword.getEditText().getText().toString().trim();
-        if(password.isEmpty())//if password is empty
+        if (password.isEmpty())//if password is empty
         {
             _inputPassword.setError("Password cannot be empty!");
             check = false;
-        }
-        else if(password.length()<8)//if password length is less than 8
+        } else if (password.length() < 8)//if password length is less than 8
         {
             _inputPassword.setError("Password should be more than 8 characters long.");
             check = false;
-        }
-        else{//else no error
+        } else {//else no error
             _inputPassword.setError(null);
         }
-        if(check)//all input is correct
+        if (check)//all input is correct
         {
             //progress dialog
-            SweetAlertDialog _progressDialog = showProgressDialog("Creating account...",getResources().getColor(R.color.colorPrimary));
+            SweetAlertDialog _progressDialog = showProgressDialog("Creating account...", getResources().getColor(R.color.colorPrimary));
             _progressDialog.show();
             //firebase instance
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(getActivity(), task -> {
+            auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(getActivity(), task -> {
                 //if register success
-                if(task.isSuccessful())
-                {
+                if (task.isSuccessful()) {
                     //close progress dialog
                     if (_progressDialog.isShowing())
                         _progressDialog.dismiss();
@@ -119,22 +112,20 @@ public class SignUpFragment extends BaseFragment {
                     // Add new Flag to start new Activity
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                }
-                else{//if register fail
+                } else {//if register fail
 
                     //close progress dialog
                     if (_progressDialog.isShowing())
                         _progressDialog.dismiss();
 
                     //appear alert dialog
-                    ErrorAlert(task.getException().getMessage(), (sweetAlertDialog) -> sweetAlertDialog.cancel(),true).show();
+                    ErrorAlert(task.getException().getMessage(), (sweetAlertDialog) -> sweetAlertDialog.cancel(), true).show();
                 }
             });
         }
     }
 
-    private void initialization(View view)
-    {
+    private void initialization(View view) {
         _checkBox = view.findViewById(R.id.checkBox);
         _termPolicy = view.findViewById(R.id.termPolicy);
         _signUpButton = view.findViewById(R.id.signUpButton);
@@ -144,12 +135,10 @@ public class SignUpFragment extends BaseFragment {
 
         //when click the check box action
         _checkBox.setOnClickListener(v -> {
-            if(_checkBox.isChecked())
-            {
+            if (_checkBox.isChecked()) {
                 _signUpButton.setAlpha(1f);
                 _signUpButton.setEnabled(true);
-            }
-            else{
+            } else {
                 _signUpButton.setAlpha(0.3f);
                 _signUpButton.setEnabled(false);
             }
@@ -159,15 +148,14 @@ public class SignUpFragment extends BaseFragment {
         _signUpButton.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-                checkInput();
+                checkInputAndSignUp();
             }
         });
 
         setTextViewClickAndStyle();
     }
 
-    private void setTextViewClickAndStyle()
-    {
+    private void setTextViewClickAndStyle() {
         //set clickable for few substring
         SpannableString spanString = new SpannableString("By signing up, I agree to the Terms & Conditions and Privacy Policy");
         SpannableString spanStringLogin = new SpannableString("Already have an account? Login");
@@ -178,9 +166,10 @@ public class SignUpFragment extends BaseFragment {
             public void onClick(@NonNull View view) {
                 //change fragment
                 FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frameLayout,LoginFragment.newInstance());
+                fragmentTransaction.replace(R.id.frameLayout, LoginFragment.newInstance());
                 fragmentTransaction.commit();
             }
+
             @Override
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
@@ -198,6 +187,7 @@ public class SignUpFragment extends BaseFragment {
                 intent.setData(Uri.parse(url));
                 startActivity(intent);
             }
+
             @Override
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
@@ -214,6 +204,7 @@ public class SignUpFragment extends BaseFragment {
                 intent.setData(Uri.parse(url));
                 startActivity(intent);
             }
+
             @Override
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
@@ -221,9 +212,9 @@ public class SignUpFragment extends BaseFragment {
             }
         };
 
-        spanString.setSpan(clickableTerms,30,48, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spanString.setSpan(clickablePolicy,52,67, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spanStringLogin.setSpan(clickableLogin,24,30,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(clickableTerms, 30, 48, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(clickablePolicy, 52, 67, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanStringLogin.setSpan(clickableLogin, 24, 30, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         _termPolicy.setText(spanString);
         _termPolicy.setMovementMethod(LinkMovementMethod.getInstance());
