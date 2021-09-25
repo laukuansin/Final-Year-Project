@@ -5,8 +5,6 @@ import com.google.gson.annotations.SerializedName;
 public class FoodImages {
     @SerializedName("classifiers")
     public FoodClassifier[] foodClassifiers;
-
-
 }
 
 

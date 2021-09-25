@@ -98,7 +98,6 @@ public class CropImageActivity extends BaseActivity {
         }
 
         initialization();
-
     }
 
     @Override
@@ -181,8 +180,11 @@ public class CropImageActivity extends BaseActivity {
     }
 
     private void setupCropImageView() {
+        //set the compress format to JPEG
         _cropImageView.setCompressFormat(Bitmap.CompressFormat.JPEG);
+        //compress quality to 50 to prevent the file size to big
         _cropImageView.setCompressQuality(50);
+        //the initial frame scale to 1, mean fit whole the image
         _cropImageView.setInitialFrameScale(1.0f);
         //load the image
         _cropImageView.startLoad(imageUri, loadCallback);
@@ -206,12 +208,14 @@ public class CropImageActivity extends BaseActivity {
 
             //success crop the image
             try {
+                //get the file
                 File file = new File(imageUriString);
-
+                //if exists, then delete the file
                 if (file.exists()) {
                     file.delete();
                 }
                 FileOutputStream outputStream = new FileOutputStream(file);
+                //compress the bitmap to output stream
                 cropped.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
                 outputStream.flush();
                 outputStream.close();

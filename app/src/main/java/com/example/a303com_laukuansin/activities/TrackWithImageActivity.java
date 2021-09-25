@@ -6,7 +6,6 @@ import android.os.PersistableBundle;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseActivity;
-import com.example.a303com_laukuansin.fragments.MealDetailFragment;
 import com.example.a303com_laukuansin.fragments.TrackWithImageFragment;
 
 import androidx.appcompat.widget.Toolbar;

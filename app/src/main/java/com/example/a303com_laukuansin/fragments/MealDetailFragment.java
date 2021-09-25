@@ -281,6 +281,7 @@ public class MealDetailFragment extends BaseFragment {
             addMealRecordToDatabase(servingUnit,quantity);
         }
     }
+
     private void updateMeal()
     {
         String servingUnit = _autoCompleteServing.getText().toString();
@@ -308,6 +309,7 @@ public class MealDetailFragment extends BaseFragment {
             updateMealRecordToDatabase(servingUnit,quantity);
         }
     }
+
     private void deleteMeal(SweetAlertDialog sweetAlertDialog)
     {
         sweetAlertDialog.dismiss();
@@ -336,7 +338,6 @@ public class MealDetailFragment extends BaseFragment {
             Log.d("Error:",e.getMessage());
         });
     }
-
 
     private void addMealRecordToDatabase(String servingUnit, double quantity)
     {
@@ -430,7 +431,6 @@ public class MealDetailFragment extends BaseFragment {
             //show error dialog
             ErrorAlert(e.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
         });
-
     }
 
     private class RetrieveCommonFoodDetail extends AsyncTask<Void, Void, Void> {
@@ -537,7 +537,6 @@ public class MealDetailFragment extends BaseFragment {
                         snackbar.show();
                     }
                 }
-
                 @Override
                 public void onFailure(Call<MealDetailResponse> call, Throwable t) {
                     if (_progressDialog.isShowing())

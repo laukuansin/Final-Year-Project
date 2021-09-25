@@ -70,9 +70,8 @@ public class ExerciseActivity extends BaseActivity implements ExerciseRecordAdap
         super.onCreate(savedInstanceState);
 
         Bundle bundle = getIntent().getExtras();
-        if(bundle!=null){
-            if(bundle.containsKey(DATE_KEY))
-            {
+        if (bundle != null) {
+            if (bundle.containsKey(DATE_KEY)) {
                 date = bundle.getString(DATE_KEY);
             }
         }
@@ -86,8 +85,7 @@ public class ExerciseActivity extends BaseActivity implements ExerciseRecordAdap
         }
     }
 
-    private void setupToolbar()
-    {
+    private void setupToolbar() {
         //handle toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -106,24 +104,24 @@ public class ExerciseActivity extends BaseActivity implements ExerciseRecordAdap
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState,outPersistentState);
-        outState.putString(DATE_KEY,date);
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putString(DATE_KEY, date);
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        date=savedInstanceState.getString(DATE_KEY);
+        date = savedInstanceState.getString(DATE_KEY);
     }
 
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
     @Override
     public void editExerciseRecord(Exercise exercise) {
-        ((ExerciseFragment)_fragment).editExerciseRecord(exercise);
+        ((ExerciseFragment) _fragment).editExerciseRecord(exercise);
     }
 }

@@ -24,6 +24,7 @@ import com.example.a303com_laukuansin.broadcastReceiver.ReminderService;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.pedometer.SensorListener;
+import com.example.a303com_laukuansin.utilities.NotificationAlarm;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
@@ -32,16 +33,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AccountFragment extends BaseFragment{
+public class AccountFragment extends BaseFragment {
     private User user;
-    private TextView _nameView,_emailView;
+    private TextView _nameView, _emailView;
     private CircleImageView _profileImageView;
 
     public AccountFragment() {
     }
 
-    public static AccountFragment newInstance()
-    {
+    public static AccountFragment newInstance() {
         return new AccountFragment();
     }
 
@@ -62,19 +62,12 @@ public class AccountFragment extends BaseFragment{
     @Override
     public void onResume() {
         super.onResume();
-        user = getSessionHandler().getUser();
-        _nameView.setText(user.getName());
-        _emailView.setText(user.getEmailAddress());
-        //set profile image
-        if (!user.getProfileImage().isEmpty()) {
-            Picasso.get().load(user.getProfileImage()).placeholder(R.drawable.ic_profile_picture).into(_profileImageView);
-        }
+        loadData();
     }
 
-    private void initialization(View view)
-    {
+    private void initialization(View view) {
         //bind view with id
-        Button logout=view.findViewById(R.id.logout);
+        Button logout = view.findViewById(R.id.logout);
         LinearLayout _personalInformationLayout = view.findViewById(R.id.personalInformationLayout);
         LinearLayout _reminderLayout = view.findViewById(R.id.reminderLayout);
         LinearLayout _changePasswordLayout = view.findViewById(R.id.changePasswordLayout);
@@ -84,7 +77,6 @@ public class AccountFragment extends BaseFragment{
         _emailView = view.findViewById(R.id.email);
         _profileImageView = view.findViewById(R.id.profileImage);
 
-
         //when click personal information
         _personalInformationLayout.setOnClickListener(new OnSingleClickListener() {
             @Override
@@ -92,7 +84,7 @@ public class AccountFragment extends BaseFragment{
                 Intent intent = new Intent(getContext(), EditPersonalInformationActivity.class);
                 startActivity(intent);
                 //add animation sliding to next activity
-                getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
@@ -103,7 +95,7 @@ public class AccountFragment extends BaseFragment{
                 Intent intent = new Intent(getContext(), ReminderActivity.class);
                 startActivity(intent);
                 //add animation sliding to next activity
-                getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
@@ -114,7 +106,7 @@ public class AccountFragment extends BaseFragment{
                 Intent intent = new Intent(getContext(), ChangePasswordActivity.class);
                 startActivity(intent);
                 //add animation sliding to next activity
-                getActivity().overridePendingTransition(R.anim.slide_in_right,R.anim.slide_out_left);
+                getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
@@ -149,8 +141,9 @@ public class AccountFragment extends BaseFragment{
                 //stop the step service
                 getActivity().stopService(new Intent(getContext(), SensorListener.class));
                 //remove all reminder has set
-                removeAllReminder();
-                FirebaseAuth auth=FirebaseAuth.getInstance();
+                NotificationAlarm notificationAlarm = new NotificationAlarm(getContext());
+                notificationAlarm.removeAllNotification();
+                FirebaseAuth auth = FirebaseAuth.getInstance();
                 //redirect to main activity
                 Intent intent = new Intent(getContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -164,18 +157,14 @@ public class AccountFragment extends BaseFragment{
         });
     }
 
-    private void removeAllReminder()
+    private void loadData()
     {
-        //get the alarm service
-        AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-        //loop from 2 to 7 because the alarm id is 2-7
-        for(int i=2;i<=7;i++)
-        {
-            Intent myIntent = new Intent(getContext(), ReminderService.class);
-            //get the pending intent
-            PendingIntent pendingIntent = PendingIntent. getBroadcast ( getContext(), i , myIntent , PendingIntent.FLAG_UPDATE_CURRENT);
-            //cancel the alarm
-            alarmManager.cancel(pendingIntent);
+        user = getSessionHandler().getUser();
+        _nameView.setText(user.getName());
+        _emailView.setText(user.getEmailAddress());
+        //set profile image
+        if (!user.getProfileImage().isEmpty()) {
+            Picasso.get().load(user.getProfileImage()).placeholder(R.drawable.ic_profile_picture).into(_profileImageView);
         }
     }
 }

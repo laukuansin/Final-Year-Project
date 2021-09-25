@@ -7,7 +7,6 @@ import android.os.PersistableBundle;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseActivity;
 import com.example.a303com_laukuansin.fragments.BodyWeightDetailFragment;
-import com.example.a303com_laukuansin.fragments.ExerciseDetailFragment;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -18,8 +17,8 @@ public class BodyWeightDetailActivity extends BaseActivity {
     public static final String DATE_KEY = "date_key";
     public static final String BODY_WEIGHT_RECORD_ID_KEY = "body_weight_record_id_key";
     private String date;
-    private String bodyWeightRecordID="";
-    private Fragment _fragment;
+    private String bodyWeightRecordID = "";
+
     @Override
     protected int ContentView() {
         return R.layout.activity_template_toolbar;
@@ -71,13 +70,11 @@ public class BodyWeightDetailActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         Bundle bundle = getIntent().getExtras();
-        if(bundle!=null){
-            if(bundle.containsKey(DATE_KEY))
-            {
+        if (bundle != null) {
+            if (bundle.containsKey(DATE_KEY)) {
                 date = bundle.getString(DATE_KEY);
             }
-            if(bundle.containsKey(BODY_WEIGHT_RECORD_ID_KEY))
-            {
+            if (bundle.containsKey(BODY_WEIGHT_RECORD_ID_KEY)) {
                 bodyWeightRecordID = bundle.getString(BODY_WEIGHT_RECORD_ID_KEY);
             }
         }
@@ -86,14 +83,13 @@ public class BodyWeightDetailActivity extends BaseActivity {
 
         //set the default fragment
         if (savedInstanceState == null) {
-            _fragment = BodyWeightDetailFragment.newInstance(date,bodyWeightRecordID);
+            Fragment _fragment = BodyWeightDetailFragment.newInstance(date, bodyWeightRecordID);
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(R.id.frame_container, _fragment).commit();
         }
     }
 
-    private void setupToolbar()
-    {
+    private void setupToolbar() {
         //handle toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -112,9 +108,9 @@ public class BodyWeightDetailActivity extends BaseActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState,outPersistentState);
-        outState.putString(DATE_KEY,date);
-        outState.putString(BODY_WEIGHT_RECORD_ID_KEY,bodyWeightRecordID);
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putString(DATE_KEY, date);
+        outState.putString(BODY_WEIGHT_RECORD_ID_KEY, bodyWeightRecordID);
 
     }
 
@@ -128,7 +124,7 @@ public class BodyWeightDetailActivity extends BaseActivity {
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 
 }

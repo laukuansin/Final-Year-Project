@@ -6,7 +6,6 @@ import android.os.Bundle;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseActivity;
 import com.example.a303com_laukuansin.fragments.ChangePasswordFragment;
-import com.example.a303com_laukuansin.fragments.MealFragment;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -74,8 +73,7 @@ public class ChangePasswordActivity extends BaseActivity {
         }
     }
 
-    private void setupToolbar()
-    {
+    private void setupToolbar() {
         //handle toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -93,7 +91,6 @@ public class ChangePasswordActivity extends BaseActivity {
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
-
 }

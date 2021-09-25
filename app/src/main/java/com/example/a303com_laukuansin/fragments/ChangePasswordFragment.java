@@ -8,12 +8,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
-import com.example.a303com_laukuansin.activities.MealActivity;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -133,6 +130,5 @@ public class ChangePasswordFragment extends BaseFragment {
                 }
             });
         }
-
     }
 }

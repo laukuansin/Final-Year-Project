@@ -133,6 +133,7 @@ public class User implements Serializable {
     {
         return (int)Math.round(Math.pow((double)getHeight()/100,2.0)*24.9);//formula to calculate the maximum ideal weight 18.4-24.9 BMI is ideal. Round off the weight.
     }
+
     public int getAge()
     {
         return Calendar.getInstance().get(Calendar.YEAR)-getYearOfBirth();
@@ -179,16 +180,19 @@ public class User implements Serializable {
         //book suggest is 22% for breakfast
         return getDailyCaloriesEaten()*0.22;
     }
+
     public double getSuggestLunchCalorieEaten()
     {
         //book suggest is 31% for lunch
         return getDailyCaloriesEaten()*0.31;
     }
+
     public double getSuggestDinnerCalorieEaten()
     {
         //book suggest is 35% for breakfast
         return getDailyCaloriesEaten()*0.35;
     }
+
     public double getSuggestSnackCalorieEaten()
     {
         //book suggest is 12% for breakfast

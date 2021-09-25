@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.domains.ServingUnit;
-import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 
 import java.util.List;
 

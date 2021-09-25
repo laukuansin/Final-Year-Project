@@ -6,7 +6,6 @@ import android.os.Bundle;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseActivity;
 import com.example.a303com_laukuansin.fragments.AchievementFragment;
-import com.example.a303com_laukuansin.fragments.ReminderFragment;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -63,6 +62,7 @@ public class AchievementActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //set toolbar
         setupToolbar();
 
         //set the default fragment
@@ -94,6 +94,7 @@ public class AchievementActivity extends BaseActivity {
     @Override
     public void finish() {
         super.finish();
+        //when the activity is finish, add slide left to right animation
         overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_right);
     }
 }

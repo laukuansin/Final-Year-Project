@@ -6,12 +6,13 @@ import android.os.Bundle;
 
 import com.example.a303com_laukuansin.R;
 
-import java.util.Calendar;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+/*
+time picker
+*/
 public class TimePickerDialogFragment extends DialogFragment {
     private TimePickerDialog.OnTimeSetListener _onTimeSet;
     private int hour,minute;

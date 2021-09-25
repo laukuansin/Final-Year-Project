@@ -17,10 +17,12 @@ import androidx.fragment.app.FragmentTransaction;
 public class SuccessEmailFragment extends BaseFragment {
     public SuccessEmailFragment() {
     }
+
     public static SuccessEmailFragment newInstance()
     {
         return new SuccessEmailFragment();
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,8 +36,6 @@ public class SuccessEmailFragment extends BaseFragment {
 
         //initialize
         initialization(view);
-
-
         return view;
     }
 
@@ -54,6 +54,5 @@ public class SuccessEmailFragment extends BaseFragment {
                 fragmentTransaction.commit();
             }
         });
-
     }
 }

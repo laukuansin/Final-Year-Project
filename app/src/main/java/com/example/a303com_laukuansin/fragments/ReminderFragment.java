@@ -1,13 +1,7 @@
 package com.example.a303com_laukuansin.fragments;
 
-import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,12 +12,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.a303com_laukuansin.R;
-import com.example.a303com_laukuansin.activities.HomeActivity;
-import com.example.a303com_laukuansin.broadcastReceiver.ReminderService;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.Reminder;
 import com.example.a303com_laukuansin.domains.User;
-import com.example.a303com_laukuansin.utilities.ConstantData;
+import com.example.a303com_laukuansin.utilities.NotificationAlarm;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.example.a303com_laukuansin.utilities.TimePickerDialogFragment;
 import com.google.firebase.firestore.CollectionReference;
@@ -37,12 +29,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.app.NotificationCompat;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ReminderFragment extends BaseFragment {
@@ -50,7 +40,7 @@ public class ReminderFragment extends BaseFragment {
     private TextView _breakfastTime, _lunchTime, _dinnerTime, _snackTime, _exerciseTime, _weightInTime;
     private SwitchCompat _breakfastSwitch, _lunchSwitch, _dinnerSwitch, _snackSwitch, _exerciseSwitch, _weightInSwitch;
     private Reminder breakfastReminder,lunchReminder,dinnerReminder,snackReminder,exerciseReminder,weightInReminder;
-    private AlarmManager alarmManager;
+    private NotificationAlarm notificationAlarm;
     private RetrieveReminders _retrieveReminders = null;
     private FirebaseFirestore database;
     private final String timeFormat = "hh:mm aaa";
@@ -108,8 +98,8 @@ public class ReminderFragment extends BaseFragment {
         _exerciseSwitch = view.findViewById(R.id.exerciseSwitch);
         _weightInSwitch = view.findViewById(R.id.weightInSwitch);
 
-        //set alarm manager
-        alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        //set notification alarm
+        notificationAlarm = new NotificationAlarm(getContext());
         //initialize database
         database = FirebaseFirestore.getInstance();
 
@@ -166,11 +156,11 @@ public class ReminderFragment extends BaseFragment {
         _breakfastSwitch.setOnClickListener(v -> {
             if (_breakfastSwitch.isChecked()) {
                 Toast.makeText(getContext(), "Turn on breakfast reminder", Toast.LENGTH_SHORT).show();
-                scheduleNotification(getNotification(breakfastReminder.getReminderName()),breakfastReminder);
+                notificationAlarm.scheduleNotification(breakfastReminder);
                 addReminderToDatabase(breakfastReminder);
             } else {
                 Toast.makeText(getContext(), "Turn off breakfast reminder", Toast.LENGTH_SHORT).show();
-                removeNotification(breakfastReminder.getReminderID());
+                notificationAlarm.removeNotification(breakfastReminder.getReminderID());
                 deleteReminderFromDatabase(breakfastReminder.getReminderID());
             }
         });
@@ -179,11 +169,11 @@ public class ReminderFragment extends BaseFragment {
         _lunchSwitch.setOnClickListener(v -> {
             if (_lunchSwitch.isChecked()) {
                 Toast.makeText(getContext(), "Turn on lunch reminder", Toast.LENGTH_SHORT).show();
-                scheduleNotification(getNotification(lunchReminder.getReminderName()),lunchReminder);
+                notificationAlarm.scheduleNotification(lunchReminder);
                 addReminderToDatabase(lunchReminder);
             } else {
                 Toast.makeText(getContext(), "Turn off lunch reminder", Toast.LENGTH_SHORT).show();
-                removeNotification(lunchReminder.getReminderID());
+                notificationAlarm.removeNotification(lunchReminder.getReminderID());
                 deleteReminderFromDatabase(lunchReminder.getReminderID());
             }
         });
@@ -192,11 +182,11 @@ public class ReminderFragment extends BaseFragment {
         _dinnerSwitch.setOnClickListener(v -> {
             if (_dinnerSwitch.isChecked()) {
                 Toast.makeText(getContext(), "Turn on dinner reminder", Toast.LENGTH_SHORT).show();
-                scheduleNotification(getNotification(dinnerReminder.getReminderName()), dinnerReminder);
+                notificationAlarm.scheduleNotification(dinnerReminder);
                 addReminderToDatabase(dinnerReminder);
             } else {
                 Toast.makeText(getContext(), "Turn off dinner reminder", Toast.LENGTH_SHORT).show();
-                removeNotification(dinnerReminder.getReminderID());
+                notificationAlarm.removeNotification(dinnerReminder.getReminderID());
                 deleteReminderFromDatabase(dinnerReminder.getReminderID());
             }
         });
@@ -205,11 +195,11 @@ public class ReminderFragment extends BaseFragment {
         _snackSwitch.setOnClickListener(v -> {
             if (_snackSwitch.isChecked()) {
                 Toast.makeText(getContext(), "Turn on snack reminder", Toast.LENGTH_SHORT).show();
-                scheduleNotification(getNotification(snackReminder.getReminderName()), snackReminder);
+                notificationAlarm.scheduleNotification(snackReminder);
                 addReminderToDatabase(snackReminder);
             } else {
                 Toast.makeText(getContext(), "Turn off snack reminder", Toast.LENGTH_SHORT).show();
-                removeNotification(snackReminder.getReminderID());
+                notificationAlarm.removeNotification(snackReminder.getReminderID());
                 deleteReminderFromDatabase(snackReminder.getReminderID());
             }
         });
@@ -218,11 +208,11 @@ public class ReminderFragment extends BaseFragment {
         _exerciseSwitch.setOnClickListener(v -> {
             if (_exerciseSwitch.isChecked()) {
                 Toast.makeText(getContext(), "Turn on exercise reminder", Toast.LENGTH_SHORT).show();
-                scheduleNotification(getNotification(exerciseReminder.getReminderName()), exerciseReminder);
+                notificationAlarm.scheduleNotification(exerciseReminder);
                 addReminderToDatabase(exerciseReminder);
             } else {
                 Toast.makeText(getContext(), "Turn off exercise reminder", Toast.LENGTH_SHORT).show();
-                removeNotification(exerciseReminder.getReminderID());
+                notificationAlarm.removeNotification(exerciseReminder.getReminderID());
                 deleteReminderFromDatabase(exerciseReminder.getReminderID());
             }
         });
@@ -231,11 +221,11 @@ public class ReminderFragment extends BaseFragment {
         _weightInSwitch.setOnClickListener(v -> {
             if (_weightInSwitch.isChecked()) {
                 Toast.makeText(getContext(), "Turn on weight in reminder", Toast.LENGTH_SHORT).show();
-                scheduleNotification(getNotification(weightInReminder.getReminderName()), weightInReminder);
+                notificationAlarm.scheduleNotification(weightInReminder);
                 addReminderToDatabase(weightInReminder);
             } else {
                 Toast.makeText(getContext(), "Turn off weight in reminder", Toast.LENGTH_SHORT).show();
-                removeNotification(weightInReminder.getReminderID());
+                notificationAlarm.removeNotification(weightInReminder.getReminderID());
                 deleteReminderFromDatabase(weightInReminder.getReminderID());
             }
         });
@@ -419,7 +409,7 @@ public class ReminderFragment extends BaseFragment {
                 //toast update message
                 Toast.makeText(getContext(), String.format("Update %1$s reminder time success", reminder.getReminderName()), Toast.LENGTH_SHORT).show();
                 //schedule notification
-                scheduleNotification(getNotification(reminder.getReminderName()),reminder);
+                notificationAlarm.scheduleNotification(reminder);
                 //update the reminder to database
                 updateReminderToDatabase(reminder);
             }
@@ -460,75 +450,5 @@ public class ReminderFragment extends BaseFragment {
         DocumentReference reminderDocumentReference = database.document(REMINDER_DOCUMENT_PATH);
         //delete reminder from database
         reminderDocumentReference.delete();
-    }
-
-
-    private Notification getNotification(String typeReminder) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(), "default");
-        //set the notification title
-        builder.setContentTitle(String.format("%1$s reminder", typeReminder));
-        if(typeReminder.equals("Weight In"))
-        {
-            //set context
-            builder.setContentText("Friendly reminder to weight in");
-        }
-        else{
-            //set context
-            builder.setContentText(String.format("Friendly reminder to log your %1$s", typeReminder));
-        }
-        builder.setSmallIcon(R.drawable.logo_no_til);
-        builder.setAutoCancel(true);
-        builder.setPriority(Notification.PRIORITY_MAX);
-        builder.setChannelId(ConstantData.CHANNEL_ID);
-        return builder.build();
-    }
-
-    private void scheduleNotification(Notification notification, Reminder reminder) {
-        //get the current time in milliseconds
-        long systemTime = System.currentTimeMillis();
-
-        Calendar calendar = Calendar.getInstance();
-        //set the calendar to current time in milliseconds
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        //need reset time zone to prevent time lag
-        calendar.setTimeZone(TimeZone.getTimeZone("GMT+8"));
-        //set the minute when to reminder
-        calendar.set(Calendar.MINUTE, reminder.getTime().get(Calendar.MINUTE));
-        //set the hour when to reminder
-        calendar.set(Calendar.HOUR_OF_DAY, reminder.getTime().get(Calendar.HOUR_OF_DAY));
-        //set second to 0
-        calendar.set(Calendar.SECOND, 0);
-        //set millisecond to 0
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        //get the selected time to remind in milliseconds
-        long selectTime = calendar.getTimeInMillis();
-
-        //if time is bigger than your select time, which mean the time u want to remind has been pass through
-        if (systemTime > selectTime) {
-            //add one more day, wait until next day only will notify
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
-        }
-
-        //get the notification intent
-        Intent notificationIntent = new Intent(getContext(), ReminderService.class);
-        //pass the notification id and notification to broadcast receiver
-        notificationIntent.putExtra(ReminderService.NOTIFICATION_ID, reminder.getReminderID());
-        notificationIntent.putExtra(ReminderService.NOTIFICATION, notification);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), reminder.getReminderID(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        //remove previous alarm
-        alarmManager.cancel(pendingIntent);
-        //set new repeating alarm
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
-    }
-
-    private void removeNotification(int notificationID) {
-
-        Intent notificationIntent = new Intent(getContext(), ReminderService.class);
-        notificationIntent.putExtra(ReminderService.NOTIFICATION_ID, notificationID);
-        //pass the notification intent
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getContext(), notificationID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        //cancel the notification
-        alarmManager.cancel(pendingIntent);
     }
 }

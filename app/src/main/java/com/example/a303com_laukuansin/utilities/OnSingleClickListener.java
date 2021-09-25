@@ -3,6 +3,9 @@ package com.example.a303com_laukuansin.utilities;
 import android.os.SystemClock;
 import android.view.View;
 
+/*
+Allow user to click one time only
+*/
 public abstract class OnSingleClickListener implements View.OnClickListener {
 
     private static final long MIN_CLICK_INTERVAL = 100;

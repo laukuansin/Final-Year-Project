@@ -3,7 +3,6 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.Animation;
@@ -31,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         //Initialize
         initialization();
     }
+
     private void initialization()
     {
         _imageView = findViewById(R.id.logoImage);
@@ -68,11 +68,12 @@ public class MainActivity extends AppCompatActivity {
 
         intent.putExtra(KEY,key);
         //animate and transition to login page
+        //if the version is higher or equal to lollipop
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this,pairs);
             startActivity(intent,options.toBundle());
         }
-        else{
+        else{//otherwise no animation
             startActivity(intent);
         }
     }

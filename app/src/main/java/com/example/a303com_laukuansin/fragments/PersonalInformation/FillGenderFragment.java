@@ -18,29 +18,31 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentTransaction;
 
-public class FillGenderFragment extends BaseFragment{
+public class FillGenderFragment extends BaseFragment {
     private User user;
     private TextView _nextButton;
     private OnReturnGenderListener _listener;
-    private LinearLayout _maleLayout,_femaleLayout;
-    private String gender="";
+    private LinearLayout _maleLayout, _femaleLayout;
+    private String gender = "";
 
     public FillGenderFragment() {
         user = getSessionHandler().getUser();//get the user from preferences
     }
-    public static FillGenderFragment newInstance()
-    {
+
+    public static FillGenderFragment newInstance() {
         return new FillGenderFragment();
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(false);
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_fill_gender, container, false);
+        View view = inflater.inflate(R.layout.fragment_fill_gender, container, false);
 
         //initialize
         initialization(view);
@@ -48,17 +50,17 @@ public class FillGenderFragment extends BaseFragment{
         return view;
     }
 
-    private void initialization(View view)
-    {
+    private void initialization(View view) {
+        //bind view with id
         _nextButton = view.findViewById(R.id.nextButton);
         TextView _backButton = view.findViewById(R.id.backButton);
         _maleLayout = view.findViewById(R.id.male_layout);
         _femaleLayout = view.findViewById(R.id.female_layout);
 
         //initial listener
-        _listener = (OnReturnGenderListener)getContext();
+        _listener = (OnReturnGenderListener) getContext();
 
-        if(user.getGender()!=null)//if user gender is not empty
+        if (user.getGender() != null)//if user gender is not empty
         {
             setGender(user.getGender());//set user gender
         }
@@ -98,16 +100,15 @@ public class FillGenderFragment extends BaseFragment{
     private void loadAgeFragment()//load age fragment
     {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left,R.anim.slide_in_left, R.anim.slide_out_right);//set animation
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);//set animation
         fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.replace(R.id.frameLayout,FillAgeFragment.newInstance());
+        fragmentTransaction.replace(R.id.frameLayout, FillAgeFragment.newInstance());
         fragmentTransaction.commit();
     }
 
-    private void setAnimation(View view)
-    {
+    private void setAnimation(View view) {
         LinearLayout _bottomLayout = view.findViewById(R.id.bottomLayout);
-        Animation _slideUp = AnimationUtils.loadAnimation(getContext(),R.anim.bottom_animation_shorter);//bottom to up
+        Animation _slideUp = AnimationUtils.loadAnimation(getContext(), R.anim.bottom_animation_shorter);//bottom to up
         _bottomLayout.setAnimation(_slideUp);
     }
 
@@ -118,12 +119,11 @@ public class FillGenderFragment extends BaseFragment{
         //need to update the user
         updateGender();
 
-        if(gender.equals("Male"))//if click male
+        if (gender.equals("Male"))//if click male
         {
             _maleLayout.setBackground(getResources().getDrawable(R.drawable.border_primary_color_shadow_layout));
             _femaleLayout.setBackground(getResources().getDrawable(R.drawable.border_grey_shadow_layout));
-        }
-        else if(gender.equals("Female")){//if click female
+        } else if (gender.equals("Female")) {//if click female
             _femaleLayout.setBackground(getResources().getDrawable(R.drawable.border_primary_color_shadow_layout));
             _maleLayout.setBackground(getResources().getDrawable(R.drawable.border_grey_shadow_layout));
         }
@@ -132,16 +132,15 @@ public class FillGenderFragment extends BaseFragment{
         _nextButton.setEnabled(true);
     }
 
-    private void updateGender()
-    {
+    private void updateGender() {
         user = getSessionHandler().getUser();//get latest user
         user.setGender(gender);//set gender
         getSessionHandler().setUser(user);//update gender
     }
 
-    public interface OnReturnGenderListener
-    {
+    public interface OnReturnGenderListener {
         void backPressed();
+
         void nextStep();
     }
 }

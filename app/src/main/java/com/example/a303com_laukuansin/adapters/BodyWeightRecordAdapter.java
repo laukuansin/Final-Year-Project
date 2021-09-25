@@ -4,12 +4,10 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.domains.BodyWeight;
-import com.example.a303com_laukuansin.domains.Exercise;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.google.android.material.card.MaterialCardView;
 
@@ -57,6 +55,7 @@ public class BodyWeightRecordAdapter extends RecyclerView.Adapter<BodyWeightReco
         holder._cardView.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
+                //call the interface
                 _listener.editBodyWeightRecord(bodyWeight);
             }
         });

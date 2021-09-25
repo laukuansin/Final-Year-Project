@@ -7,7 +7,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -49,9 +48,6 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
         boolean isConnected = ConnectivityReceiver.isConnected();
         showSnack(isConnected);
     }
-    protected boolean isConnected(){//return got wifi connection or not
-        return ConnectivityReceiver.isConnected();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +58,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
 
         setContentView(ContentView());
     }
+
     // Showing the status in Snackbar
     private void showSnack(boolean isConnected) {
         FrameLayout contentContainer = (FrameLayout) findViewById(R.id.frame_container);
@@ -89,6 +86,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
             }
         }
     }
+
     /**
      * Callback will be triggered when there is change in
      * network connection
@@ -97,6 +95,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
     public void onNetworkConnectionChanged(boolean isConnected) {
         showSnack(isConnected);
     }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -150,6 +149,7 @@ public abstract class BaseAppCompatActivity extends AppCompatActivity implements
                 return super.onOptionsItemSelected(item);
         }
     }
+
     protected void hideSoftKeyboard(){
         if (getCurrentFocus() != null && getCurrentFocus().getWindowToken() != null){
             InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);

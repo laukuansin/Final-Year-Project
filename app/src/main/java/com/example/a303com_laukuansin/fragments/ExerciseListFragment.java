@@ -10,21 +10,13 @@ import android.view.ViewGroup;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.activities.ExerciseDetailActivity;
 import com.example.a303com_laukuansin.activities.ExerciseListActivity;
-import com.example.a303com_laukuansin.activities.MealDetailActivity;
 import com.example.a303com_laukuansin.adapters.ExerciseListAdapter;
-import com.example.a303com_laukuansin.adapters.ExerciseRecordAdapter;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.Exercise;
-import com.github.ybq.android.spinkit.SpinKitView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +55,7 @@ public class ExerciseListFragment extends BaseFragment {
         }
         setHasOptionsMenu(false);
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -71,6 +64,7 @@ public class ExerciseListFragment extends BaseFragment {
         loadData();
         return view;
     }
+
     private void initialization(View view)
     {
         //bind view with id
@@ -82,6 +76,7 @@ public class ExerciseListFragment extends BaseFragment {
         _exerciseListRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
     }
+
     private void loadData()
     {
         if(_retrieveExerciseList==null)
@@ -90,7 +85,6 @@ public class ExerciseListFragment extends BaseFragment {
             _retrieveExerciseList.execute();
         }
     }
-
 
     private class RetrieveExerciseList extends AsyncTask<Void,Void,Void>
     {
@@ -142,6 +136,7 @@ public class ExerciseListFragment extends BaseFragment {
             return null;
         }
     }
+
     public void selectExercise(Exercise exercise)
     {
         Intent intent = new Intent(getContext(), ExerciseDetailActivity.class);

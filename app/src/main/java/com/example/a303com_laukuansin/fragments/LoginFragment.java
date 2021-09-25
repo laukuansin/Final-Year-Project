@@ -27,19 +27,19 @@ import androidx.fragment.app.FragmentTransaction;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class LoginFragment extends BaseFragment {
-    private TextInputLayout _inputEmail,_inputPassword;
+    private TextInputLayout _inputEmail, _inputPassword;
     private TextView _signUpView;
     private FirebaseAuth auth;
     private SweetAlertDialog _progressDialog;
 
-    public LoginFragment()
-    {
+    public LoginFragment() {
 
     }
-    public static LoginFragment newInstance()
-    {
+
+    public static LoginFragment newInstance() {
         return new LoginFragment();
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,21 +53,18 @@ public class LoginFragment extends BaseFragment {
 
         //initialize
         initialization(view);
-
-
         return view;
     }
-    private void loadFragment(Fragment fragment)
-    {
+
+    private void loadFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout,fragment);
-        if(fragment instanceof ForgotPasswordFragment)
+        fragmentTransaction.replace(R.id.frameLayout, fragment);
+        if (fragment instanceof ForgotPasswordFragment)
             fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
 
-    private void initialization(View view)
-    {
+    private void initialization(View view) {
         _inputEmail = view.findViewById(R.id.emailLayout);
         _inputPassword = view.findViewById(R.id.passwordLayout);
         Button _loginButton = view.findViewById(R.id.loginButton);
@@ -77,9 +74,8 @@ public class LoginFragment extends BaseFragment {
         //get auth instance
         auth = FirebaseAuth.getInstance();
 
-
         //create progress dialog
-        _progressDialog = showProgressDialog("Logging in...",getResources().getColor(R.color.colorPrimary));
+        _progressDialog = showProgressDialog("Logging in...", getResources().getColor(R.color.colorPrimary));
 
         //when click login button action
         _loginButton.setOnClickListener(new OnSingleClickListener() {
@@ -103,8 +99,8 @@ public class LoginFragment extends BaseFragment {
         setTextViewClickAndStyle();
 
     }
-    private void setTextViewClickAndStyle()
-    {
+
+    private void setTextViewClickAndStyle() {
         //change the specific text color and bold
         String signUpText = "Don't have an account? Sign up now";
         ClickableSpan clickableSignUp = new ClickableSpan() {
@@ -112,6 +108,7 @@ public class LoginFragment extends BaseFragment {
             public void onClick(@NonNull View view) {
                 loadFragment(SignUpFragment.newInstance());
             }
+
             @Override
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
@@ -119,52 +116,45 @@ public class LoginFragment extends BaseFragment {
             }
         };
         SpannableString spannableString = new SpannableString(signUpText);
-        spannableString.setSpan(clickableSignUp, 23,34, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableString.setSpan(clickableSignUp, 23, 34, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         _signUpView.setText(spannableString);
         _signUpView.setMovementMethod(LinkMovementMethod.getInstance());
         _signUpView.setHighlightColor(Color.TRANSPARENT);
     }
 
-    private void checkInputAndLogin()
-    {
+    private void checkInputAndLogin() {
         String email = _inputEmail.getEditText().getText().toString().trim();//get email
         boolean check = true;
-        if(email.isEmpty())// if email is empty
+        if (email.isEmpty())// if email is empty
         {
             _inputEmail.setError("Email address cannot be empty!");
             check = false;
-        }
-        else if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())//if email does not meet the format
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches())//if email does not meet the format
         {
             _inputEmail.setError("Invalid Email address format!");
             check = false;
-        }
-        else{//else email did not have any error
+        } else {//else email did not have any error
             _inputEmail.setError(null);
         }
         String password = _inputPassword.getEditText().getText().toString().trim();//get password
-        if(password.isEmpty())//if password is empty
+        if (password.isEmpty())//if password is empty
         {
             _inputPassword.setError("Password cannot be empty!");
             check = false;
-        }
-        else{//else password is correct
+        } else {//else password is correct
             _inputPassword.setError(null);
         }
-        if(check)
-        {
+        if (check) {
             _progressDialog.show();
-            auth.signInWithEmailAndPassword(email,password).addOnCompleteListener(task -> {//checked by authentication firebase
+            auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {//checked by authentication firebase
                 //if login success
-                if(task.isSuccessful())
-                {
+                if (task.isSuccessful()) {
                     getSessionHandler().checkAuthorization();//check authorization, to determine which activity to go
-                }
-                else{//if register fail
+                } else {//if register fail
                     //appear alert dialog
-                    if(_progressDialog.isShowing())
+                    if (_progressDialog.isShowing())
                         _progressDialog.dismiss();
-                    ErrorAlert(task.getException().getMessage(), sweetAlertDialog -> sweetAlertDialog.cancel(),true).show();
+                    ErrorAlert(task.getException().getMessage(), sweetAlertDialog -> sweetAlertDialog.cancel(), true).show();
                 }
             });
         }
@@ -173,7 +163,7 @@ public class LoginFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(_progressDialog.isShowing())
+        if (_progressDialog.isShowing())
             _progressDialog.dismiss();
     }
 

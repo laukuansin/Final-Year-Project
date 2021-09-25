@@ -6,7 +6,6 @@ import android.os.PersistableBundle;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseActivity;
-import com.example.a303com_laukuansin.fragments.ExerciseFragment;
 import com.example.a303com_laukuansin.fragments.WaterFragment;
 
 import androidx.appcompat.widget.Toolbar;

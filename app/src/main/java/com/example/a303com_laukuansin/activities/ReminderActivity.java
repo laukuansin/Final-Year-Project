@@ -5,7 +5,6 @@ import android.os.Bundle;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.BaseActivity;
-import com.example.a303com_laukuansin.fragments.EditPersonalInformationFragment;
 import com.example.a303com_laukuansin.fragments.ReminderFragment;
 
 import androidx.appcompat.widget.Toolbar;

@@ -18,10 +18,7 @@ import android.os.IBinder;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.cores.AppController;
 import com.example.a303com_laukuansin.utilities.ConstantData;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

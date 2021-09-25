@@ -1,6 +1,5 @@
 package com.example.a303com_laukuansin.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,24 +23,15 @@ import com.example.a303com_laukuansin.domains.Meal;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.example.a303com_laukuansin.utilities.ProgressAnimation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +51,7 @@ public class MealFragment extends BaseFragment {
     private TextView _mealProgressView, _breakfastProgressView, _lunchProgressView, _dinnerProgressView, _snackProgressView;
     private RecyclerView _breakfastRecyclerView, _lunchRecyclerView, _dinnerRecyclerView, _snackRecyclerView;
     private FirebaseFirestore database;
+    private LinearLayout _breakfastLayout,_lunchLayout,_dinnerLayout,_snackLayout,_containerLayout;
 
     public MealFragment() {
         user = getSessionHandler().getUser();
@@ -118,11 +109,11 @@ public class MealFragment extends BaseFragment {
         _lunchRecyclerView = view.findViewById(R.id.lunchRecyclerView);
         _dinnerRecyclerView = view.findViewById(R.id.dinnerRecyclerView);
         _snackRecyclerView = view.findViewById(R.id.snackRecyclerView);
-        LinearLayout _breakfastLayout = view.findViewById(R.id.breakfastLayout);
-        LinearLayout _lunchLayout = view.findViewById(R.id.lunchLayout);
-        LinearLayout _dinnerLayout = view.findViewById(R.id.dinnerLayout);
-        LinearLayout _snackLayout = view.findViewById(R.id.snackLayout);
-        LinearLayout _containerLayout = view.findViewById(R.id.containerLayout);
+        _breakfastLayout = view.findViewById(R.id.breakfastLayout);
+        _lunchLayout = view.findViewById(R.id.lunchLayout);
+        _dinnerLayout = view.findViewById(R.id.dinnerLayout);
+        _snackLayout = view.findViewById(R.id.snackLayout);
+        _containerLayout = view.findViewById(R.id.containerLayout);
         ImageView _addBreakfastButton = view.findViewById(R.id.addBreakfastMealButton);
         ImageView _addLunchButton = view.findViewById(R.id.addLunchMealButton);
         ImageView _addDinnerButton = view.findViewById(R.id.addDinnerMealButton);
@@ -137,18 +128,11 @@ public class MealFragment extends BaseFragment {
         setupRecyclerView(_dinnerRecyclerView);
         setupRecyclerView(_snackRecyclerView);
 
-        //setup each meal layout click
-        setupMealLayoutClick(_breakfastLayout, _containerLayout, _breakfastRecyclerView);
-        setupMealLayoutClick(_lunchLayout, _containerLayout, _lunchRecyclerView);
-        setupMealLayoutClick(_dinnerLayout, _containerLayout, _dinnerRecyclerView);
-        setupMealLayoutClick(_snackLayout, _containerLayout, _snackRecyclerView);
-
         //setup add meal click
         setupAddMealClick(_addBreakfastButton, "Breakfast");
         setupAddMealClick(_addLunchButton, "Lunch");
         setupAddMealClick(_addDinnerButton, "Dinner");
         setupAddMealClick(_addSnackButton, "Snack");
-
     }
 
     private class RetrieveMealRecord extends AsyncTask<Void, Void, Void> {
@@ -213,8 +197,7 @@ public class MealFragment extends BaseFragment {
                     meal.setMealType(documentMapData.get("mealType").toString());
                     meal.setServingUnit(documentMapData.get("servingUnit").toString());
                     meal.setFoodWeightInGram((double) documentMapData.get("foodWeight"));
-                    if(documentMapData.get("foodImageURL")!=null)
-                    {
+                    if (documentMapData.get("foodImageURL") != null) {
                         meal.setFoodImageURL(documentMapData.get("foodImageURL").toString());
                     }
 
@@ -276,6 +259,51 @@ public class MealFragment extends BaseFragment {
                 setupAdapter(_lunchMealRecordList, _lunchRecyclerView);
                 setupAdapter(_dinnerMealRecordList, _dinnerRecyclerView);
                 setupAdapter(_snackMealRecordList, _snackRecyclerView);
+
+                //setup each meal layout click
+                if(_breakfastRecordList.isEmpty())
+                {
+                    _breakfastRecyclerView.setVisibility(View.GONE);
+                    _breakfastLayout.setEnabled(false);
+                }
+                else{
+                    _breakfastLayout.setEnabled(true);
+                    _breakfastRecyclerView.setVisibility(View.VISIBLE);
+                    setupMealLayoutClick(_breakfastLayout, _containerLayout, _breakfastRecyclerView);
+                }
+                //if lunch record is empty
+                if(_lunchMealRecordList.isEmpty())
+                {
+                    _lunchRecyclerView.setVisibility(View.GONE);
+                    _lunchLayout.setEnabled(false);
+                }
+                else{
+                    _lunchRecyclerView.setVisibility(View.VISIBLE);
+                    _lunchLayout.setEnabled(true);
+                    setupMealLayoutClick(_lunchLayout, _containerLayout, _lunchRecyclerView);
+                }
+                //if dinner record is empty
+                if(_dinnerMealRecordList.isEmpty())
+                {
+                    _dinnerRecyclerView.setVisibility(View.GONE);
+                    _dinnerLayout.setEnabled(false);
+                }
+                else{
+                    _dinnerRecyclerView.setVisibility(View.VISIBLE);
+                    _dinnerLayout.setEnabled(true);
+                    setupMealLayoutClick(_dinnerLayout, _containerLayout, _dinnerRecyclerView);
+                }
+                //if snack record is empty
+                if(_snackMealRecordList.isEmpty())
+                {
+                    _snackRecyclerView.setVisibility(View.GONE);
+                    _snackLayout.setEnabled(false);
+                }
+                else{
+                    _snackRecyclerView.setVisibility(View.VISIBLE);
+                    _snackLayout.setEnabled(true);
+                    setupMealLayoutClick(_snackLayout, _containerLayout, _snackRecyclerView);
+                }
 
             })).addOnFailureListener(e -> {
                 if (_progressDialog.isShowing())
