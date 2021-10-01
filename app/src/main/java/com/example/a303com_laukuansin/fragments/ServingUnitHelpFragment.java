@@ -74,7 +74,7 @@ public class ServingUnitHelpFragment extends BaseFragment {
         @Override
         protected Void doInBackground(Void... voids) {
             getActivity().runOnUiThread(() ->
-                    database.collection("ServingUnitList").orderBy("servingUnitName").addSnapshotListener((value, error) -> {
+                    database.collection("ServingUnits").orderBy("servingUnitName").addSnapshotListener((value, error) -> {
                         if (error != null) {
                             ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
                             return;

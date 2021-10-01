@@ -1,5 +1,6 @@
 package com.example.a303com_laukuansin.domains;
 
+import java.util.Comparator;
 
 public class Exercise{
     private String exerciseName;
@@ -77,4 +78,14 @@ public class Exercise{
     public void setDate(String date) {
         this.date = date;
     }
+
+
+    //comparator
+    public static Comparator<Exercise> exerciseNameAZComparator = (e1, e2) -> e1.getExerciseName().compareTo(e2.getExerciseName());
+
+    public static Comparator<Exercise> exerciseNameZAComparator = (e1, e2) -> e2.getExerciseName().compareTo(e1.getExerciseName());
+
+    public static Comparator<Exercise> exerciseCaloriesLowToHighComparator = (e1, e2) -> Double.compare(e1.getCaloriesBurnedPerKGPerMin(),e2.getCaloriesBurnedPerKGPerMin());
+
+    public static Comparator<Exercise> exerciseCaloriesHighToLowComparator = (e1, e2) -> Double.compare(e2.getCaloriesBurnedPerKGPerMin(),e1.getCaloriesBurnedPerKGPerMin());
 }

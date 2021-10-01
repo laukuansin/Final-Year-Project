@@ -65,6 +65,11 @@ public class HomeActivity extends BaseActivity {
     }
 
     @Override
+    protected void AttemptFilter() {
+
+    }
+
+    @Override
     protected int MenuResource() {
         return 0;
     }

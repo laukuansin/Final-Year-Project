@@ -54,6 +54,11 @@ public class BodyWeightDetailActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void AttemptFilter() {
+
+    }
+
 
     @Override
     protected int MenuResource() {

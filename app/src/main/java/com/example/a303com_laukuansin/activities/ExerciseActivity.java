@@ -56,6 +56,11 @@ public class ExerciseActivity extends BaseActivity implements ExerciseRecordAdap
     }
 
     @Override
+    protected void AttemptFilter() {
+
+    }
+
+    @Override
     protected int MenuResource() {
         return 0;
     }

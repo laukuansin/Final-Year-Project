@@ -366,7 +366,7 @@ public class ExerciseDetailFragment extends BaseFragment {
         @Override
         protected Void doInBackground(Void... voids) {
             getActivity().runOnUiThread(() -> {
-                String DOCUMENT_PATH = String.format("ExerciseList/%1$s", exerciseID);
+                String DOCUMENT_PATH = String.format("Exercises/%1$s", exerciseID);
                 //get the Document reference
                 //document path = ExerciseList/exerciseID
                 DocumentReference documentReference = database.document(DOCUMENT_PATH);

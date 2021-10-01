@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.activities.ExerciseDetailActivity;
@@ -13,11 +14,14 @@ import com.example.a303com_laukuansin.activities.ExerciseListActivity;
 import com.example.a303com_laukuansin.adapters.ExerciseListAdapter;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.Exercise;
+import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +34,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ExerciseListFragment extends BaseFragment {
+    private ExerciseListAdapter adapter;
     private String date;
+    private List<Exercise> _exerciseList;
     private RecyclerView _exerciseListRecyclerView;
     private RetrieveExerciseList _retrieveExerciseList = null;
 
@@ -53,7 +59,7 @@ public class ExerciseListFragment extends BaseFragment {
                 date = getArguments().getString(ExerciseListActivity.DATE_KEY, "");
             }
         }
-        setHasOptionsMenu(false);
+        setHasOptionsMenu(true);
     }
 
     @Nullable
@@ -74,7 +80,8 @@ public class ExerciseListFragment extends BaseFragment {
         _exerciseListRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         _exerciseListRecyclerView.setItemAnimator(new DefaultItemAnimator());
         _exerciseListRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-
+        //initialize the list
+        _exerciseList = new ArrayList<>();
     }
 
     private void loadData()
@@ -104,7 +111,7 @@ public class ExerciseListFragment extends BaseFragment {
         protected Void doInBackground(Void... voids) {
             FirebaseFirestore database = FirebaseFirestore.getInstance();
             //get the Collection reference
-            CollectionReference collectionReference = database.collection("ExerciseList");
+            CollectionReference collectionReference = database.collection("Exercises");
             //get the exercise list which sort by exercise name
             collectionReference.orderBy("exerciseName").addSnapshotListener((value, error) -> {
                 if(_progressDialog.isShowing())
@@ -117,18 +124,20 @@ public class ExerciseListFragment extends BaseFragment {
                     _retrieveExerciseList = null;
                     return;
                 }
+
                 getActivity().runOnUiThread(() -> {
-                    List<Exercise> _exerciseList = new ArrayList<>();
+
                     for (DocumentSnapshot documentSnapshot: value.getDocuments())
                     {
                         Exercise exercise = new Exercise();
                         Map<String, Object> documentMapData = documentSnapshot.getData();
                         exercise.setExerciseID(documentSnapshot.getId());
                         exercise.setExerciseName(documentMapData.get("exerciseName").toString());
+                        exercise.setCaloriesBurnedPerKGPerMin((double) documentMapData.get("caloriesPerKGPerMin"));
                         exercise.setExerciseIcon(documentMapData.get("iconURL").toString());
                         _exerciseList.add(exercise);
                     }
-                    ExerciseListAdapter adapter = new ExerciseListAdapter( getContext(),_exerciseList);
+                    adapter = new ExerciseListAdapter( getContext(),_exerciseList,getSessionHandler().getUser());
                     _exerciseListRecyclerView.setAdapter(adapter);
 
                 });
@@ -144,5 +153,56 @@ public class ExerciseListFragment extends BaseFragment {
         intent.putExtra(ExerciseDetailActivity.EXERCISE_ID_KEY, exercise.getExerciseID());
         startActivity(intent);
         getActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+    }
+
+    public void openFilterDialog()
+    {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.BottomSheetDialogTheme);
+        bottomSheetDialog.setContentView(R.layout.bottom_dialog_filter);
+        LinearLayout _AtoZLayout = bottomSheetDialog.findViewById(R.id.AtoZSortLayout);
+        LinearLayout _ZtoALayout = bottomSheetDialog.findViewById(R.id.ZtoASortLayout);
+        LinearLayout _HighToLowLayout = bottomSheetDialog.findViewById(R.id.highToLowSortLayout);
+        LinearLayout _LowToHighLayout = bottomSheetDialog.findViewById(R.id.lowToHighSortLayout);
+
+        _AtoZLayout.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                //sort A to Z
+                Collections.sort(_exerciseList,Exercise.exerciseNameAZComparator);
+                adapter.notifyDataSetChanged();
+                bottomSheetDialog.cancel();
+            }
+        });
+
+        _ZtoALayout.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                //sort Z to A
+                Collections.sort(_exerciseList,Exercise.exerciseNameZAComparator);
+                adapter.notifyDataSetChanged();
+                bottomSheetDialog.cancel();
+            }
+        });
+
+        _HighToLowLayout.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                //sort high to low of calories burnt
+                Collections.sort(_exerciseList,Exercise.exerciseCaloriesHighToLowComparator);
+                adapter.notifyDataSetChanged();
+                bottomSheetDialog.cancel();
+            }
+        });
+
+        _LowToHighLayout.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                //sort low to high of calories burnt
+                Collections.sort(_exerciseList,Exercise.exerciseCaloriesLowToHighComparator);
+                adapter.notifyDataSetChanged();
+                bottomSheetDialog.cancel();
+            }
+        });
+        bottomSheetDialog.show();
     }
 }

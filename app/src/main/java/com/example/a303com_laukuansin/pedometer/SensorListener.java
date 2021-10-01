@@ -149,7 +149,7 @@ public class SensorListener extends Service implements SensorEventListener {
             currentDate = dateFormat.format(new Date());
             stepRecordMap.put("date",currentDate);
             String path = String.format("StepRecords/%1$s/Records", AppController.getInstance().getSessionHandler().getUser().getUID());
-            stepRecordID = database.collection(path).getId();
+            stepRecordID = database.collection(path).document().getId();
             database.collection(path).document(stepRecordID).set(stepRecordMap);
         }
     }

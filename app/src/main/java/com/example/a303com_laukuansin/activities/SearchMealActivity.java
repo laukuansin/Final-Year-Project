@@ -55,6 +55,11 @@ public class SearchMealActivity extends BaseActivity {
     }
 
     @Override
+    protected void AttemptFilter() {
+
+    }
+
+    @Override
     protected int MenuResource() {
         return R.menu.search_only;
     }

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <View
+        android:layout_width="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:background="@drawable/bottom_dialog_indicator_orange"
+        android:layout_height="4dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Filter"
+            android:textColor="@color/black_1000"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/AtoZSortLayout"
+            android:layout_width="match_parent"
+            android:layout_marginTop="20dp"
+            android:padding="15dp"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/ic_a_to_z"
+                android:layout_width="24dp"
+                android:layout_height="24dp"/>
+            <TextView
+                android:text="A to Z"
+                android:layout_width="match_parent"
+                android:layout_marginLeft="20dp"
+                android:textColor="@color/black_1000"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <View
+            android:background="@color/grey_200"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+        <LinearLayout
+            android:id="@+id/ZtoASortLayout"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackground"
+            android:padding="15dp"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/ic_z_to_a"
+                android:layout_width="24dp"
+                android:layout_height="24dp"/>
+            <TextView
+                android:text="Z to A"
+                android:layout_width="match_parent"
+                android:layout_marginLeft="20dp"
+                android:textColor="@color/black_1000"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <View
+            android:background="@color/grey_200"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+        <LinearLayout
+            android:id="@+id/highToLowSortLayout"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:background="?attr/selectableItemBackground"
+            android:padding="15dp"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/ic_9_to_1"
+                android:layout_width="24dp"
+                android:layout_height="24dp"/>
+            <TextView
+                android:text="Sort Calories Burnt from High to Low"
+                android:layout_width="match_parent"
+                android:layout_marginLeft="20dp"
+                android:textColor="@color/black_1000"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <View
+            android:background="@color/grey_200"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+        <LinearLayout
+            android:id="@+id/lowToHighSortLayout"
+            android:layout_width="match_parent"
+            android:gravity="center"
+            android:padding="15dp"
+            android:layout_marginBottom="10dp"
+            android:background="?attr/selectableItemBackground"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/ic_1_to_9"
+                android:layout_width="24dp"
+                android:layout_height="24dp"/>
+            <TextView
+                android:text="Sort Calories Burnt from Low to High"
+                android:layout_width="match_parent"
+                android:layout_marginLeft="20dp"
+                android:textColor="@color/black_1000"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

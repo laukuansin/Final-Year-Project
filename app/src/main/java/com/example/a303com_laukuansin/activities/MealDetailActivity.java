@@ -69,6 +69,11 @@ public class MealDetailActivity extends BaseActivity {
     }
 
     @Override
+    protected void AttemptFilter() {
+
+    }
+
+    @Override
     protected int MenuResource() {
         return R.menu.help_only;
     }

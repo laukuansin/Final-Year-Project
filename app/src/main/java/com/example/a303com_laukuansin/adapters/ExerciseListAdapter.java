@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.a303com_laukuansin.R;
 import com.example.a303com_laukuansin.domains.Exercise;
+import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 
 import java.util.List;
@@ -21,12 +22,14 @@ import androidx.recyclerview.widget.RecyclerView;
 public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapter.ViewHolder>{
     private final Context _context;
     private final List<Exercise> _exerciseList;
+    private User _user;
     private OnActionListener _listener;
 
 
-    public ExerciseListAdapter(Context _context, List<Exercise> _exerciseList) {
+    public ExerciseListAdapter(Context _context, List<Exercise> _exerciseList, User _user) {
         this._context = _context;
         this._exerciseList = _exerciseList;
+        this._user = _user;
 
         if (_context instanceof OnActionListener){
             _listener = (OnActionListener)_context;
@@ -48,6 +51,7 @@ public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapte
 
         holder._exerciseName.setText(exercise.getExerciseName());
         Glide.with(_context).load(exercise.getExerciseIcon()).placeholder(R.drawable.ic_image_holder).into(holder._exerciseIcon);
+        holder._caloriesBurnt.setText(String.format("%1$s calories",(int)Math.round(exercise.getCaloriesBurnedPerKGPerMin()*60*_user.getWeight())));
         holder._itemBlock.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
@@ -65,11 +69,13 @@ public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapte
         private final LinearLayout _itemBlock;
         private final TextView _exerciseName;
         private final ImageView _exerciseIcon;
+        private final TextView _caloriesBurnt;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             _exerciseName = itemView.findViewById(R.id.exerciseName);
             _exerciseIcon = itemView.findViewById(R.id.iconView);
             _itemBlock = itemView.findViewById(R.id.item_block);
+            _caloriesBurnt = itemView.findViewById(R.id.caloriesBurnt);
         }
     }
 

@@ -56,6 +56,11 @@ public class TrackWithImageActivity extends BaseActivity {
     }
 
     @Override
+    protected void AttemptFilter() {
+
+    }
+
+    @Override
     protected int MenuResource() {
         return R.menu.save_only;
     }

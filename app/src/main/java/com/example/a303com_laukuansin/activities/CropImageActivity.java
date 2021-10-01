@@ -70,6 +70,11 @@ public class CropImageActivity extends BaseActivity {
     }
 
     @Override
+    protected void AttemptFilter() {
+
+    }
+
+    @Override
     protected int MenuResource() {
         return 0;
     }

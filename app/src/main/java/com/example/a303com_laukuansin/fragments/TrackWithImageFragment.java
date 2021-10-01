@@ -500,7 +500,7 @@ public class TrackWithImageFragment extends BaseFragment {
                         Map<String, Object> foodSubmitMap = new HashMap<>();//create hash map to store the food submit data
                         foodSubmitMap.put("imageUrl", imagePath);
                         foodSubmitMap.put("foodName", foodClass.Class);
-                        database.collection("FoodSubmitList").add(foodSubmitMap);
+                        database.collection("NotFoundFoods").add(foodSubmitMap);
                         sweetAlertDialog.dismiss();
                         getActivity().finish();
                     }, false).show();

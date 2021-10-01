@@ -56,6 +56,11 @@ public class MealActivity extends BaseActivity implements MealRecordAdapter.OnAc
     }
 
     @Override
+    protected void AttemptFilter() {
+
+    }
+
+    @Override
     protected int MenuResource() {
         return 0;
     }

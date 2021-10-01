@@ -56,13 +56,18 @@ public class ExerciseListActivity extends BaseActivity implements ExerciseListAd
     }
 
     @Override
+    protected void AttemptFilter() {
+        ((ExerciseListFragment)_fragment).openFilterDialog();
+    }
+
+    @Override
     protected int MenuResource() {
-        return 0;
+        return R.menu.filter_only;
     }
 
     @Override
     protected boolean DisableActionMenu() {
-        return true;
+        return false;
     }
 
     @Override
