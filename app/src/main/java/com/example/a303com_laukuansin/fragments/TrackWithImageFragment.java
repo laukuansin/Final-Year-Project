@@ -424,8 +424,8 @@ public class TrackWithImageFragment extends BaseFragment {
                                     if (foodClass.Class.equals("non-food")) {
                                         checkIsFood = false;
                                         break;
-                                    } else if (foodClass.Class.equals("food") || foodClass.Class.equals("meal") || foodClass.Class.equals("lunch")) {
-                                        //else if the result is "food","meal","lunch", then continue, because it is meaningless to get it
+                                    } else if (foodClass.Class.equals("food") || foodClass.Class.equals("meal") || foodClass.Class.equals("lunch")||foodClass.Class.equals("breakfast")||foodClass.Class.equals("dinner")) {
+                                        //else if the result is "food","meal","lunch","breakfast","dinner" then continue, because it is meaningless to get it
                                         continue;
                                     }
                                     //then add the result into list
