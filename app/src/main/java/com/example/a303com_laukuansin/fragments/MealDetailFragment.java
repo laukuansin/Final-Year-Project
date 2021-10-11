@@ -176,7 +176,7 @@ public class MealDetailFragment extends BaseFragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (charSequence.toString().isEmpty()) {
+                if (charSequence.toString().isEmpty()||charSequence.toString().equals(".")) {
                     //disable add and update button
                     _addButton.setAlpha(0.2f);
                     _addButton.setEnabled(false);

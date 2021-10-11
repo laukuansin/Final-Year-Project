@@ -1,5 +1,11 @@
 package com.example.a303com_laukuansin.domains;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Comparator;
+import java.util.Date;
+
 public class BodyWeight {
     private String bodyWeightRecordID;
     private double bodyWeight;
@@ -31,4 +37,20 @@ public class BodyWeight {
     public void setDate(String date) {
         this.date = date;
     }
+
+    private Date getDateInTime()
+    {
+        SimpleDateFormat format = new SimpleDateFormat("dd MMM yyyy");
+        try{
+            Date date = format.parse(getDate());
+            return date;
+        }catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //comparator
+    public static Comparator<BodyWeight> bodyWeightDescComparator = (b1, b2) -> b2.getDateInTime().compareTo(b1.getDateInTime());
+
 }

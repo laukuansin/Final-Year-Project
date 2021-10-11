@@ -102,6 +102,7 @@
 
         <activity android:name=".activities.BarcodeScannerActivity"
             android:windowSoftInputMode="adjustResize"
+            android:label="Barcode Scanner"
             android:screenOrientation="portrait">
         </activity>
 

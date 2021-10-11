@@ -15,6 +15,7 @@ import com.example.a303com_laukuansin.activities.BodyWeightDetailActivity;
 import com.example.a303com_laukuansin.adapters.BodyWeightRecordAdapter;
 import com.example.a303com_laukuansin.cores.BaseFragment;
 import com.example.a303com_laukuansin.domains.BodyWeight;
+import com.example.a303com_laukuansin.domains.Exercise;
 import com.example.a303com_laukuansin.domains.User;
 import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -25,6 +26,7 @@ import com.google.firebase.firestore.Query;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -166,8 +168,7 @@ public class BodyWeightFragment extends BaseFragment {
                 //get the body weight record collection reference
                 //collection path = BodyWeightRecords/UID/Records
                 CollectionReference bodyWeightCollectionReference = database.collection(BODY_WEIGHT_COLLECTION_PATH);
-                //order the body weight record by date in descending order
-                bodyWeightCollectionReference.orderBy("date", Query.Direction.DESCENDING).addSnapshotListener((value, error) -> {
+                bodyWeightCollectionReference.addSnapshotListener((value, error) -> {
                     if (error!=null)
                     {
                         ErrorAlert(error.getMessage(), sweetAlertDialog -> sweetAlertDialog.dismiss(),true).show();
@@ -187,6 +188,9 @@ public class BodyWeightFragment extends BaseFragment {
 
                         _bodyWeightList.add(bodyWeight);
                     }
+                    //sort the body weight in descending
+                    Collections.sort(_bodyWeightList, BodyWeight.bodyWeightDescComparator);
+
                     switch (user.getTargetGoal()) {
                         case "Maintain Weight":
                             _bodyWeightProgressView.setText(String.format("Maintain %.2f kg", user.getTargetWeight()));

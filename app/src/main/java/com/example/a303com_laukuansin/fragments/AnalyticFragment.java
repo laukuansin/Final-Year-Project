@@ -389,8 +389,7 @@ public class AnalyticFragment extends BaseFragment {
             String BODY_WEIGHT_COLLECTION_PATH = String.format("BodyWeightRecords/%1$s/Records", user.getUID());
             //get body weight collection reference
             CollectionReference bodyWeightCollectionRef = database.collection(BODY_WEIGHT_COLLECTION_PATH);
-            //sort the body weight by date
-            bodyWeightCollectionRef.orderBy("date").get().addOnSuccessListener(exerciseSnapshots -> {
+            bodyWeightCollectionRef.get().addOnSuccessListener(exerciseSnapshots -> {
                 if (_progressDialog.isShowing())
                     _progressDialog.dismiss();
 
@@ -398,16 +397,36 @@ public class AnalyticFragment extends BaseFragment {
                 List<Entry> entries = new ArrayList<>();
                 //date list to display the x-axis date
                 List<String> dateList = new ArrayList<>();
-                //for the index purpose, the entry is required
-                int count = 0;
+                HashMap<Date, Double> hashMap = new HashMap<>();
+
                 for (DocumentSnapshot documentSnapshot : exerciseSnapshots.getDocuments()) {
                     Map<String, Object> documentMapData = documentSnapshot.getData();
                     double bodyWeight = (double) documentMapData.get("bodyWeight");
-                    String date = documentMapData.get("date").toString();
+                    String dateString = documentMapData.get("date").toString();
 
-                    entries.add(new Entry(count++, (float) bodyWeight));
-                    dateList.add(date);
+                    try {
+                        //change the date in string to date
+                        Date date = dateFormat.parse(dateString);
+                        hashMap.put(date,bodyWeight);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
+                //for the index purpose, the entry is required
+                int count = 0;
+                //convert the hash map to tree map for sorting purpose
+                Map<Date, Double> sortedMap = new TreeMap<>(hashMap);
+                //loop through the sorted map
+                for (Map.Entry<Date, Double> entry : sortedMap.entrySet()) {
+                    //get the date and calories
+                    String dateString = dateFormat.format(entry.getKey());
+                    double bodyWeight = entry.getValue();
+
+                    //add into Entries and date list
+                    entries.add(new Entry(count++, (float) bodyWeight));
+                    dateList.add(dateString);
+                }
+
                 //if it has data only proceed
                 if(!entries.isEmpty()&&!dateList.isEmpty())
                 {
