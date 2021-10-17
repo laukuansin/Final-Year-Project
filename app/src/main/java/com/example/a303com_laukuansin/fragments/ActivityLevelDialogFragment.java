@@ -19,6 +19,7 @@ public class ActivityLevelDialogFragment extends DialogFragment {
 
     public ActivityLevelDialogFragment() {
     }
+
     public void setParentFragment(Fragment fragment) {
         _parentFragment = fragment;
     }

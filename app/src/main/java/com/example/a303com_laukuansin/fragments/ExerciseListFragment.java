@@ -71,6 +71,15 @@ public class ExerciseListFragment extends BaseFragment {
         return view;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_retrieveExerciseList!=null)
+        {
+            _retrieveExerciseList.cancel(true);
+        }
+    }
+
     private void initialization(View view)
     {
         //bind view with id

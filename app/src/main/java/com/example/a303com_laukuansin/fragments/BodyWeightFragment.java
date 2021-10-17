@@ -83,6 +83,15 @@ public class BodyWeightFragment extends BaseFragment {
         loadData();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_retrieveRecords!=null)
+        {
+            _retrieveRecords.cancel(true);
+        }
+    }
+
     private void loadData()
     {
         if(_retrieveRecords==null)

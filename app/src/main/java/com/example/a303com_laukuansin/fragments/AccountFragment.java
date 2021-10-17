@@ -29,6 +29,8 @@ import com.example.a303com_laukuansin.utilities.OnSingleClickListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
+import java.util.Objects;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -144,15 +146,16 @@ public class AccountFragment extends BaseFragment {
                 NotificationAlarm notificationAlarm = new NotificationAlarm(getContext());
                 notificationAlarm.removeAllNotification();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
+                //sign out the authentication
+                auth.signOut();
+                //clear the preferences
+                getSessionHandler().clearLoginSession();
+
                 //redirect to main activity
                 Intent intent = new Intent(getContext(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
-                //sign out the authentication
-                auth.signOut();
-                //clear the preferences
-                getSessionHandler().clearLoginSession();
             }
         });
     }

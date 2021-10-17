@@ -76,6 +76,15 @@ public class MealFragment extends BaseFragment {
         setHasOptionsMenu(false);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_retrieveMealRecord!=null)
+        {
+            _retrieveMealRecord.cancel(true);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

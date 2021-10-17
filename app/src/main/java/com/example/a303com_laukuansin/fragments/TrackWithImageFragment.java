@@ -102,6 +102,19 @@ public class TrackWithImageFragment extends BaseFragment {
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_recogniseFoodImage!=null)
+        {
+            _recogniseFoodImage.cancel(true);
+        }
+        if(_uploadImage!=null)
+        {
+            _uploadImage.cancel(true);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

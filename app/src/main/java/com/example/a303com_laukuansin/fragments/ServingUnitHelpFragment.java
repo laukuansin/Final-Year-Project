@@ -51,6 +51,15 @@ public class ServingUnitHelpFragment extends BaseFragment {
         return view;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_retrieveServingUnit!=null)
+        {
+            _retrieveServingUnit.cancel(true);
+        }
+    }
+
     private void initialization(View view) {
         //bind view with id
         _recyclerView = view.findViewById(R.id.recyclerView);

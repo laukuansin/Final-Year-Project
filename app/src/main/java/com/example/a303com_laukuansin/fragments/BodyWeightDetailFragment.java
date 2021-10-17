@@ -88,6 +88,15 @@ public class BodyWeightDetailFragment extends BaseFragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_retrieveDetail!=null)
+        {
+            _retrieveDetail.cancel(true);
+        }
+    }
+
     private void initialization(View view) {
         //bind view with ID
         _weightPicker = view.findViewById(R.id.weightPicker);

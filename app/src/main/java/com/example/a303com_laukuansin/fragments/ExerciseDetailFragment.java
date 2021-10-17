@@ -85,6 +85,15 @@ public class ExerciseDetailFragment extends BaseFragment {
         setHasOptionsMenu(false);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_retrieveExerciseDetail!=null)
+        {
+            _retrieveExerciseDetail.cancel(true);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

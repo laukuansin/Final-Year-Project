@@ -82,6 +82,15 @@ public class ExerciseFragment extends BaseFragment {
         loadData(date, user);//load data
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_retrieveExerciseRecordAndStep!=null)
+        {
+            _retrieveExerciseRecordAndStep.cancel(true);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

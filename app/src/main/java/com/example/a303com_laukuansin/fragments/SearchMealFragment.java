@@ -95,6 +95,19 @@ public class SearchMealFragment extends BaseFragment {
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_searchMeal!=null)
+        {
+            _searchMeal.cancel(true);
+        }
+        if(_checkBarcode!=null)
+        {
+            _checkBarcode.cancel(true);
+        }
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

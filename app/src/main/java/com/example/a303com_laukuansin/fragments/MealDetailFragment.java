@@ -89,6 +89,23 @@ public class MealDetailFragment extends BaseFragment {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_getBarcodeFoodDetail!=null)
+        {
+            _getBarcodeFoodDetail.cancel(true);
+        }
+        if(_getBrandedFoodDetail!=null)
+        {
+            _getBrandedFoodDetail.cancel(true);
+        }
+        if(_getCommonFoodDetail!=null)
+        {
+            _getCommonFoodDetail.cancel(true);
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {

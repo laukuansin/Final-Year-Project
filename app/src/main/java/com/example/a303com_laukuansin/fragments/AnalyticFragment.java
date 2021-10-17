@@ -103,6 +103,24 @@ public class AnalyticFragment extends BaseFragment {
         });
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_retrieveBodyWeight!=null)
+        {
+            _retrieveBodyWeight.cancel(true);
+        }
+        if(_retrieveCaloriesBurned!=null)
+        {
+            _retrieveCaloriesBurned.cancel(true);
+        }
+        if(_retrieveCaloriesEaten!=null)
+        {
+            _retrieveCaloriesEaten.cancel(true);
+        }
+
+    }
+
     private void loadCaloriesEatenData(User user, BarChart barChart) {
         if (_retrieveCaloriesEaten == null) {
             _retrieveCaloriesEaten = new RetrieveCaloriesEaten(user, barChart);

@@ -39,7 +39,7 @@ public class BaseFragment extends Fragment {
     }
 
     protected SweetAlertDialog ErrorAlert(String message, SweetAlertDialog.OnSweetClickListener positiveButtonAction, boolean cancelable) {
-        SweetAlertDialog dialog = new SweetAlertDialog(this.getContext(), SweetAlertDialog.ERROR_TYPE);
+        SweetAlertDialog dialog = new SweetAlertDialog(getContext(), SweetAlertDialog.ERROR_TYPE);
         dialog.setTitleText(R.string.alert_title_error);
         dialog.setContentText(message);
         dialog.setConfirmButton(R.string.alert_ok, positiveButtonAction);

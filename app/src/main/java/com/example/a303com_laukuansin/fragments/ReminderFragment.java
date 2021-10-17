@@ -77,6 +77,15 @@ public class ReminderFragment extends BaseFragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_retrieveReminders!=null)
+        {
+            _retrieveReminders.cancel(true);
+        }
+    }
+
     private void initialization(View view) {
         //bind view with id
         LinearLayout _breakfastLayout = view.findViewById(R.id.breakfastLayout);

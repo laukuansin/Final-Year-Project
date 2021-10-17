@@ -75,6 +75,15 @@ public class AchievementFragment extends BaseFragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_retrieveMonthlyData!=null)
+        {
+            _retrieveMonthlyData.cancel(true);
+        }
+    }
+
     private void initialization(View view) {
         //bind view with id
         LinearLayout _monthYearLayout = view.findViewById(R.id.monthYearLayout);
@@ -245,7 +254,8 @@ public class AchievementFragment extends BaseFragment {
                             //its mean that user have miss out 5 day of calories burnt
                             double score = ((double)(reachGoalCaloriesEaten + reachGoalCaloriesBurnt)/(double)(2*maximumDayOfRecord))*100;
 
-                            _totalScore.setText(String.format("%.1f/100",score));
+                            //rounding score
+                            _totalScore.setText(String.format("%1$d/100",Math.round(score)));
                             if(score<50)
                             {
                                 _scoreReview.setText("Don't give up! You can do this");

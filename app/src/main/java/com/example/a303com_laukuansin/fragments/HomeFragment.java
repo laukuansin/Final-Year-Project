@@ -99,6 +99,18 @@ public class HomeFragment extends BaseFragment{
         loadData();//load data
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(_retrieveData != null) {
+            _retrieveData.cancel(true);
+        }
+        if(_syncStepData != null)
+        {
+            _syncStepData.cancel(true);
+        }
+    }
+
     private void initialization(View view) {
         getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);//  set status text dark
 
