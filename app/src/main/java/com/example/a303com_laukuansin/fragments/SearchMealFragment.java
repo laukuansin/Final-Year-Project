@@ -257,7 +257,6 @@ public class SearchMealFragment extends BaseFragment {
 
                 //if the barcode format is UPC_E, the reason to change is because the food database UPC_E will not get the result
                 //therefore when barcode format is upc e, it will convert to upc a format
-                Log.d("format",result.getFormatName());
                 if(barcodeFormat.equals("UPC_E"))
                 {
                     barcode = convertUPCE_To_UPCA(barcode);
@@ -269,19 +268,20 @@ public class SearchMealFragment extends BaseFragment {
 
     private String convertUPCE_To_UPCA(String barcode)
     {
+        int checkDigit = barcode.charAt(7);
         switch (barcode.charAt(6)) {
             case '0':
             case '1':
             case '2': {
-                barcode = barcode.substring(1, 3) + barcode.charAt(6) + "0000"  + barcode.substring(3, 6) + barcode.charAt(7);
+                barcode = barcode.substring(1, 3) + barcode.charAt(6) + "0000"  + barcode.substring(3, 6);
                 break;
             }
             case '3': {
-                barcode = barcode.substring(1, 4) + "00000" + barcode.substring(4,6) + barcode.charAt(7);
+                barcode = barcode.substring(1, 4) + "00000" + barcode.substring(4,6);
                 break;
             }
             case '4': {
-                barcode = barcode.substring(1, 5) + "00000" + barcode.charAt(5) + barcode.charAt(7);
+                barcode = barcode.substring(1, 5) + "00000" + barcode.charAt(5);
                 break;
             }
             case '5':
@@ -289,11 +289,11 @@ public class SearchMealFragment extends BaseFragment {
             case '7':
             case '8':
             case '9': {
-                barcode = barcode.substring(1, 6) + "0000" + barcode.charAt(6) + barcode.charAt(7);
+                barcode = barcode.substring(1, 6) + "0000" + barcode.charAt(6);
                 break;
             }
         }
-        return "0" + barcode;
+        return "0" + barcode + checkDigit;
     }
 
     private void goToMealDetailActivity(String foodName, String foodID,String foodBarcode) {
@@ -486,7 +486,6 @@ public class SearchMealFragment extends BaseFragment {
                                         _brandedFoodAdapter.add(_brandedFoodAdapter.getAdapterItemCount(), createInstanceOfBrandedFoodItem(brandedFood));
                                     }
                                 }
-
                             } else {
                                 _waitingOrErrorView.setText(String.format("No meal found for key word \"%1$s\"", query));
                                 _waitingOrErrorLayout.setVisibility(View.VISIBLE);
@@ -495,18 +494,18 @@ public class SearchMealFragment extends BaseFragment {
                     } else {//response fail
                         _viewContainer.setVisibility(View.GONE);
                         //if API call failure
-                        final Snackbar snackbar = SearchMealFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(response.message()) ? response.message() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
+                        final Snackbar snackbar = SearchMealFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(response.message()) ?
+                                response.message() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
                         snackbar.setAction("Dismiss", view -> snackbar.dismiss());
                         snackbar.show();
                     }
-
                 }
-
                 @Override
                 public void onFailure(Call<MealResponse> call, Throwable t) {
                     _viewContainer.setVisibility(View.GONE);
                     //if API call failure
-                    final Snackbar snackbar = SearchMealFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(t.getMessage()) ? t.getMessage() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
+                    final Snackbar snackbar = SearchMealFragment.super.initSnackbar(android.R.id.content, !TextUtils.isEmpty(t.getMessage()) ?
+                            t.getMessage() : "Unknown Error", Snackbar.LENGTH_INDEFINITE);
                     snackbar.setAction("Dismiss", view -> snackbar.dismiss());
                     snackbar.show();
                 }

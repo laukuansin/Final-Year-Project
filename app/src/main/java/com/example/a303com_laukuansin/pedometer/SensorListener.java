@@ -76,7 +76,8 @@ public class SensorListener extends Service implements SensorEventListener {
                 //store the the total step taken to hasStepCount
                 hasStepCount = tempStep;//1000
             } else {//has record in today
-                int thisStepCount = tempStep - hasStepCount;//get the step count has walked, tempStep will keep increase, hasStepCount will not increase or decrease, because it will be stored one day once
+                int thisStepCount = tempStep - hasStepCount; /*get the step count has walked, tempStep will keep increase, hasStepCount will not increase or decrease,
+                                                             because it will be stored one day once*/
                 currentStep += thisStepCount - previousStepCount;
                 previousStepCount = thisStepCount;
             }
@@ -196,7 +197,6 @@ public class SensorListener extends Service implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
-
     }
 
     private void initBroadcastReceiver() {

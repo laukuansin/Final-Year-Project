@@ -392,7 +392,8 @@ public class TrackWithImageFragment extends BaseFragment {
         //compress the image
         File file = null;
         try {
-            file = new Compressor(getContext()).setDestinationDirectoryPath(getContext().getFilesDir().getAbsolutePath()).setCompressFormat(Bitmap.CompressFormat.JPEG).setQuality(50).compressToFile(imageFile);
+            file = new Compressor(getContext()).setDestinationDirectoryPath(getContext().getFilesDir().getAbsolutePath()).
+                    setCompressFormat(Bitmap.CompressFormat.JPEG).setQuality(50).compressToFile(imageFile);
             return Uri.fromFile(file);
         } catch (Exception e) {
             Log.d("Error", e.getMessage());
@@ -437,7 +438,8 @@ public class TrackWithImageFragment extends BaseFragment {
                                     if (foodClass.Class.equals("non-food")) {
                                         checkIsFood = false;
                                         break;
-                                    } else if (foodClass.Class.equals("food") || foodClass.Class.equals("meal") || foodClass.Class.equals("lunch")||foodClass.Class.equals("breakfast")||foodClass.Class.equals("dinner")) {
+                                    } else if (foodClass.Class.equals("food") || foodClass.Class.equals("meal") || foodClass.Class.equals("lunch")||
+                                            foodClass.Class.equals("breakfast")||foodClass.Class.equals("dinner")) {
                                         //else if the result is "food","meal","lunch","breakfast","dinner" then continue, because it is meaningless to get it
                                         continue;
                                     }
@@ -462,7 +464,7 @@ public class TrackWithImageFragment extends BaseFragment {
                                     }, false).show();
                                 }
                             } else {
-                                ErrorAlert("There is same input error. Please try again later", sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
+                                ErrorAlert("There is some input error. Please try again later", sweetAlertDialog -> sweetAlertDialog.dismiss(), true).show();
                             }
                         });
                     } else {

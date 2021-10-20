@@ -25,3 +25,4 @@ public class IBMWatsonInterceptor implements Interceptor{
         return chain.proceed(request);
     }
 }
+

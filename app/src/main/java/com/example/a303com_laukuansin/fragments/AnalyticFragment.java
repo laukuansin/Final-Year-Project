@@ -205,7 +205,6 @@ public class AnalyticFragment extends BaseFragment {
                     //get the date and calories
                     String dateString = dateFormat.format(entry.getKey());
                     double totalCaloriesPerDay = entry.getValue();
-
                     //add into barEntries and date list
                     barEntries.add(new BarEntry(count++, (float) totalCaloriesPerDay));
                     dateList.add(dateString);
@@ -219,14 +218,12 @@ public class AnalyticFragment extends BaseFragment {
                     barDataSet.setColor(getResources().getColor(R.color.green_A700));
                     //change the label text size of the bar chart
                     barDataSet.setValueTextSize(10f);
-
                     //set the BarData
                     BarData data = new BarData(barDataSet);
                     //set each bar width
                     data.setBarWidth(0.5f);
                     //set data into bar chart
                     barChart.setData(data);
-
                     setupBarChartXAxis(dateList, barChart);
                     setupBarChartYAxis(barChart, R.color.green_A700, user.getDailyCaloriesEaten());
                     setupBarChart(barEntries.size(), barChart);

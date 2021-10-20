@@ -10,3 +10,4 @@ public interface IBMWatsonService {
     @GET("classify")
     Call<FoodClassifyResponse> getFoodClassify(@Query("url") String url, @Query("version")String version, @Query("classifier_ids")String label);
 }
+

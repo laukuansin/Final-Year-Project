@@ -12,3 +12,4 @@ public class MealResponse {
     @SerializedName("branded")
     public BrandedFood[] brandedFood;
 }
+

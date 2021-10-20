@@ -7,3 +7,4 @@ public class FoodClassifyResponse {
     @SerializedName("images")
     public FoodImages[] foodImages;
 }
+
