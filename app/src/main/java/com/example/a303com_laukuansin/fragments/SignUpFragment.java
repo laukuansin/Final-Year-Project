@@ -65,7 +65,7 @@ public class SignUpFragment extends BaseFragment {
         boolean check = true;
         if (email.isEmpty())//if email is empty
         {
-            _inputEmail.setError("Email address cannot be empty!");
+            _inputEmail.setError("Empty");
             check = false;
         } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches())//if email is invalid format
         {
