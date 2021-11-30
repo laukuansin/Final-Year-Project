@@ -14,7 +14,7 @@ public class IBMWatsonInterceptor implements Interceptor{
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
         String username="apikey";
-        String password="FckSwGh6_xRcXUINH_7f0RnJAjiR5D_WIpbuUuLng-va";
+        //String password=""; Here is empty because due to the abuse of the API
         String auth=username+":"+password;
         String authHeader="Basic "+ Base64.encodeToString(auth.getBytes(),Base64.NO_WRAP);
 
