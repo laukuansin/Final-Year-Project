@@ -14,8 +14,9 @@ public class NutritionixInterceptor implements Interceptor {
         Request request = chain.request()
                 .newBuilder()
                 .addHeader("Content-Type","application/x-www-form-urlencoded")
-                .addHeader("x-app-id","7375706d")
-                .addHeader("x-app-key","be8864f4960beb021d2e28b55e4b9353")
+                //below both is empty due to the abuse of the API
+                .addHeader("x-app-id","")
+                .addHeader("x-app-key","")
                 .build();
         return chain.proceed(request);
     }
